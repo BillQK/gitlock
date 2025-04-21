@@ -5,6 +5,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   alias GitlockHolmes.Adapters.VCS.{Git}
   alias GitlockHolmes.Adapters.Reporters.{CsvReporter}
   alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots}
+  alias GitlockHolmes.Adapters.Complexity.{MockAnalyzer}
 
   @doc """
   Entry point for the CLI application.
@@ -108,8 +109,10 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
     # Select investigation
     investigation = get_investigation(options_map.investigation)
 
+    analyzer = get_analyzer("mock")
+
     # Run the investigation
-    case investigation.investigate(options_map.log, vcs_adapter, reporter, options_map) do
+    case investigation.investigate(options_map.log, vcs_adapter, reporter, analyzer, options_map) do
       {:ok, output} ->
         File.write("output.csv", output)
 
@@ -125,4 +128,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
 
   defp get_investigation("hotspots"),
     do: IdentifyHotspots
+
+  defp get_analyzer("mock"),
+    do: MockAnalyzer
 end
