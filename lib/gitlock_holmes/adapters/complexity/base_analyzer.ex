@@ -68,6 +68,20 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
         end
       end
 
+      @doc """
+      Recursively analyze supported files in `directory` concurrently.
+
+      Returns a map of relative paths to `%ComplexityMetrics{}` on success,
+      or `{:error, reason}` if `directory` isn’t a valid directory.
+
+      Options:
+        * `opts` (map) – reserved for future use.
+
+      ## Example
+
+          iex> analyze_directory("lib/my_app", %{})
+          %{"foo.ex" => %ComplexityMetrics{...}, "bar/baz.ex" => %ComplexityMetrics{...}}
+      """
       @impl true
       @spec analyze_directory(directory :: String.t(), opts :: map()) ::
               %{String.t() => map()} | {:error, String.t()}
