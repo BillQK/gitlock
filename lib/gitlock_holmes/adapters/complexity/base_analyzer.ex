@@ -53,22 +53,23 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
               error: String.t() | nil
             }
       def analyze_file(file_path) do
-        with {:ok, content} <- File.read(file_path) do
-          %{
-            file_path: file_path,
-            loc: count_lines(content),
-            cyclomatic_complexity: calculate_complexity(content, file_path),
-            language: detect_language(file_path),
-            error: nil
-          }
-        else
-          _ ->
+        case File.read(file_path) do
+          {:ok, content} ->
+            %{
+              file_path: file_path,
+              loc: count_lines(content),
+              cyclomatic_complexity: calculate_complexity(content, file_path),
+              language: detect_language(file_path),
+              error: nil
+            }
+
+          {:error, reason} ->
             %{
               file_path: file_path,
               loc: 1,
               cyclomatic_complexity: 0,
               language: :unknown,
-              error: "Could not read file"
+              error: "Could not read file: #{reason}"
             }
         end
       end
@@ -76,18 +77,25 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
       @impl true
       @spec analyze_directory(directory :: String.t(), opts :: map()) ::
               %{String.t() => map()} | {:error, String.t()}
-      def analyze_directory(directory, _opts \\ %{}) do
-        with true <- File.dir?(directory) do
-          directory
-          |> collect_all_files()
-          |> Enum.map(fn file ->
-            relative_path = Path.relative_to(file, directory)
-            result = analyze_file(file)
-            {relative_path, result}
-          end)
-          |> Enum.into(%{})
-        else
-          _ -> {:error, "Invalid or inaccessible directory: #{directory}"}
+      def analyze_directory(directory, opts \\ %{}) do
+        case File.dir?(directory) do
+          true ->
+            files = collect_all_files(directory)
+
+            files
+            |> Task.async_stream(
+              fn file ->
+                relative_path = Path.relative_to(file, directory)
+                result = analyze_file(file)
+                {relative_path, result}
+              end,
+              max_concurrency: Map.get(opts, :concurrency, System.schedulers_online())
+            )
+            |> Enum.map(fn {:ok, result} -> result end)
+            |> Enum.into(%{})
+
+          false ->
+            {:error, "Invalid or inaccessible directory: #{directory}"}
         end
       end
 
