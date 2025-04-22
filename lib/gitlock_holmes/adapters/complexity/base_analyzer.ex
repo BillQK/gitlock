@@ -45,32 +45,24 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
           * `:error` (optional)
       """
       @impl true
-      @spec analyze_file(file_path :: String.t()) :: %{
-              file_path: String.t(),
-              loc: non_neg_integer(),
-              cyclomatic_complexity: non_neg_integer(),
-              language: atom(),
-              error: String.t() | nil
-            }
+      @spec analyze_file(String.t()) ::
+              {:ok, ComplexityMetrics.t()}
+              | {:error, {:io, String.t(), term()}}
       def analyze_file(file_path) do
         case File.read(file_path) do
           {:ok, content} ->
-            %{
-              file_path: file_path,
-              loc: count_lines(content),
-              cyclomatic_complexity: calculate_complexity(content, file_path),
-              language: detect_language(file_path),
-              error: nil
-            }
+            metrics =
+              ComplexityMetrics.new(
+                file_path,
+                count_lines(content),
+                calculate_complexity(content, file_path),
+                detect_language(file_path)
+              )
+
+            {:ok, metrics}
 
           {:error, reason} ->
-            %{
-              file_path: file_path,
-              loc: 1,
-              cyclomatic_complexity: 0,
-              language: :unknown,
-              error: "Could not read file: #{reason}"
-            }
+            {:error, {:io, file_path, reason}}
         end
       end
 
@@ -140,4 +132,3 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
     end
   end
 end
-
