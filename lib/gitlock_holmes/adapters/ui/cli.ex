@@ -3,7 +3,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   Command-line interface for Gitlock Holmes.
   """
   alias GitlockHolmes.Adapters.VCS.{Git}
-  alias GitlockHolmes.Adapters.Reporters.{CsvReporter}
+  alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
   alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots}
   alias GitlockHolmes.Adapters.Complexity.{MockAnalyzer}
 
@@ -120,7 +120,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
            options_map
          ) do
       {:ok, output} ->
-        path = "output/output.csv"
+        path = "output/output.json"
         File.mkdir_p!(Path.dirname(path))
         File.write(path, output)
 
@@ -131,7 +131,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   end
 
   defp get_vcs_adapter("git"), do: Git
-  defp get_reporter("csv"), do: CsvReporter
+  defp get_reporter("csv"), do: JsonReporter
   defp get_investigation("hotspots"), do: IdentifyHotspots
   defp get_analyzer("mock"), do: MockAnalyzer
 end

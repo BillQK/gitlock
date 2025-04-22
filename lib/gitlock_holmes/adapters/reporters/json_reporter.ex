@@ -4,5 +4,5 @@ defmodule GitlockHolmes.Adapters.Reporters.JsonReporter do
   """
   @behaviour GitlockHolmes.Ports.ReportPort
 
-  def report(results, _), do: {:ok, Jason.decode!(results)}
+  def report(results, _), do: {:ok, Jason.encode!(results, pretty: true)}
 end
