@@ -4,10 +4,13 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
 
   This module provides shared functionality for complexity analyzers through
   a macro that can be used by concrete implementations.
+
+  It supports analyzing a single file or a directory of files by delegating to
+  `analyze_file/1`.
   """
 
   @doc """
-  When used, provides default implementations for the ComplexityAnalyzerPort behavior.
+  When used, provides default implementations for the `ComplexityAnalyzerPort` behavior.
 
   ## Examples
 
@@ -32,9 +35,14 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
 
       ## Parameters
         * `file_path` - Path to the file to analyze
-        
+
       ## Returns
-        A map containing complexity metrics for the file
+        A map with the following keys:
+          * `:file_path`
+          * `:loc`
+          * `:cyclomatic_complexity`
+          * `:language`
+          * `:error` (optional)
       """
       @impl true
       @spec analyze_file(file_path :: String.t()) :: %{
@@ -50,18 +58,42 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
             file_path: file_path,
             loc: count_lines(content),
             cyclomatic_complexity: calculate_complexity(content, file_path),
-            language: detect_language(file_path)
+            language: detect_language(file_path),
+            error: nil
           }
         else
           _ ->
             %{
               file_path: file_path,
-              loc: 0,
+              loc: 1,
               cyclomatic_complexity: 0,
               language: :unknown,
               error: "Could not read file"
             }
         end
+      end
+
+      @impl true
+      @spec analyze_directory(directory :: String.t(), opts :: map()) ::
+              %{String.t() => map()} | {:error, String.t()}
+      def analyze_directory(directory, _opts \\ %{}) do
+        with true <- File.dir?(directory) do
+          directory
+          |> collect_all_files()
+          |> Enum.map(fn file ->
+            relative_path = Path.relative_to(file, directory)
+            result = analyze_file(file)
+            {relative_path, result}
+          end)
+          |> Enum.into(%{})
+        else
+          _ -> {:error, "Invalid or inaccessible directory: #{directory}"}
+        end
+      end
+
+      defp collect_all_files(dir) do
+        Path.wildcard(Path.join([dir, "**", "*"]))
+        |> Enum.filter(&File.regular?/1)
       end
 
       @spec count_lines(content :: String.t()) :: non_neg_integer()
@@ -85,19 +117,22 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
 
       @doc """
       Calculates the cyclomatic complexity of code content.
-      This function must be implemented by modules using this base.
+
+      This function **must** be implemented by any module using this base.
 
       ## Parameters
         * `content` - The code content to analyze
         * `file_path` - Path to the file (for context)
-        
+
       ## Returns
-        The calculated cyclomatic complexity
+        The calculated cyclomatic complexity as an integer
       """
       @spec calculate_complexity(content :: String.t(), file_path :: String.t()) ::
               non_neg_integer()
 
       defoverridable analyze_file: 1
+      defoverridable analyze_directory: 2
     end
   end
 end
+

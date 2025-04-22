@@ -5,3 +5,4 @@ defmodule GitlockHolmes.Adapters.Complexity.MockAnalyzer do
 
   defp calculate_complexity(_content, _file_path), do: Enum.random(1..5)
 end
+

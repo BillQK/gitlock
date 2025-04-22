@@ -29,6 +29,11 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
       !parsed_opts[:investigation] ->
         IO.puts("Error: No investigation specified. Use --investigation or -i.")
 
+      !parsed_opts[:dir] ->
+        IO.puts(
+          "Error: No code directory specified. Use --dir to provide path for complexity analysis."
+        )
+
       true ->
         run_investigation(parsed_opts, remaining_args)
     end
@@ -46,6 +51,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
         time_period: :integer,
         team_map: :string,
         min_revs: :integer,
+        dir: :string,
         help: :boolean
       ],
       aliases: [
@@ -86,6 +92,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
       -t, --time-period DAYS       Time window for temporal grouping (in days)
           --team-map FILE          Path to team mapping file
           --min-revs NUM           Minimum revisions threshold
+          --dir DIRECTORY          Path to code directory for complexity analysis
       -h, --help                   Display this help message
 
     INVESTIGATIONS:
@@ -100,19 +107,18 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   defp run_investigation(options, _args) do
     options_map = Map.new(options)
 
-    # Select VCS adapter
     vcs_adapter = get_vcs_adapter(options_map.vcs)
-
-    # Select reporter
     reporter = get_reporter(options_map[:format] || "csv")
-
-    # Select investigation
     investigation = get_investigation(options_map.investigation)
+    analyzer = get_analyzer(options_map[:analyzer] || "mock")
 
-    analyzer = get_analyzer("mock")
-
-    # Run the investigation
-    case investigation.investigate(options_map.log, vcs_adapter, reporter, analyzer, options_map) do
+    case investigation.investigate(
+           options_map.log,
+           vcs_adapter,
+           reporter,
+           analyzer,
+           options_map
+         ) do
       {:ok, output} ->
         File.write("output.csv", output)
 
@@ -123,12 +129,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   end
 
   defp get_vcs_adapter("git"), do: Git
-
   defp get_reporter("csv"), do: CsvReporter
-
-  defp get_investigation("hotspots"),
-    do: IdentifyHotspots
-
-  defp get_analyzer("mock"),
-    do: MockAnalyzer
+  defp get_investigation("hotspots"), do: IdentifyHotspots
+  defp get_analyzer("mock"), do: MockAnalyzer
 end
