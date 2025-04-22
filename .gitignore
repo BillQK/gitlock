@@ -24,3 +24,6 @@ gitlock_holmes-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Ignore CLI 
+gitlock_holmes
