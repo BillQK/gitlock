@@ -30,6 +30,8 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
     quote do
       @behaviour GitlockHolmes.Ports.ComplexityAnalyzerPort
 
+      alias GitlockHolmes.Domain.Entities.ComplexityMetrics
+
       @doc """
       Analyzes the complexity of a file.
 
@@ -70,21 +72,29 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
       @spec analyze_directory(directory :: String.t(), opts :: map()) ::
               %{String.t() => map()} | {:error, String.t()}
       def analyze_directory(directory, opts \\ %{}) do
-        case File.dir?(directory) do
-          true ->
-            files = collect_all_files(directory)
+        if File.dir?(directory) do
+          supported_ext = supported_extensions()
 
-            files
-            |> Task.async_stream(fn file ->
-              relative_path = Path.relative_to(file, directory)
-              result = analyze_file(file)
-              {relative_path, result}
-            end)
-            |> Enum.map(fn {:ok, result} -> result end)
-            |> Enum.into(%{})
+          directory
+          |> collect_all_files()
+          |> Enum.filter(fn file ->
+            ext = Path.extname(file)
+            "*" in supported_ext || ext in supported_ext
+          end)
+          |> Task.async_stream(&analyze_file/1, on_timeout: :kill_task)
+          |> Enum.reduce(%{}, fn
+            {:ok, {:ok, %ComplexityMetrics{} = m}}, acc ->
+              relative_path = Path.relative_to(m.file_path, directory)
+              Map.put(acc, relative_path, m)
 
-          false ->
-            {:error, "Invalid or inaccessible directory: #{directory}"}
+            {:ok, {:error, {:io, path, reason}}}, acc ->
+              Map.put(acc, path, %{error: "I/O error: #{inspect(reason)}"})
+
+            {:exit, reason}, acc ->
+              Map.put(acc, "exit_#{inspect(reason)}", %{error: "Task crashed"})
+          end)
+        else
+          {:error, "Invalid or inaccessible directory: #{directory}"}
         end
       end
 

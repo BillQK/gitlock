@@ -8,7 +8,14 @@ defmodule GitlockHolmes.MixProject do
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      escript: [main_module: GitlockHolmes.Adapters.UI.CLI]
+      escript: escript()
+    ]
+  end
+
+  def escript do
+    [
+      main_module: GitlockHolmes.Adapters.UI.CLI,
+      path: "bin/gitlock_holmes"
     ]
   end
 

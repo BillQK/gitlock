@@ -120,7 +120,9 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
            options_map
          ) do
       {:ok, output} ->
-        File.write("output.csv", output)
+        path = "output/output.csv"
+        File.mkdir_p!(Path.dirname(path))
+        File.write(path, output)
 
       {:error, reason} ->
         IO.puts("Investigation failed: #{reason}")

@@ -45,4 +45,3 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
     end
   end
 end
-
