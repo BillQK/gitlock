@@ -4,5 +4,9 @@ defmodule GitlockHolmes.Adapters.Reporters.JsonReporter do
   """
   @behaviour GitlockHolmes.Ports.ReportPort
 
-  def report(results, _), do: {:ok, Jason.encode!(results, pretty: true)}
+  @impl true
+  @spec report(results :: [map()], opts :: map()) :: {:ok, String.t()} | {:error, String.t()}
+  def report(results, _opts) do
+    {:ok, Jason.encode!(results, pretty: true)}
+  end
 end
