@@ -83,14 +83,11 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
             files = collect_all_files(directory)
 
             files
-            |> Task.async_stream(
-              fn file ->
-                relative_path = Path.relative_to(file, directory)
-                result = analyze_file(file)
-                {relative_path, result}
-              end,
-              max_concurrency: Map.get(opts, :concurrency, System.schedulers_online())
-            )
+            |> Task.async_stream(fn file ->
+              relative_path = Path.relative_to(file, directory)
+              result = analyze_file(file)
+              {relative_path, result}
+            end)
             |> Enum.map(fn {:ok, result} -> result end)
             |> Enum.into(%{})
 
