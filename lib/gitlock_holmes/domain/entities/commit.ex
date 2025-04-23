@@ -12,7 +12,7 @@ defmodule GitlockHolmes.Domain.Entities.Commit do
   @type t :: %__MODULE__{
           id: String.t(),
           author: Author.t(),
-          date: String.t(),
+          date: Date.t(),
           message: String.t(),
           file_changes: [FileChange.t()]
         }
@@ -58,7 +58,7 @@ defmodule GitlockHolmes.Domain.Entities.Commit do
     %__MODULE__{
       id: id,
       author: author,
-      date: date,
+      date: Date.from_iso8601!(date),
       message: message,
       file_changes: file_changes
     }
@@ -104,4 +104,3 @@ defmodule GitlockHolmes.Domain.Entities.Commit do
     end)
   end
 end
-

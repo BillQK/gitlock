@@ -1,8 +1,10 @@
-defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
+defmodule GitlockHolmes.Investigations.Methodology.IdentifyCouplings do
   @moduledoc """
-  Use case for identifying hotspots in the codebase.
+  Use case for identifying couplings in the codebase
   """
-  alias GitlockHolmes.Domain.Services.HotspotDetection
+
+  alias GitlockHolmes.Domain.Services.CouplingDetection
+
   @behaviour GitlockHolmes.Investigations.Investigation
 
   @typedoc "Module implementing the VersionControlPort behavior"
@@ -18,15 +20,15 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
   @type investigation_result :: {:ok, String.t()} | {:error, String.t()}
 
   @doc """
-  Identifies hotspots (frequently changing files) in a codebase.
+  Identifies couplings in a codebase.
 
   ## Parameters
     - log_file: Path to VCS log file
     - vcs_port: Module implementing VersionControlPort
     - reporter_port: Module implementing ReportPort
-    - analyzer_port: Module implement ComplexityAnalyzerPort
     - options: Additional options for analysis
   """
+
   @spec investigate(
           String.t(),
           vcs_port(),
@@ -35,10 +37,9 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
           investigation_options()
         ) ::
           investigation_result()
-  def investigate(log_file, vcs_port, reporter_port, analyzer, options \\ %{}) do
+  def investigate(log_file, vcs_port, reporter_port, _analyzer, options \\ %{}) do
     with {:ok, commits} <- vcs_port.get_commit_history(log_file, options),
-         complexity_map = analyzer.analyze_directory(options[:dir]),
-         results = HotspotDetection.detect_hotspots(commits, complexity_map),
+         results = CouplingDetection.detect_couplings(commits),
          {:ok, formatted_output} <- reporter_port.report(results, options) do
       {:ok, formatted_output}
     else

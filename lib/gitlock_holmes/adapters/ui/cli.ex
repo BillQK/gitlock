@@ -2,6 +2,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   @moduledoc """
   Command-line interface for Gitlock Holmes.
   """
+  alias GitlockHolmes.Investigations.Methodology.IdentifyCouplings
   alias GitlockHolmes.Adapters.VCS.{Git}
   alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
   alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots}
@@ -29,10 +30,10 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
       !parsed_opts[:investigation] ->
         IO.puts("Error: No investigation specified. Use --investigation or -i.")
 
-      !parsed_opts[:dir] ->
-        IO.puts(
-          "Error: No code directory specified. Use --dir to provide path for complexity analysis."
-        )
+      # !parsed_opts[:dir] ->
+      #   IO.puts(
+      #     "Error: No code directory specified. Use --dir to provide path for complexity analysis."
+      #   )
 
       true ->
         run_investigation(parsed_opts, remaining_args)
@@ -98,7 +99,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
     INVESTIGATIONS:
       knowledge_silos              Detect knowledge concentration
       hotspots                     Identify high-risk areas
-      coupling                     Find logical coupling patterns
+      couplings                    Find logical coupling patterns
       team_communication           Map team communication patterns
       code_health                  Assess overall code health
     """)
@@ -108,7 +109,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
     options_map = Map.new(options)
 
     vcs_adapter = get_vcs_adapter(options_map.vcs)
-    reporter = get_reporter(options_map[:format] || "csv")
+    reporter = get_reporter(options_map[:format])
     investigation = get_investigation(options_map.investigation)
     analyzer = get_analyzer(options_map[:analyzer] || "mock")
 
@@ -120,7 +121,9 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
            options_map
          ) do
       {:ok, output} ->
-        path = "output/output.json"
+        path =
+          "output/#{options_map.investigation}-#{NaiveDateTime.utc_now()}.#{options_map[:format]}"
+
         File.mkdir_p!(Path.dirname(path))
         File.write(path, output)
 
@@ -131,7 +134,9 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   end
 
   defp get_vcs_adapter("git"), do: Git
-  defp get_reporter("csv"), do: JsonReporter
+  defp get_reporter("csv"), do: CsvReporter
+  defp get_reporter("json"), do: JsonReporter
   defp get_investigation("hotspots"), do: IdentifyHotspots
+  defp get_investigation("couplings"), do: IdentifyCouplings
   defp get_analyzer("mock"), do: MockAnalyzer
 end
