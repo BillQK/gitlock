@@ -2,6 +2,7 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
   @moduledoc """
   Use case for identifying hotspots in the codebase.
   """
+  alias GitlockHolmes.Domain.Services.ComplexityCollector
   alias GitlockHolmes.Domain.Services.HotspotDetection
   @behaviour GitlockHolmes.Investigations.Investigation
 
@@ -37,7 +38,7 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
           investigation_result()
   def investigate(log_file, vcs_port, reporter_port, analyzer, options \\ %{}) do
     with {:ok, commits} <- vcs_port.get_commit_history(log_file, options),
-         complexity_map = analyzer.analyze_directory(options[:dir]),
+         complexity_map = ComplexityCollector.collect_complexity(analyzer, options[:dir]),
          results = HotspotDetection.detect_hotspots(commits, complexity_map),
          {:ok, formatted_output} <- reporter_port.report(results, options) do
       {:ok, formatted_output}
