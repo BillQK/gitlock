@@ -2,10 +2,9 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   @moduledoc """
   Command-line interface for Gitlock Holmes.
   """
-  alias GitlockHolmes.Investigations.Methodology.IdentifyCouplings
   alias GitlockHolmes.Adapters.VCS.{Git}
   alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
-  alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots}
+  alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots, GetSummary, IdentifyCouplings}
   alias GitlockHolmes.Adapters.Complexity.{MockAnalyzer}
 
   @doc """
@@ -102,6 +101,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
       couplings                    Find logical coupling patterns
       team_communication           Map team communication patterns
       code_health                  Assess overall code health
+      summary                      Get history summary
     """)
   end
 
@@ -122,7 +122,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
          ) do
       {:ok, output} ->
         path =
-          "output/#{options_map.investigation}-#{NaiveDateTime.utc_now()}.#{options_map[:format]}"
+          "output/#{options_map.investigation}-#{DateTime.utc_now()}.#{options_map[:format]}"
 
         File.mkdir_p!(Path.dirname(path))
         File.write(path, output)
@@ -138,5 +138,6 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   defp get_reporter("json"), do: JsonReporter
   defp get_investigation("hotspots"), do: IdentifyHotspots
   defp get_investigation("couplings"), do: IdentifyCouplings
+  defp get_investigation("summary"), do: GetSummary
   defp get_analyzer("mock"), do: MockAnalyzer
 end
