@@ -18,24 +18,7 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
   @type investigation_options :: map()
   @type investigation_result :: {:ok, String.t()} | {:error, String.t()}
 
-  @doc """
-  Identifies hotspots (frequently changing files) in a codebase.
-
-  ## Parameters
-    - log_file: Path to VCS log file
-    - vcs_port: Module implementing VersionControlPort
-    - reporter_port: Module implementing ReportPort
-    - analyzer_port: Module implement ComplexityAnalyzerPort
-    - options: Additional options for analysis
-  """
-  @spec investigate(
-          String.t(),
-          vcs_port(),
-          reporter_port(),
-          analyzer_port(),
-          investigation_options()
-        ) ::
-          investigation_result()
+  @impl true
   def investigate(log_file, vcs_port, reporter_port, analyzer, options \\ %{}) do
     with {:ok, commits} <- vcs_port.get_commit_history(log_file, options),
          complexity_map = ComplexityCollector.collect_complexity(analyzer, options[:dir]),

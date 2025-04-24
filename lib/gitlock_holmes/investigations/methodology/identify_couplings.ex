@@ -7,36 +7,7 @@ defmodule GitlockHolmes.Investigations.Methodology.IdentifyCouplings do
 
   @behaviour GitlockHolmes.Investigations.Investigation
 
-  @typedoc "Module implementing the VersionControlPort behavior"
-  @type vcs_port :: module()
-
-  @typedoc "Module implementing the ReportPort behavior"
-  @type reporter_port :: module()
-
-  @typedoc "Module implementing the ComplexityAnalyzerPort behavior"
-  @type analyzer_port :: module()
-
-  @type investigation_options :: map()
-  @type investigation_result :: {:ok, String.t()} | {:error, String.t()}
-
-  @doc """
-  Identifies couplings in a codebase.
-
-  ## Parameters
-    - log_file: Path to VCS log file
-    - vcs_port: Module implementing VersionControlPort
-    - reporter_port: Module implementing ReportPort
-    - options: Additional options for analysis
-  """
-
-  @spec investigate(
-          String.t(),
-          vcs_port(),
-          reporter_port(),
-          analyzer_port(),
-          investigation_options()
-        ) ::
-          investigation_result()
+  @impl true
   def investigate(log_file, vcs_port, reporter_port, _analyzer, options \\ %{}) do
     with {:ok, commits} <- vcs_port.get_commit_history(log_file, options),
          results = CouplingDetection.detect_couplings(commits),

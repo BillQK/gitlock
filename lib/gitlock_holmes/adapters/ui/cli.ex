@@ -2,6 +2,7 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   @moduledoc """
   Command-line interface for Gitlock Holmes.
   """
+  alias GitlockHolmes.Investigations.Methodology.IdentifyCoupledHotspots
   alias GitlockHolmes.Adapters.VCS.{Git}
   alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
   alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots, GetSummary, IdentifyCouplings}
@@ -139,5 +140,6 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
   defp get_investigation("hotspots"), do: IdentifyHotspots
   defp get_investigation("couplings"), do: IdentifyCouplings
   defp get_investigation("summary"), do: GetSummary
+  defp get_investigation("coupled_hotspots"), do: IdentifyCoupledHotspots
   defp get_analyzer("mock"), do: MockAnalyzer
 end
