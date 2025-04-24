@@ -1,7 +1,35 @@
 defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
+  @moduledoc """
+  Service for detecting *coupled hotspots* in a codebase.
+
+  A **coupled hotspot** is a pair of files that are both:
+  - Individually risky (frequently changed and/or complex)
+  - Frequently changed together (high temporal coupling)
+
+  This service combines hotspot and coupling analysis to identify
+  risky dependencies that are likely to cause maintenance or
+  architectural pain over time.
+
+  The result includes:
+    - Each file in a risky pair
+    - The other file it is coupled with
+    - A combined risk score (multiplicative risk of both files)
+    - A trend value (change in coupling over time)
+    - Individual risk scores for both files
+  """
+
   alias GitlockHolmes.Domain.Services.{HotspotDetection, CouplingDetection}
   alias GitlockHolmes.Domain.Entities.{Commit, ComplexityMetrics}
 
+  @typedoc """
+  Result of a combined risk analysis between two coupled files.
+
+  - `entity`: Primary file in the pair
+  - `coupled`: Coupled file that changes with `entity`
+  - `combined_risk_score`: Product of the individual risk scores
+  - `trend`: Change in coupling over time (positive = increasing)
+  - `individual_risks`: A map of file path → individual risk score
+  """
   @type combined_risk :: %{
           entity: String.t(),
           coupled: String.t(),
@@ -10,6 +38,36 @@ defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
           individual_risks: %{String.t() => float()}
         }
 
+  @doc """
+  Runs combined analysis to identify coupled hotspots.
+
+  This function performs both hotspot and coupling detection,
+  then filters to find file pairs that are both coupled and
+  independently risky.
+
+  ## Parameters
+
+    - `commits`: A list of parsed `%Commit{}` structs from version control
+    - `complexity_metrics`: Optional map of file paths to complexity scores
+
+  ## Returns
+
+    - A sorted list of coupled hotspot results, with highest combined risk first
+
+  ## Example
+
+      iex> CoupledHotspotAnalysis.detect_combined(commits, complexity_metrics)
+      [
+        %{
+          entity: "lib/foo.ex",
+          coupled: "lib/bar.ex",
+          trend: 12.5,
+          combined_risk_score: 30.25,
+          individual_risks: %{"lib/foo.ex" => 5.5, "lib/bar.ex" => 5.5}
+        }
+      ]
+
+  """
   @spec detect_combined([Commit.t()], %{String.t() => ComplexityMetrics.t()}) :: [combined_risk()]
   def detect_combined(commits, complexity_metrics \\ %{}) do
     hotspots = HotspotDetection.detect_hotspots(commits, complexity_metrics)
