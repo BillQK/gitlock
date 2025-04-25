@@ -3,7 +3,7 @@ defmodule GitlockHolmes.Domain.Services.ComplexityCollector do
   Service that collects and normalizes complexity metrics using a given analyzer.
   """
 
-  alias GitlockHolmes.Domain.Entities.ComplexityMetrics
+  alias GitlockHolmes.Domain.Values.ComplexityMetrics
 
   @typedoc "Module implementing the ComplexityAnalyzerPort behavior"
   @type analyzer_port :: module()

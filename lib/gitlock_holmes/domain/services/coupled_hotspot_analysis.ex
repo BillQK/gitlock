@@ -18,8 +18,9 @@ defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
     - Individual risk scores for both files
   """
 
+  alias GitlockHolmes.Domain.Values.ComplexityMetrics
   alias GitlockHolmes.Domain.Services.{HotspotDetection, CouplingDetection}
-  alias GitlockHolmes.Domain.Entities.{Commit, ComplexityMetrics}
+  alias GitlockHolmes.Domain.Entities.{Commit}
 
   @typedoc """
   Result of a combined risk analysis between two coupled files.

@@ -15,8 +15,9 @@ defmodule GitlockHolmes.Investigations.Investigation do
       end
   """
 
+  alias GitlockHolmes.Domain.Values.ComplexityMetrics
   alias GitlockHolmes.Domain.Services.ComplexityCollector
-  alias GitlockHolmes.Domain.Entities.{Commit, ComplexityMetrics}
+  alias GitlockHolmes.Domain.Entities.{Commit}
 
   @typedoc "Analysis result list of maps"
   @type results :: [map()]
@@ -58,7 +59,8 @@ defmodule GitlockHolmes.Investigations.Investigation do
       end
 
       # The value of needs_complexity is being evaluated at compile time, not runtime
-      # Instead of trying to use the compile-time value in a runtime condition, we use it to conditionally define entirely different functions.
+      # Instead of trying to use the compile-time value in a runtime condition,
+      # we use it to conditionally define entirely different functions.
       # The key difference is here - we use a private function that's defined conditionally
       # based on the compile-time option, rather than trying to use the option at runtime
       if unquote(needs_complexity) do

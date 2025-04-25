@@ -7,7 +7,7 @@ defmodule GitlockHolmes.Domain.Entities.Commit do
   """
 
   alias GitlockHolmes.Domain.Entities.Author
-  alias GitlockHolmes.Domain.Entities.FileChange
+  alias GitlockHolmes.Domain.Values.FileChange
 
   @type t :: %__MODULE__{
           id: String.t(),

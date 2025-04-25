@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Entities.ComplexityMetrics do
+defmodule GitlockHolmes.Domain.Values.ComplexityMetrics do
   @moduledoc """
   Entity representing complexity metrics for a file.
   """

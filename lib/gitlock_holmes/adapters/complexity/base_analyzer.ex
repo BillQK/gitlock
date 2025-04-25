@@ -30,7 +30,7 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
     quote do
       @behaviour GitlockHolmes.Ports.ComplexityAnalyzerPort
 
-      alias GitlockHolmes.Domain.Entities.ComplexityMetrics
+      alias GitlockHolmes.Domain.Values.ComplexityMetrics
 
       @doc """
       Analyzes the complexity of a file.
