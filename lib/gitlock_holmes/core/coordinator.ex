@@ -9,7 +9,7 @@ defmodule GitlockHolmes.Core.Coordinator do
   }
 
   alias GitlockHolmes.Adapters.Outbound.VCS.Git
-  alias GitlockHolmes.Adapters.Complexity.MockAnalyzer
+  alias GitlockHolmes.Adapters.Outbound.Complexity.MockAnalyzer
   alias GitlockHolmes.Adapters.Outbound.Reporters.{CsvReporter, JsonReporter}
 
   @investigations %{
