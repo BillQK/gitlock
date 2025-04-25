@@ -12,7 +12,7 @@ defmodule GitlockHolmes.Adapters.Inbound.CLI.Main do
     IdentifyCoupledHotspots
   }
 
-  alias GitlockHolmes.Adapters.Complexity.{MockAnalyzer}
+  alias GitlockHolmes.Adapters.Outbound.Complexity.{MockAnalyzer}
 
   @doc """
   Entry point for the CLI application.
