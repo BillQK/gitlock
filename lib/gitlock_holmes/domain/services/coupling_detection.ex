@@ -6,6 +6,7 @@ defmodule GitlockHolmes.Domain.Services.CouplingDetection do
   High coupling indicates a potential dependency between files that may not
   be obvious from the code structure alone.
   """
+  alias GitlockHolmes.Domain.Values.CouplingMetrics
   alias GitlockHolmes.Domain.Services.{CommitSplitter, CochangeAnalyzer, ComputeCouplings}
   alias GitlockHolmes.Domain.Entities.Commit
 
@@ -20,9 +21,7 @@ defmodule GitlockHolmes.Domain.Services.CouplingDetection do
   ## Returns
   - A list of coupling results sorted by descending degree.
   """
-  @spec detect_couplings([Commit.t()], float(), pos_integer()) :: [
-          ComputeCouplings.coupling_result()
-        ]
+  @spec detect_couplings([Commit.t()], float(), pos_integer()) :: [CouplingMetrics.t()]
   def detect_couplings(commits, min_coupling \\ 1.0, min_windows \\ 5) do
     {full, early, recent} = CommitSplitter.split_commits(commits)
 

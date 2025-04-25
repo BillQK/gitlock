@@ -1,23 +1,6 @@
 defmodule GitlockHolmes.Domain.Services.ComputeCouplings do
   @moduledoc "Calculates coupling metrics between files"
-
-  @typedoc """
-  Result of temporal coupling analysis between two files.
-
-  Fields:
-  - entity: The first file in the coupling relationship
-  - coupled: The second file that changes together with the first one
-  - degree: Coupling strength (percentage of co-changes)
-  - windows: Number of commits where both files changed together
-  - trend: Change in coupling over time (higher values indicate increasing coupling)
-  """
-  @type coupling_result :: %{
-          entity: String.t(),
-          coupled: String.t(),
-          degree: float(),
-          windows: non_neg_integer(),
-          trend: float()
-        }
+  alias GitlockHolmes.Domain.Values.CouplingMetrics
 
   # Calculates the coupling strength, trend, and filters results based on thresholds.
   #
@@ -38,7 +21,7 @@ defmodule GitlockHolmes.Domain.Services.ComputeCouplings do
           %{String.t() => integer()},
           float(),
           integer()
-        ) :: [coupling_result()]
+        ) :: [CouplingMetrics.t()]
   def calculate_coupling_strength(all, early, recent, file_counts, min_coupling, min_windows) do
     Enum.map(all, fn {{file1, file2}, shared} ->
       total1 = Map.get(file_counts, file1, 1)
@@ -57,13 +40,13 @@ defmodule GitlockHolmes.Domain.Services.ComputeCouplings do
 
       trend = Float.round(recent_degree - early_degree, 1)
 
-      %{
-        entity: file1,
-        coupled: file2,
-        degree: Float.round(degree, 1),
-        windows: shared,
-        trend: trend
-      }
+      CouplingMetrics.new(
+        file1,
+        file2,
+        Float.round(degree, 1),
+        shared,
+        trend
+      )
     end)
     |> Enum.filter(fn %{degree: degree, windows: windows} ->
       degree >= min_coupling and windows >= min_windows

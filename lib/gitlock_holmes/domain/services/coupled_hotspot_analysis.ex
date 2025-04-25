@@ -18,26 +18,10 @@ defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
     - Individual risk scores for both files
   """
 
+  alias GitlockHolmes.Domain.Values.CombinedRisk
   alias GitlockHolmes.Domain.Values.ComplexityMetrics
   alias GitlockHolmes.Domain.Services.{HotspotDetection, CouplingDetection}
   alias GitlockHolmes.Domain.Entities.{Commit}
-
-  @typedoc """
-  Result of a combined risk analysis between two coupled files.
-
-  - `entity`: Primary file in the pair
-  - `coupled`: Coupled file that changes with `entity`
-  - `combined_risk_score`: Product of the individual risk scores
-  - `trend`: Change in coupling over time (positive = increasing)
-  - `individual_risks`: A map of file path → individual risk score
-  """
-  @type combined_risk :: %{
-          entity: String.t(),
-          coupled: String.t(),
-          combined_risk_score: float(),
-          trend: float(),
-          individual_risks: %{String.t() => float()}
-        }
 
   @doc """
   Runs combined analysis to identify coupled hotspots.
@@ -69,7 +53,9 @@ defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
       ]
 
   """
-  @spec detect_combined([Commit.t()], %{String.t() => ComplexityMetrics.t()}) :: [combined_risk()]
+  @spec detect_combined([Commit.t()], %{String.t() => ComplexityMetrics.t()}) :: [
+          CombinedRisk.t()
+        ]
   def detect_combined(commits, complexity_metrics \\ %{}) do
     hotspots = HotspotDetection.detect_hotspots(commits, complexity_metrics)
     couplings = CouplingDetection.detect_couplings(commits)
