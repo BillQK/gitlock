@@ -2,8 +2,8 @@ defmodule GitlockHolmes.Adapters.Inbound.CLI.Main do
   @moduledoc """
   Command-line interface for Gitlock Holmes.
   """
-  alias GitlockHolmes.Adapters.VCS.{Git}
-  alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
+  alias GitlockHolmes.Adapters.Outbound.VCS.{Git}
+  alias GitlockHolmes.Adapters.Outbound.Reporters.{CsvReporter, JsonReporter}
 
   alias GitlockHolmes.Core.Investigations.Methodology.{
     IdentifyHotspots,

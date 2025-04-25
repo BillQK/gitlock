@@ -14,7 +14,7 @@ defmodule GitlockHolmes.MixProject do
 
   def escript do
     [
-      main_module: GitlockHolmes.Adapters.UI.CLI,
+      main_module: GitlockHolmes.Adapters.Inbound.CLI.Main,
       path: "bin/gitlock_holmes"
     ]
   end
