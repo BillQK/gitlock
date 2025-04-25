@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Investigations.Investigation do
+defmodule GitlockHolmes.Core.Investigations.Investigation do
   @moduledoc """
   Behaviour and macro for defining investigations.
   Use this module to automatically get the common investigation pipeline,
@@ -35,7 +35,7 @@ defmodule GitlockHolmes.Investigations.Investigation do
     needs_complexity = Keyword.get(opts, :complexity, false)
 
     quote do
-      @behaviour GitlockHolmes.Investigations.Investigation
+      @behaviour GitlockHolmes.Core.Investigations.Investigation
 
       @doc "Runs the investigation using the shared pipeline"
       @spec investigate(

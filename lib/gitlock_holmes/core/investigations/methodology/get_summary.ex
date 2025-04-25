@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Investigations.Methodology.GetSummary do
+defmodule GitlockHolmes.Core.Investigations.Methodology.GetSummary do
   @moduledoc """
   Investigation that summarizes commit history of a codebase.
   """
 
-  use GitlockHolmes.Investigations.Investigation, complexity: false
+  use GitlockHolmes.Core.Investigations.Investigation, complexity: false
   alias GitlockHolmes.Domain.Services.Summary
 
   @impl true

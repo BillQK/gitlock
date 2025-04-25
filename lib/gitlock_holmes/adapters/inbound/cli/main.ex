@@ -1,11 +1,17 @@
-defmodule GitlockHolmes.Adapters.UI.CLI do
+defmodule GitlockHolmes.Adapters.Inbound.CLI.Main do
   @moduledoc """
   Command-line interface for Gitlock Holmes.
   """
-  alias GitlockHolmes.Investigations.Methodology.IdentifyCoupledHotspots
   alias GitlockHolmes.Adapters.VCS.{Git}
   alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
-  alias GitlockHolmes.Investigations.Methodology.{IdentifyHotspots, GetSummary, IdentifyCouplings}
+
+  alias GitlockHolmes.Core.Investigations.Methodology.{
+    IdentifyHotspots,
+    GetSummary,
+    IdentifyCouplings,
+    IdentifyCoupledHotspots
+  }
+
   alias GitlockHolmes.Adapters.Complexity.{MockAnalyzer}
 
   @doc """

@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Investigations.Methodology.IdentifyCouplings do
+defmodule GitlockHolmes.Core.Investigations.Methodology.IdentifyCouplings do
   @moduledoc """
   Use case for identifying couplings in the codebase
   """
 
-  use GitlockHolmes.Investigations.Investigation, complexity: false
+  use GitlockHolmes.Core.Investigations.Investigation, complexity: false
   alias GitlockHolmes.Domain.Services.CouplingDetection
 
   @impl true

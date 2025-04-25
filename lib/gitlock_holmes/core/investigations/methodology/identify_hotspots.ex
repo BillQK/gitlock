@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Investigations.Methodology.IdentifyHotspots do
+defmodule GitlockHolmes.Core.Investigations.Methodology.IdentifyHotspots do
   @moduledoc """
   Use case for identifying hotspots in the codebase.
   """
   alias GitlockHolmes.Domain.Services.HotspotDetection
-  use GitlockHolmes.Investigations.Investigation, complexity: true
+  use GitlockHolmes.Core.Investigations.Investigation, complexity: true
 
   def analyze(commits, complexity_map) do
     HotspotDetection.detect_hotspots(commits, complexity_map)

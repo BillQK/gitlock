@@ -1,7 +1,7 @@
-defmodule GitlockHolmes.Investigations.Methodology.IdentifyCoupledHotspots do
+defmodule GitlockHolmes.Core.Investigations.Methodology.IdentifyCoupledHotspots do
   @moduledoc "Use case for identifying coupled hotspots."
 
-  use GitlockHolmes.Investigations.Investigation, complexity: true
+  use GitlockHolmes.Core.Investigations.Investigation, complexity: true
 
   alias GitlockHolmes.Domain.Services.CoupledHotspotAnalysis
 

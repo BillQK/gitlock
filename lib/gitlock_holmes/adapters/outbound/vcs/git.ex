@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Adapters.VCS.Git do
+defmodule GitlockHolmes.Adapters.Outbound.VCS.Git do
   @moduledoc """
   Git adapter for accessing Git commit history.
   """
@@ -6,7 +6,7 @@ defmodule GitlockHolmes.Adapters.VCS.Git do
   @behaviour GitlockHolmes.Ports.VersionControlPort
 
   alias GitlockHolmes.Domain.Entities.Commit
-  alias GitlockHolmes.Domain.Entities.FileChange
+  alias GitlockHolmes.Domain.Values.FileChange
   alias GitlockHolmes.Domain.Entities.Author
 
   @type parse_error :: {:error, String.t()}

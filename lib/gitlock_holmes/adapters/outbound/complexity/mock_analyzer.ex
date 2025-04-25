@@ -1,10 +1,10 @@
-defmodule GitlockHolmes.Adapters.Complexity.MockAnalyzer do
+defmodule GitlockHolmes.Adapters.Outbound.Complexity.MockAnalyzer do
   @moduledoc """
 
     Mock adapater 
   """
 
-  use GitlockHolmes.Adapters.Complexity.BaseAnalyzer
+  use GitlockHolmes.Adapters.Outbound.Complexity.BaseAnalyzer
 
   def supported_extensions, do: ["*"]
 
