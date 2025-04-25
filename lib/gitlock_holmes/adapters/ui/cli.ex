@@ -30,11 +30,6 @@ defmodule GitlockHolmes.Adapters.UI.CLI do
       !parsed_opts[:investigation] ->
         IO.puts("Error: No investigation specified. Use --investigation or -i.")
 
-      !parsed_opts[:dir] ->
-        IO.puts(
-          "Error: No code directory specified. Use --dir to provide path for complexity analysis."
-        )
-
       true ->
         run_investigation(parsed_opts, remaining_args)
     end
