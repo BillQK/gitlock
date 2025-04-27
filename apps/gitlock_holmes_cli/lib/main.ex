@@ -103,7 +103,7 @@ defmodule GitlockHolmesCLI.Main do
     investigation_type = String.to_atom(options_map.investigation)
 
     # Use the public GitlockHolmes API
-    case GitlockHolmes.investigate(
+    case GitlockHolmesCore.investigate(
            investigation_type,
            options_map.log,
            options_map

@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Core.Investigations.Investigation do
+defmodule GitlockHolmesCore.Core.Investigations.Investigation do
   @moduledoc """
   Behaviour and macro for defining investigations.
   Use this module to automatically get the common investigation pipeline,
@@ -15,9 +15,9 @@ defmodule GitlockHolmes.Core.Investigations.Investigation do
       end
   """
 
-  alias GitlockHolmes.Domain.Values.ComplexityMetrics
-  alias GitlockHolmes.Domain.Services.ComplexityCollector
-  alias GitlockHolmes.Domain.Entities.{Commit}
+  alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
+  alias GitlockHolmesCore.Domain.Services.ComplexityCollector
+  alias GitlockHolmesCore.Domain.Entities.{Commit}
 
   @typedoc "Analysis result list of maps"
   @type results :: [map()]
@@ -35,7 +35,7 @@ defmodule GitlockHolmes.Core.Investigations.Investigation do
     needs_complexity = Keyword.get(opts, :complexity, false)
 
     quote do
-      @behaviour GitlockHolmes.Core.Investigations.Investigation
+      @behaviour GitlockHolmesCore.Core.Investigations.Investigation
 
       @doc "Runs the investigation using the shared pipeline"
       @spec investigate(

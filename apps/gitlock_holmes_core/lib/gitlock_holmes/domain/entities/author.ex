@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Entities.Author do
+defmodule GitlockHolmesCore.Domain.Entities.Author do
   @moduledoc """
   Represents an author who made changes to the codebase.
 

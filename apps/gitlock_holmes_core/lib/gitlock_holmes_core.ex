@@ -1,4 +1,4 @@
-defmodule GitlockHolmes do
+defmodule GitlockHolmesCore do
   @moduledoc """
   GitlockHolmes is a forensic code analysis tool inspired by Adam Tornhill's
   "Your Code as Crime Scene" methodology.
@@ -8,6 +8,6 @@ defmodule GitlockHolmes do
   @doc "Delegates to the core investigation flow"
   @spec investigate(atom(), String.t(), map()) :: {:ok, any()} | {:error, String.t()}
   defdelegate investigate(investigation_type, repo_path, opts \\ %{}),
-    to: GitlockHolmes.Core.Coordinator,
+    to: GitlockHolmesCore.Core.Coordinator,
     as: :investigate
 end

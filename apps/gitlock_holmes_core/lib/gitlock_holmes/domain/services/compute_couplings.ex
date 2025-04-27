@@ -1,6 +1,6 @@
-defmodule GitlockHolmes.Domain.Services.ComputeCouplings do
+defmodule GitlockHolmesCore.Domain.Services.ComputeCouplings do
   @moduledoc "Calculates coupling metrics between files"
-  alias GitlockHolmes.Domain.Values.CouplingMetrics
+  alias GitlockHolmesCore.Domain.Values.CouplingMetrics
 
   # Calculates the coupling strength, trend, and filters results based on thresholds.
   #

@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Core.Investigations.Methodology.IdentifyCoupledHotspots do
+defmodule GitlockHolmesCore.Core.Investigations.Methodology.IdentifyCoupledHotspots do
   @moduledoc "Use case for identifying coupled hotspots."
 
-  use GitlockHolmes.Core.Investigations.Investigation, complexity: true
+  use GitlockHolmesCore.Core.Investigations.Investigation, complexity: true
 
-  alias GitlockHolmes.Domain.Services.CoupledHotspotAnalysis
+  alias GitlockHolmesCore.Domain.Services.CoupledHotspotAnalysis
 
   @impl true
   def analyze(commits, complexity_map) do

@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Domain.Services.HotspotDetection do
+defmodule GitlockHolmesCore.Domain.Services.HotspotDetection do
   @moduledoc """
   Service for detecting hotspots in the codebase.
   """
-  alias GitlockHolmes.Domain.Entities.Commit
-  alias GitlockHolmes.Domain.Values.{FileChange, ComplexityMetrics}
+  alias GitlockHolmesCore.Domain.Entities.Commit
+  alias GitlockHolmesCore.Domain.Values.{FileChange, ComplexityMetrics}
 
   @type risk_factor :: :high | :medium | :low
   @type hotspot :: %{

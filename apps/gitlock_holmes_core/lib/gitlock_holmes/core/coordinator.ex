@@ -1,16 +1,16 @@
-defmodule GitlockHolmes.Core.Coordinator do
+defmodule GitlockHolmesCore.Core.Coordinator do
   @moduledoc "Coordinates adapter setup and invokes investigations"
 
-  alias GitlockHolmes.Core.Investigations.Methodology.{
+  alias GitlockHolmesCore.Core.Investigations.Methodology.{
     IdentifyHotspots,
     IdentifyCouplings,
     IdentifyCoupledHotspots,
     GetSummary
   }
 
-  alias GitlockHolmes.Adapters.VCS.Git
-  alias GitlockHolmes.Adapters.Complexity.MockAnalyzer
-  alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
+  alias GitlockHolmesCore.Adapters.VCS.Git
+  alias GitlockHolmesCore.Adapters.Complexity.MockAnalyzer
+  alias GitlockHolmesCore.Adapters.Reporters.{CsvReporter, JsonReporter}
 
   @investigations %{
     hotspots: IdentifyHotspots,

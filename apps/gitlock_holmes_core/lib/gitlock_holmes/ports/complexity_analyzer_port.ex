@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Ports.ComplexityAnalyzerPort do
+defmodule GitlockHolmesCore.Ports.ComplexityAnalyzerPort do
   @moduledoc """
   Port for complexity analysis operations.
   """
 
-  alias GitlockHolmes.Domain.Values.ComplexityMetrics
+  alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
 
   @typedoc "Success tuple wrapping a ComplexityMetrics struct"
   @type ok_metric :: {:ok, ComplexityMetrics.t()}

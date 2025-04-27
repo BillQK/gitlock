@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Values.FileChange do
+defmodule GitlockHolmesCore.Domain.Values.FileChange do
   @moduledoc """
   Represents a change to a file in a commit.
 

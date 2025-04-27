@@ -1,7 +1,7 @@
-defmodule GitlockHolmes.Domain.Services.CommitSplitter do
+defmodule GitlockHolmesCore.Domain.Services.CommitSplitter do
   @moduledoc "Splitting commits into temporal groups"
 
-  alias GitlockHolmes.Domain.Entities.Commit
+  alias GitlockHolmesCore.Domain.Entities.Commit
 
   # Splits a list of commits into full, early (first half), and recent (second half).
   @spec split_commits([Commit.t()]) :: {[Commit.t()], [Commit.t()], [Commit.t()]}

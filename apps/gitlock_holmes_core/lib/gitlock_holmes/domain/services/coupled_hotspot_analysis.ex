@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
+defmodule GitlockHolmesCore.Domain.Services.CoupledHotspotAnalysis do
   @moduledoc """
   Service for detecting *coupled hotspots* in a codebase.
 
@@ -18,10 +18,10 @@ defmodule GitlockHolmes.Domain.Services.CoupledHotspotAnalysis do
     - Individual risk scores for both files
   """
 
-  alias GitlockHolmes.Domain.Values.CombinedRisk
-  alias GitlockHolmes.Domain.Values.ComplexityMetrics
-  alias GitlockHolmes.Domain.Services.{HotspotDetection, CouplingDetection}
-  alias GitlockHolmes.Domain.Entities.{Commit}
+  alias GitlockHolmesCore.Domain.Values.CombinedRisk
+  alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
+  alias GitlockHolmesCore.Domain.Services.{HotspotDetection, CouplingDetection}
+  alias GitlockHolmesCore.Domain.Entities.{Commit}
 
   @doc """
   Runs combined analysis to identify coupled hotspots.

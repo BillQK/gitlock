@@ -1,9 +1,9 @@
-defmodule GitlockHolmes.Ports.VersionControlPort do
+defmodule GitlockHolmesCore.Ports.VersionControlPort do
   @moduledoc """
   Port for accessing version control history.
   """
 
-  alias GitlockHolmes.Domain.Entities.Commit
+  alias GitlockHolmesCore.Domain.Entities.Commit
 
   @typedoc "Path or identifier for the repository (e.g. a log file path or repo URL)"
   @type repo_path :: String.t()

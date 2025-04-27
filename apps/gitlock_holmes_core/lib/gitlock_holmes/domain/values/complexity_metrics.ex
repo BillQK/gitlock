@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Values.ComplexityMetrics do
+defmodule GitlockHolmesCore.Domain.Values.ComplexityMetrics do
   @moduledoc """
   Value object representing complexity metrics for a file.
 
@@ -92,4 +92,3 @@ defmodule GitlockHolmes.Domain.Values.ComplexityMetrics do
     "#{Path.basename(metrics.file_path)} (#{metrics.language}): #{metrics.loc} LOC, complexity: #{metrics.cyclomatic_complexity}"
   end
 end
-

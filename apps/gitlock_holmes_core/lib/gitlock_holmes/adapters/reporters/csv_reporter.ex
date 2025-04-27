@@ -1,8 +1,8 @@
-defmodule GitlockHolmes.Adapters.Reporters.CsvReporter do
+defmodule GitlockHolmesCore.Adapters.Reporters.CsvReporter do
   @moduledoc """
   CSV reporter for formatting analysis results.
   """
-  @behaviour GitlockHolmes.Ports.ReportPort
+  @behaviour GitlockHolmesCore.Ports.ReportPort
 
   @type report_options :: %{optional(:rows) => non_neg_integer()}
 

@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Ports.ReportPort do
+defmodule GitlockHolmesCore.Ports.ReportPort do
   @moduledoc """
   Port for formatting investigation results into an output string.
   """

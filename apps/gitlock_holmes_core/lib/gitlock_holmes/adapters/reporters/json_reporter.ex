@@ -1,8 +1,8 @@
-defmodule GitlockHolmes.Adapters.Reporters.JsonReporter do
+defmodule GitlockHolmesCore.Adapters.Reporters.JsonReporter do
   @moduledoc """
   JSON reporter for formatting analysis results.
   """
-  @behaviour GitlockHolmes.Ports.ReportPort
+  @behaviour GitlockHolmesCore.Ports.ReportPort
 
   @impl true
   @spec report(results :: [map()], opts :: map()) :: {:ok, String.t()} | {:error, String.t()}

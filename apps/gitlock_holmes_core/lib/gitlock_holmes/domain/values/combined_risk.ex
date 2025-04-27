@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Values.CombinedRisk do
+defmodule GitlockHolmesCore.Domain.Values.CombinedRisk do
   @moduledoc """
   Value object representing the combined risk analysis between two coupled files.
 

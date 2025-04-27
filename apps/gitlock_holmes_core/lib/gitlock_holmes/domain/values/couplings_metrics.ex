@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Values.CouplingMetrics do
+defmodule GitlockHolmesCore.Domain.Values.CouplingMetrics do
   @moduledoc """
   Value object representing temporal coupling between two files.
 

@@ -1,7 +1,7 @@
-defmodule GitlockHolmes.Domain.Services.CochangeAnalyzer do
+defmodule GitlockHolmesCore.Domain.Services.CochangeAnalyzer do
   @moduledoc "Analyzes file co-changes in commits"
 
-  alias GitlockHolmes.Domain.Entities.Commit
+  alias GitlockHolmesCore.Domain.Entities.Commit
 
   # Analyzes co-change data for a given list of commits.
   #

@@ -25,6 +25,7 @@ erl_crash.dump
 # CLI binary 
 /bin/
 
-
 # Output
 /output/
+
+.DS_Store

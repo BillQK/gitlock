@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
+defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
   @moduledoc """
   Base adapter for complexity analyzers.
 
@@ -28,9 +28,9 @@ defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
   @spec __using__(any()) :: Macro.t()
   defmacro __using__(_) do
     quote do
-      @behaviour GitlockHolmes.Ports.ComplexityAnalyzerPort
+      @behaviour GitlockHolmesCore.Ports.ComplexityAnalyzerPort
 
-      alias GitlockHolmes.Domain.Values.ComplexityMetrics
+      alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
 
       @doc """
       Analyzes the complexity of a file.

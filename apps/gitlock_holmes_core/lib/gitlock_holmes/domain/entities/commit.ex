@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Entities.Commit do
+defmodule GitlockHolmesCore.Domain.Entities.Commit do
   @moduledoc """
   Represents a commit in version control.
 
@@ -6,8 +6,8 @@ defmodule GitlockHolmes.Domain.Entities.Commit do
   date, commit message, and the associated file changes.
   """
 
-  alias GitlockHolmes.Domain.Entities.Author
-  alias GitlockHolmes.Domain.Values.FileChange
+  alias GitlockHolmesCore.Domain.Entities.Author
+  alias GitlockHolmesCore.Domain.Values.FileChange
 
   @type t :: %__MODULE__{
           id: String.t(),

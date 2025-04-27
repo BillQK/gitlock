@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Services.Summary do
+defmodule GitlockHolmesCore.Domain.Services.Summary do
   @moduledoc """
   Service for summarizing commit history in the codebase.
 
@@ -6,7 +6,7 @@ defmodule GitlockHolmes.Domain.Services.Summary do
   commits, unique authors, and entities (files touched).
   """
 
-  alias GitlockHolmes.Domain.Entities.Commit
+  alias GitlockHolmesCore.Domain.Entities.Commit
 
   @type summary :: %{
           statistic: String.t(),

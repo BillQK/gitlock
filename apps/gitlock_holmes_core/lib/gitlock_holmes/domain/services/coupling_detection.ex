@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Domain.Services.CouplingDetection do
+defmodule GitlockHolmesCore.Domain.Services.CouplingDetection do
   @moduledoc """
   Service for analyzing temporal coupling between files.
 
@@ -6,9 +6,9 @@ defmodule GitlockHolmes.Domain.Services.CouplingDetection do
   High coupling indicates a potential dependency between files that may not
   be obvious from the code structure alone.
   """
-  alias GitlockHolmes.Domain.Values.CouplingMetrics
-  alias GitlockHolmes.Domain.Services.{CommitSplitter, CochangeAnalyzer, ComputeCouplings}
-  alias GitlockHolmes.Domain.Entities.Commit
+  alias GitlockHolmesCore.Domain.Values.CouplingMetrics
+  alias GitlockHolmesCore.Domain.Services.{CommitSplitter, CochangeAnalyzer, ComputeCouplings}
+  alias GitlockHolmesCore.Domain.Entities.Commit
 
   @doc """
   Detects temporal couplings between files based on commit co-changes.
