@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Adapters.Outbound.VCS.Git do
+defmodule GitlockHolmes.Adapters.VCS.Git do
   @moduledoc """
   Git adapter for accessing Git commit history.
   """

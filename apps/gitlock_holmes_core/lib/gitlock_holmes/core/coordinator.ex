@@ -8,9 +8,9 @@ defmodule GitlockHolmes.Core.Coordinator do
     GetSummary
   }
 
-  alias GitlockHolmes.Adapters.Outbound.VCS.Git
-  alias GitlockHolmes.Adapters.Outbound.Complexity.MockAnalyzer
-  alias GitlockHolmes.Adapters.Outbound.Reporters.{CsvReporter, JsonReporter}
+  alias GitlockHolmes.Adapters.VCS.Git
+  alias GitlockHolmes.Adapters.Complexity.MockAnalyzer
+  alias GitlockHolmes.Adapters.Reporters.{CsvReporter, JsonReporter}
 
   @investigations %{
     hotspots: IdentifyHotspots,

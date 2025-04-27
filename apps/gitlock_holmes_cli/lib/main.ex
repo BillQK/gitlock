@@ -1,18 +1,7 @@
-defmodule GitlockHolmes.Adapters.Inbound.CLI.Main do
+defmodule GitlockHolmesCLI.Main do
   @moduledoc """
   Command-line interface for Gitlock Holmes.
   """
-  alias GitlockHolmes.Adapters.Outbound.VCS.{Git}
-  alias GitlockHolmes.Adapters.Outbound.Reporters.{CsvReporter, JsonReporter}
-
-  alias GitlockHolmes.Core.Investigations.Methodology.{
-    IdentifyHotspots,
-    GetSummary,
-    IdentifyCouplings,
-    IdentifyCoupledHotspots
-  }
-
-  alias GitlockHolmes.Adapters.Outbound.Complexity.{MockAnalyzer}
 
   @doc """
   Entry point for the CLI application.
@@ -110,37 +99,26 @@ defmodule GitlockHolmes.Adapters.Inbound.CLI.Main do
   defp run_investigation(options, _args) do
     options_map = Map.new(options)
 
-    vcs_adapter = get_vcs_adapter(options_map.vcs)
-    reporter = get_reporter(options_map[:format])
-    investigation = get_investigation(options_map.investigation)
-    analyzer = get_analyzer(options_map[:analyzer] || "mock")
+    # Convert investigation string to atom for the core API
+    investigation_type = String.to_atom(options_map.investigation)
 
-    case investigation.investigate(
+    # Use the public GitlockHolmes API
+    case GitlockHolmes.investigate(
+           investigation_type,
            options_map.log,
-           vcs_adapter,
-           reporter,
-           analyzer,
            options_map
          ) do
       {:ok, output} ->
         path =
-          "output/#{options_map.investigation}-#{DateTime.utc_now()}.#{options_map[:format]}"
+          "output/#{options_map.investigation}-#{DateTime.utc_now()}.#{options_map[:format] || "csv"}"
 
         File.mkdir_p!(Path.dirname(path))
         File.write(path, output)
+        IO.puts("Analysis complete. Results saved to #{path}")
 
       {:error, reason} ->
         IO.puts("Investigation failed: #{reason}")
         System.halt(1)
     end
   end
-
-  defp get_vcs_adapter("git"), do: Git
-  defp get_reporter("csv"), do: CsvReporter
-  defp get_reporter("json"), do: JsonReporter
-  defp get_investigation("hotspots"), do: IdentifyHotspots
-  defp get_investigation("couplings"), do: IdentifyCouplings
-  defp get_investigation("summary"), do: GetSummary
-  defp get_investigation("coupled_hotspots"), do: IdentifyCoupledHotspots
-  defp get_analyzer("mock"), do: MockAnalyzer
 end

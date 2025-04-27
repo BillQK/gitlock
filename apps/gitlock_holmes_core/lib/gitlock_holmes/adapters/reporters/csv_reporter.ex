@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Adapters.Outbound.Reporters.CsvReporter do
+defmodule GitlockHolmes.Adapters.Reporters.CsvReporter do
   @moduledoc """
   CSV reporter for formatting analysis results.
   """

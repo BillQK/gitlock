@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.Adapters.Outbound.Complexity.BaseAnalyzer do
+defmodule GitlockHolmes.Adapters.Complexity.BaseAnalyzer do
   @moduledoc """
   Base adapter for complexity analyzers.
 
