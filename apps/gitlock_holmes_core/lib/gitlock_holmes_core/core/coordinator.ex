@@ -5,6 +5,7 @@ defmodule GitlockHolmesCore.Core.Coordinator do
     IdentifyHotspots,
     IdentifyCouplings,
     IdentifyCoupledHotspots,
+    IdentifyKnowledgeSilos,
     GetSummary
   }
 
@@ -16,7 +17,8 @@ defmodule GitlockHolmesCore.Core.Coordinator do
     hotspots: IdentifyHotspots,
     couplings: IdentifyCouplings,
     summary: GetSummary,
-    coupled_hotspots: IdentifyCoupledHotspots
+    coupled_hotspots: IdentifyCoupledHotspots,
+    knowledge_silos: IdentifyKnowledgeSilos
   }
 
   @doc """
