@@ -70,7 +70,7 @@ defmodule GitlockHolmesCore.Domain.Services.CoupledHotspotAnalysis do
       risk_a = hotspot_map[a].risk_score
       risk_b = hotspot_map[b].risk_score
 
-      %{
+      %CombinedRisk{
         entity: a,
         coupled: b,
         trend: trend,

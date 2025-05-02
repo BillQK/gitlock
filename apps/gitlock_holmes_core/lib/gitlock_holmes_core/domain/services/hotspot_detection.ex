@@ -3,17 +3,7 @@ defmodule GitlockHolmesCore.Domain.Services.HotspotDetection do
   Service for detecting hotspots in the codebase.
   """
   alias GitlockHolmesCore.Domain.Entities.Commit
-  alias GitlockHolmesCore.Domain.Values.{FileChange, ComplexityMetrics}
-
-  @type risk_factor :: :high | :medium | :low
-  @type hotspot :: %{
-          entity: String.t(),
-          revisions: non_neg_integer(),
-          complexity: non_neg_integer(),
-          loc: non_neg_integer(),
-          risk_factor: risk_factor(),
-          risk_score: float()
-        }
+  alias GitlockHolmesCore.Domain.Values.{FileChange, ComplexityMetrics, Hotspot}
 
   @doc """
   Identifies hotspots by analyzing revision frequency.
@@ -27,7 +17,7 @@ defmodule GitlockHolmesCore.Domain.Services.HotspotDetection do
   ## Returns
     A list of hotspots sorted by risk (highest risk first)
   """
-  @spec detect_hotspots([Commit.t()], %{String.t() => ComplexityMetrics.t()}) :: [hotspot()]
+  @spec detect_hotspots([Commit.t()], %{String.t() => ComplexityMetrics.t()}) :: [Hotspot]
   def detect_hotspots(commits, complexity_metrics \\ %{}) do
     # Extract all file changes
     file_changes =
@@ -46,7 +36,7 @@ defmodule GitlockHolmesCore.Domain.Services.HotspotDetection do
       # Calculate risk based on both change frequency and complexity
       risk_score = calculate_risk_score(changes, complexity, loc)
 
-      %{
+      %Hotspot{
         entity: entity,
         revisions: length(changes),
         complexity: complexity,
@@ -84,7 +74,7 @@ defmodule GitlockHolmesCore.Domain.Services.HotspotDetection do
   @doc """
   Determines risk level based on calculated score.
   """
-  @spec risk_level_from_score(float()) :: risk_factor()
+  @spec risk_level_from_score(float()) :: Hotspot.risk_factor()
   def risk_level_from_score(score) when score > 2.0, do: :high
   def risk_level_from_score(score) when score > 1.0, do: :medium
   def risk_level_from_score(_), do: :low

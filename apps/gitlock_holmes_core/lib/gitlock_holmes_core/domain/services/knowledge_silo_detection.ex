@@ -52,7 +52,7 @@ defmodule GitlockHolmesCore.Domain.Services.KnowledgeSiloDetection do
       risk_level = risk_level_from_metrics(ownership_ratio, total_commits, unique_authors)
 
       # Create result map
-      %KnowledgeSilo{
+      %{
         entity: entity,
         main_author: main_author,
         ownership_ratio: Float.round(ownership_ratio * 100, 1),

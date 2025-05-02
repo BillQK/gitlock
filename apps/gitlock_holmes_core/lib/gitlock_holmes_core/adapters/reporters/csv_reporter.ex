@@ -13,8 +13,11 @@ defmodule GitlockHolmesCore.Adapters.Reporters.CsvReporter do
     headers =
       case List.first(results) do
         # Default if no results
-        nil -> ["entity", "revisions", "risk_factor"]
-        first -> first |> Map.keys() |> Enum.map(&to_string/1)
+        nil ->
+          ["entity", "revisions", "risk_factor"]
+
+        first ->
+          first |> Map.keys() |> Enum.reject(&(&1 == :__struct__)) |> Enum.map(&to_string/1)
       end
 
     # Apply row limit if specified

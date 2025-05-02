@@ -40,13 +40,13 @@ defmodule GitlockHolmesCore.Domain.Services.ComputeCouplings do
 
       trend = Float.round(recent_degree - early_degree, 1)
 
-      CouplingMetrics.new(
-        file1,
-        file2,
-        Float.round(degree, 1),
-        shared,
-        trend
-      )
+      %CouplingMetrics{
+        entity: file1,
+        coupled: file2,
+        degree: Float.round(degree, 1),
+        windows: shared,
+        trend: trend
+      }
     end)
     |> Enum.filter(fn %{degree: degree, windows: windows} ->
       degree >= min_coupling and windows >= min_windows
