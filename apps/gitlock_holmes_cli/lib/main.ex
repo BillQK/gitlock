@@ -79,10 +79,6 @@ defmodule GitlockHolmesCLI.Main do
       -i, --investigation TYPE     Type of investigation to perform
       -f, --format FORMAT          Output format (csv, json, html) [default: csv]
       -r, --rows NUM               Limit output to NUM rows
-      -a, --arch-group FILE        Path to architectural grouping definition
-      -t, --time-period DAYS       Time window for temporal grouping (in days)
-          --team-map FILE          Path to team mapping file
-          --min-revs NUM           Minimum revisions threshold
           --dir DIRECTORY          Path to code directory for complexity analysis
       -h, --help                   Display this help message
 
