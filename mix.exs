@@ -24,7 +24,7 @@ defmodule GitlockHolmes.MixProject do
 
   defp aliases do
     [
-      "escript.build": ["cmd --app gitlock_holmes_cli mix escript.build"]
+      "escript.build": ["do --app gitlock_holmes_cli escript.build"]
     ]
   end
 end
