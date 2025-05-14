@@ -12,6 +12,11 @@ defmodule GitlockHolmesCore.Core.Investigations.Investigation do
         def analyze(commits, complexity_map) do
           # Your analysis logic here
         end
+
+        # Optional Override 
+        def investigate(log_file, vcs, reporter, analyzer, options) do
+          # your pipeline logic here
+        end
       end
   """
 
@@ -31,6 +36,17 @@ defmodule GitlockHolmesCore.Core.Investigations.Investigation do
               complexity_map :: complexity_map()
             ) :: results()
 
+  @doc "Callback to run the complete investigation flow"
+  @callback investigate(
+              log_file :: String.t(),
+              vcs_port :: module(),
+              reporter_port :: module(),
+              analyzer_port :: module() | nil,
+              options :: map()
+            ) :: {:ok, String.t()} | {:error, String.t()}
+
+  @optional_callbacks [investigate: 5]
+
   defmacro __using__(opts) do
     needs_complexity = Keyword.get(opts, :complexity, false)
 
@@ -38,6 +54,7 @@ defmodule GitlockHolmesCore.Core.Investigations.Investigation do
       @behaviour GitlockHolmesCore.Core.Investigations.Investigation
 
       @doc "Runs the investigation using the shared pipeline"
+      @impl true
       @spec investigate(
               log_file :: String.t(),
               vcs_port :: module(),
