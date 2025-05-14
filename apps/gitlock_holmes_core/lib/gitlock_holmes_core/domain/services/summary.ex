@@ -34,8 +34,7 @@ defmodule GitlockHolmesCore.Domain.Services.Summary do
     entities =
       commits
       |> Enum.flat_map(& &1.file_changes)
-      |> Enum.map(& &1.entity)
-      |> Enum.uniq()
+      |> Enum.uniq_by(& &1.entity)
 
     [
       %{statistic: "number-of-commits", value: length(commits)},
