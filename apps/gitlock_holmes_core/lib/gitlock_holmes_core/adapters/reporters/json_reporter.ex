@@ -6,13 +6,15 @@ defmodule GitlockHolmesCore.Adapters.Reporters.JsonReporter do
 
   @impl true
   @spec report(results :: [map()], opts :: map()) :: {:ok, String.t()} | {:error, String.t()}
-  def report(results, opts) do
+  def report(results, options) do
     results =
       Enum.map(results, fn
         %{__struct__: _} = struct -> Map.from_struct(struct)
         map -> map
       end)
-      |> Enum.take(opts.rows)
+
+    results =
+      if options[:rows], do: Enum.take(results, options[:rows]), else: results
 
     {:ok, Jason.encode!(results, pretty: true)}
   end
