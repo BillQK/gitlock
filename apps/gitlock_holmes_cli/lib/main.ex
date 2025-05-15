@@ -26,7 +26,13 @@ defmodule GitlockHolmesCLI.Main do
         IO.puts("Error: No investigation specified. Use --investigation or -i.")
 
       true ->
-        run_investigation(parsed_opts, remaining_args)
+        {uSecs, :ok} =
+          :timer.tc(fn opts, args -> run_investigation(opts, args) end, [
+            parsed_opts,
+            remaining_args
+          ])
+
+        IO.puts("Execution Time: #{uSecs / 1_000_000}s")
     end
   end
 

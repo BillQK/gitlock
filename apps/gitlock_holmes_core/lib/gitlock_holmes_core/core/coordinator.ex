@@ -1,6 +1,8 @@
 defmodule GitlockHolmesCore.Core.Coordinator do
   @moduledoc "Coordinates adapter setup and invokes investigations"
 
+  alias GitlockHolmesCore.Adapters.Complexity.DispatchAnalyzer
+
   alias GitlockHolmesCore.Core.Investigations.Methodology.{
     IdentifyHotspots,
     IdentifyCouplings,
@@ -10,7 +12,6 @@ defmodule GitlockHolmesCore.Core.Coordinator do
   }
 
   alias GitlockHolmesCore.Adapters.VCS.Git
-  alias GitlockHolmesCore.Adapters.Complexity.MockAnalyzer
   alias GitlockHolmesCore.Adapters.Reporters.{CsvReporter, JsonReporter}
 
   @investigations %{
@@ -62,7 +63,9 @@ defmodule GitlockHolmesCore.Core.Coordinator do
     if type in [:hotspots, :coupled_hotspots] and not Map.has_key?(opts, :dir) do
       {:error, "Directory path required for #{inspect(type)} analysis"}
     else
-      {:ok, MockAnalyzer}
+      # The DispatchAnalyzer handles multi-language code by delegating 
+      # to appropriate analyzers
+      {:ok, DispatchAnalyzer}
     end
   end
 end

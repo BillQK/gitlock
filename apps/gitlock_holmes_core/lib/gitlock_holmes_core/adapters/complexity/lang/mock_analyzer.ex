@@ -1,4 +1,4 @@
-defmodule GitlockHolmesCore.Adapters.Complexity.MockAnalyzer do
+defmodule GitlockHolmesCore.Adapters.Complexity.Lang.MockAnalyzer do
   @moduledoc """
 
     Mock adapater 

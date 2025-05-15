@@ -26,11 +26,14 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       end
   """
   @spec __using__(any()) :: Macro.t()
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
     quote do
       @behaviour GitlockHolmesCore.Ports.ComplexityAnalyzerPort
 
       alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
+
+      # Determine if this is a delegating analyzer that doesn't calculate complexity directly
+      @is_delegating_analyzer unquote(Keyword.get(opts, :delegating, false))
 
       @doc """
       Analyzes the complexity of a file.
@@ -72,7 +75,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       Recursively analyze supported files in `directory` concurrently.
 
       Returns a map of relative paths to `%ComplexityMetrics{}` on success,
-      or `{:error, reason}` if `directory` isn’t a valid directory.
+      or `{:error, reason}` if `directory` isn't a valid directory.
 
       Options:
         * `opts` (map) – reserved for future use.
@@ -136,20 +139,27 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
         end
       end
 
-      @doc """
-      Calculates the cyclomatic complexity of code content.
+      # For delegating analyzers, provide a default implementation
+      if @is_delegating_analyzer do
+        # Default implementation for delegating analyzers that don't do complexity calculation directly.
+        # This is never called when the analyze_file method is overridden.
+        defp calculate_complexity(_content, _file_path), do: 0
+      else
+        @doc """
+        Calculates the cyclomatic complexity of code content.
 
-      This function **must** be implemented by any module using this base.
+        This function **must** be implemented by any non-delegating analyzer module using this base.
 
-      ## Parameters
-        * `content` - The code content to analyze
-        * `file_path` - Path to the file (for context)
+        ## Parameters
+          * `content` - The code content to analyze
+          * `file_path` - Path to the file (for context)
 
-      ## Returns
-        The calculated cyclomatic complexity as an integer
-      """
-      @spec calculate_complexity(content :: String.t(), file_path :: String.t()) ::
-              non_neg_integer()
+        ## Returns
+          The calculated cyclomatic complexity as an integer
+        """
+        @spec calculate_complexity(content :: String.t(), file_path :: String.t()) ::
+                non_neg_integer()
+      end
 
       defoverridable analyze_file: 1
       defoverridable analyze_directory: 2
