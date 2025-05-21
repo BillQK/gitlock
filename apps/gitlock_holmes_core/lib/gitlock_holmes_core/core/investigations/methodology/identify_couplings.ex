@@ -6,8 +6,7 @@ defmodule GitlockHolmesCore.Core.Investigations.Methodology.IdentifyCouplings do
   use GitlockHolmesCore.Core.Investigations.Investigation, complexity: false
   alias GitlockHolmesCore.Domain.Services.CouplingDetection
 
-  @impl true
-  def analyze(commits, _complexity_map) do
+  def analyze(commits, _complexity_map, _options) do
     CouplingDetection.detect_couplings(commits)
   end
 end

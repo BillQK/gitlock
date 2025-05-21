@@ -26,13 +26,13 @@ defmodule GitlockHolmesCLI.Main do
         IO.puts("Error: No investigation specified. Use --investigation or -i.")
 
       true ->
-        {uSecs, :ok} =
+        {u_secs, :ok} =
           :timer.tc(fn opts, args -> run_investigation(opts, args) end, [
             parsed_opts,
             remaining_args
           ])
 
-        IO.puts("Execution Time: #{uSecs / 1_000_000}s")
+        IO.puts("Execution Time: #{u_secs / 1_000_000}s")
     end
   end
 
@@ -49,7 +49,11 @@ defmodule GitlockHolmesCLI.Main do
         team_map: :string,
         min_revs: :integer,
         dir: :string,
-        help: :boolean
+        help: :boolean,
+        # Blast radius 
+        target_files: :string,
+        blast_threshold: :float,
+        max_radius: :integer
       ],
       aliases: [
         l: :log,
@@ -59,7 +63,12 @@ defmodule GitlockHolmesCLI.Main do
         r: :rows,
         a: :arch_group,
         t: :time_period,
-        h: :help
+        h: :help,
+
+        # Blast radius aliases
+        tf: :target_files,
+        bt: :blast_threshold,
+        mr: :max_radius
       ]
     )
   end
@@ -88,11 +97,17 @@ defmodule GitlockHolmesCLI.Main do
           --dir DIRECTORY          Path to code directory for complexity analysis
       -h, --help                   Display this help message
 
+    BLAST RADIUS OPTIONS:
+          --target-files FILES     Comma-separated list of files to analyze (required for blast_radius)
+          --blast-threshold VAL    Coupling strength threshold (0.0-1.0) [default: 0.3]
+          --max-radius NUM         Maximum depth of blast radius calculation [default: 2]
+
     INVESTIGATIONS:
       knowledge_silos              Detect knowledge concentration
       hotspots                     Identify high-risk areas
       couplings                    Find logical coupling patterns
       team_communication           Map team communication patterns
+      blast_radius                 Analyze impact of changing specific files
       code_health                  Assess overall code health
       summary                      Get history summary
     """)
@@ -103,6 +118,19 @@ defmodule GitlockHolmesCLI.Main do
 
     # Convert investigation string to atom for the core API
     investigation_type = String.to_atom(options_map.investigation)
+
+    options_map =
+      if options_map[:target_files] do
+        target_files =
+          options_map.target_files
+          |> String.split(",")
+          |> Enum.map(&String.trim/1)
+          |> Enum.filter(&(String.length(&1) > 0))
+
+        Map.put(options_map, :target_files, target_files)
+      else
+        options_map
+      end
 
     # Use the public GitlockHolmes API
     case GitlockHolmesCore.investigate(

@@ -6,7 +6,7 @@ defmodule GitlockHolmesCore.Core.Investigations.Methodology.IdentifyCoupledHotsp
   alias GitlockHolmesCore.Domain.Services.CoupledHotspotAnalysis
 
   @impl true
-  def analyze(commits, complexity_map) do
+  def analyze(commits, complexity_map, _options) do
     CoupledHotspotAnalysis.detect_combined(commits, complexity_map)
   end
 end
