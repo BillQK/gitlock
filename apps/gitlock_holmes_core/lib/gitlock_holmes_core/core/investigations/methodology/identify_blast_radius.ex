@@ -17,7 +17,6 @@ defmodule GitlockHolmesCore.Core.Investigations.Methodology.IdentifyBlastRadius 
     graph = FileGraphBuilder.create_from_commits(commits, complexity_map, options)
 
     impacts = ChangeAnalyzer.analyze_changes(target_files, graph, options)
-    IO.inspect(impacts, pretty: true)
 
     format_results(impacts, options)
   end
