@@ -33,7 +33,8 @@ defmodule GitlockHolmesCore.Core.Investigations.Investigation do
   @doc "Callback to implement the core analysis logic for an investigation"
   @callback analyze(
               commits :: [Commit.t()],
-              complexity_map :: complexity_map()
+              complexity_map :: complexity_map(),
+              options :: map()
             ) :: results()
 
   @doc "Callback to run the complete investigation flow"
@@ -66,7 +67,7 @@ defmodule GitlockHolmesCore.Core.Investigations.Investigation do
         complexity_map = get_complexity_map(analyzer, options)
 
         with {:ok, commits} <- vcs.get_commit_history(log_file, options),
-             results <- analyze(commits, complexity_map),
+             results <- analyze(commits, complexity_map, options),
              {:ok, report} <- reporter.report(results, options) do
           {:ok, report}
         else

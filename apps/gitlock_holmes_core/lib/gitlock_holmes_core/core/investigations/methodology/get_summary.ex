@@ -7,7 +7,7 @@ defmodule GitlockHolmesCore.Core.Investigations.Methodology.GetSummary do
   alias GitlockHolmesCore.Domain.Services.Summary
 
   @impl true
-  def analyze(commits, _complexity_map) do
+  def analyze(commits, _complexity_map, _options) do
     Summary.summarize(commits)
   end
 end

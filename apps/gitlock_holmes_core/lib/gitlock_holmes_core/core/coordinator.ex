@@ -8,6 +8,7 @@ defmodule GitlockHolmesCore.Core.Coordinator do
     IdentifyCouplings,
     IdentifyCoupledHotspots,
     IdentifyKnowledgeSilos,
+    IdentifyBlastRadius,
     GetSummary
   }
 
@@ -19,7 +20,8 @@ defmodule GitlockHolmesCore.Core.Coordinator do
     couplings: IdentifyCouplings,
     summary: GetSummary,
     coupled_hotspots: IdentifyCoupledHotspots,
-    knowledge_silos: IdentifyKnowledgeSilos
+    knowledge_silos: IdentifyKnowledgeSilos,
+    blast_radius: IdentifyBlastRadius
   }
 
   @doc """

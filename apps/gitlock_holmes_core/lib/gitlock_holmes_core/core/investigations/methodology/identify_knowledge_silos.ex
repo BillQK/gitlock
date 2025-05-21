@@ -12,7 +12,7 @@ defmodule GitlockHolmesCore.Core.Investigations.Methodology.IdentifyKnowledgeSil
   alias GitlockHolmesCore.Domain.Services.KnowledgeSiloDetection
 
   @impl true
-  def analyze(commits, _complexity_map) do
+  def analyze(commits, _complexity_map, _options) do
     KnowledgeSiloDetection.detect_knowledge_silos(commits)
   end
 end
