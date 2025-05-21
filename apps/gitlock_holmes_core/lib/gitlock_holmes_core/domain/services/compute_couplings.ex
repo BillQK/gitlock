@@ -188,7 +188,7 @@ defmodule GitlockHolmesCore.Domain.Services.ComputeCouplings do
       calculate_impact(coupled_files, blast_radius, rest, visited, current_impact, depth + 1)
 
     # Continue BFS traversal
-    blast_radius_bfs(graph, new_blast, new_queue, threshold, max_depth, new_visited)
+    blast_radius_bfs(graph, new_blast, new_queue, threshold, max_depth - 1, new_visited)
   end
 
   @doc """
