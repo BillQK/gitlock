@@ -298,6 +298,43 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraph do
 
   # Helper for getting data from nested structure with nil safe
   defp get_component(graph, file) do
-    get_in(graph.nodes, [file, :component])
+    with :ok <- validate_graph(graph),
+         :ok <- validate_file_exists_in_graph(file, graph) do
+      get_in(graph.nodes, [file, :component])
+    end
   end
+
+  @doc """
+  Validates files exists in graph 
+
+  ## Parameters 
+    * `file_path` - Target file path
+    * `graph - The file graph
+
+  ## Returns 
+    :ok or {:error, description}
+  """
+  @spec validate_file_exists_in_graph(String.t(), t()) :: :ok | {:error, String.t()}
+  def validate_file_exists_in_graph(file, %__MODULE__{nodes: nodes}) do
+    if Map.has_key?(nodes, file) do
+      :ok
+    else
+      {:error, "File '#{file}' not found in the file graph"}
+    end
+  end
+
+  @doc """
+  Validate graph 
+
+  ## Parameters 
+    * `graph` - The file graph
+
+  ## Returns
+    :ok or {:error, description}
+  """
+  @spec validate_graph(t()) :: :ok | {:error, String.t()}
+  def validate_graph(%__MODULE__{}), do: :ok
+
+  def validate_graph(invalid),
+    do: {:error, "Expected a FileGraph struct, got: #{inspect(invalid)}"}
 end

@@ -283,7 +283,11 @@ defmodule GitlockHolmesCore.Domain.Services.ComputeCouplings do
           MapSet.t(),
           float(),
           non_neg_integer()
-        ) :: {%{String.t() => float()}, [{String.t(), non_neg_integer(), MapSet.t()}]}
+        ) :: {
+          [{String.t(), float(), non_neg_integer()}],
+          [{String.t(), non_neg_integer()}],
+          MapSet.t(String.t())
+        }
   def calculate_impact(coupled_files, blast_radius, queue, visited, current_impact, new_depth) do
     coupled_files
     |> Enum.reduce({blast_radius, queue, visited}, fn {file, coupling},

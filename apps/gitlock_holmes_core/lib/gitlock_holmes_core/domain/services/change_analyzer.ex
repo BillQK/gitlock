@@ -15,6 +15,20 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
   alias GitlockHolmesCore.Domain.Values.FileGraph
   alias GitlockHolmesCore.Domain.Services.ComputeCouplings
 
+  @max_size_factor 2.0
+  @size_divisor 5
+
+  @max_complexity_factor 2.5
+  @complexity_divisor 10
+
+  @max_revision_factor 2.5
+  @revision_divisor 10
+
+  @max_cross_component_factor 3.0
+  @cross_component_multiplier 0.8
+
+  @max_total_score 10.0
+
   @doc """
   Analyzes the impact of chainging multiple target files. 
 
@@ -42,7 +56,7 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
           [ChangeImpact.t()] | {:error, String.t()}
   def analyze_changes(target_files, graph, options \\ %{}) do
     with :ok <- validate_target_files(target_files),
-         :ok <- validate_graph(graph) do
+         :ok <- FileGraph.validate_graph(graph) do
       Enum.map(target_files, fn file ->
         analyze_file_impact(file, graph, options)
       end)
@@ -55,12 +69,6 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
 
   defp validate_target_files(invalid),
     do: {:error, "Expected a list of target files, got: #{inspect(invalid)}"}
-
-  @spec validate_graph(term()) :: :ok | {:error, String.t()}
-  defp validate_graph(%FileGraph{}), do: :ok
-
-  defp validate_graph(invalid),
-    do: {:error, "Expected a FileGraph struct, got: #{inspect(invalid)}"}
 
   @doc """
   Analyzes the impact of changing a single target file.
@@ -89,7 +97,7 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
   @spec analyze_file_impact(String.t(), FileGraph.t(), map()) ::
           ChangeImpact.t() | {:error, String.t()}
   def analyze_file_impact(target_file, graph, options \\ %{}) do
-    with :ok <- validate_file_exists_in_graph(target_file, graph) do
+    with :ok <- FileGraph.validate_file_exists_in_graph(target_file, graph) do
       # Set default options if not provided 
       blast_threshold = Map.get(options, :blast_threshold, 0.3)
       max_radius = Map.get(options, :max_radius, 2)
@@ -129,29 +137,6 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
       )
     end
   end
-
-  @spec validate_file_exists_in_graph(String.t(), FileGraph.t()) :: :ok | {:error, String.t()}
-  defp validate_file_exists_in_graph(file, %FileGraph{nodes: nodes}) do
-    if Map.has_key?(nodes, file) do
-      :ok
-    else
-      {:error, "File '#{file}' not found in the file graph"}
-    end
-  end
-
-  @max_size_factor 2.0
-  @size_divisor 5
-
-  @max_complexity_factor 2.5
-  @complexity_divisor 10
-
-  @max_revision_factor 2.5
-  @revision_divisor 10
-
-  @max_cross_component_factor 3.0
-  @cross_component_multiplier 0.8
-
-  @max_total_score 10.0
 
   @doc """
   Calculates a risk score based on multiple factors.
