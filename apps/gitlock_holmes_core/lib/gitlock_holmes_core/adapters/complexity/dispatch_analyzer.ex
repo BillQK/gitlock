@@ -15,6 +15,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.DispatchAnalyzer do
   alias GitlockHolmesCore.Adapters.Complexity.Lang.{
     ElixirAnalyzer,
     JavaScriptAnalyzer,
+    PythonAnalyzer,
     MockAnalyzer
   }
 
@@ -22,6 +23,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.DispatchAnalyzer do
   @available_analyzers [
     ElixirAnalyzer,
     JavaScriptAnalyzer,
+    PythonAnalyzer,
     MockAnalyzer
   ]
 
