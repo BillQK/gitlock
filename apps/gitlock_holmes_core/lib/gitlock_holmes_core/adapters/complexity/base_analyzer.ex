@@ -31,6 +31,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       @behaviour GitlockHolmesCore.Ports.ComplexityAnalyzerPort
 
       alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
+      alias GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer
 
       # Determine if this is a delegating analyzer that doesn't calculate complexity directly
       @is_delegating_analyzer unquote(Keyword.get(opts, :delegating, false))
@@ -108,7 +109,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
               Map.put(acc, path, %{error: "I/O error: #{inspect(reason)}"})
 
             {:exit, reason}, acc ->
-              Map.put(acc, "exit_#{inspect(reason)}", %{error: "Task crashed"})
+              Map.put(acc, "exit_#{inspect(reason)}", %{error: "Task crashed: #{inspect(reason)}"})
           end)
         else
           {:error, "Invalid or inaccessible directory: #{directory}"}
