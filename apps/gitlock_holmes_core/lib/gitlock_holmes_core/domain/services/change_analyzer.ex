@@ -38,12 +38,29 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
         %ChangeImpact{entity: "lib/user/profile.ex", ...}
       ]  
   """
-  @spec analyze_changes([String.t()], FileGraph.t(), map()) :: [ChangeImpact.t()]
-  def analyze_changes(target_files, graph, options \\ {}) do
-    Enum.map(target_files, fn file ->
-      analyze_file_impact(file, graph, options)
-    end)
+  @spec analyze_changes([String.t()], FileGraph.t(), map()) ::
+          [ChangeImpact.t()] | {:error, String.t()}
+  def analyze_changes(target_files, graph, options \\ %{}) do
+    with :ok <- validate_target_files(target_files),
+         :ok <- validate_graph(graph) do
+      Enum.map(target_files, fn file ->
+        analyze_file_impact(file, graph, options)
+      end)
+    end
   end
+
+  @spec validate_target_files(term()) :: :ok | {:error, String.t()}
+  defp validate_target_files(files) when is_list(files) and length(files) > 0, do: :ok
+  defp validate_target_files([]), do: {:error, "Target files list cannot be empty"}
+
+  defp validate_target_files(invalid),
+    do: {:error, "Expected a list of target files, got: #{inspect(invalid)}"}
+
+  @spec validate_graph(term()) :: :ok | {:error, String.t()}
+  defp validate_graph(%FileGraph{}), do: :ok
+
+  defp validate_graph(invalid),
+    do: {:error, "Expected a FileGraph struct, got: #{inspect(invalid)}"}
 
   @doc """
   Analyzes the impact of changing a single target file.
@@ -69,44 +86,72 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
       iex> impact.impact_severity
       :high
   """
-  @spec analyze_file_impact(String.t(), FileGraph.t(), map()) :: ChangeImpact.t()
-  def analyze_file_impact(target_file, graph, options \\ {}) do
-    # Set default opions if not provided 
-    blast_threshold = Map.get(options, :blast_threshold, 0.3)
-    max_radius = Map.get(options, :max_radius, 2)
-    blast_radius = ComputeCouplings.blast_radius(graph, target_file, blast_threshold, max_radius)
+  @spec analyze_file_impact(String.t(), FileGraph.t(), map()) ::
+          ChangeImpact.t() | {:error, String.t()}
+  def analyze_file_impact(target_file, graph, options \\ %{}) do
+    with :ok <- validate_file_exists_in_graph(target_file, graph) do
+      # Set default options if not provided 
+      blast_threshold = Map.get(options, :blast_threshold, 0.3)
+      max_radius = Map.get(options, :max_radius, 2)
 
-    file_metrics = FileGraph.file_metrics(graph, target_file)
-    affected_files = format_affected_files(graph, blast_radius)
-    affected_components = FileGraph.cross_component_impact(graph, blast_radius)
+      blast_radius =
+        ComputeCouplings.blast_radius(graph, target_file, blast_threshold, max_radius)
 
-    risk_score =
-      calculate_risk_score(
-        blast_radius,
-        file_metrics,
-        affected_components,
-        options
-      )
+      file_metrics = FileGraph.file_metrics(graph, target_file)
+      affected_files = format_affected_files(graph, blast_radius)
+      affected_components = FileGraph.cross_component_impact(graph, blast_radius)
 
-    risk_factors =
-      identify_risk_factors(
+      risk_score =
+        calculate_risk_score(
+          blast_radius,
+          file_metrics,
+          affected_components,
+          options
+        )
+
+      risk_factors =
+        identify_risk_factors(
+          target_file,
+          file_metrics,
+          blast_radius,
+          affected_components
+        )
+
+      suggested_reviewers = suggest_reviewers(graph, target_file, blast_radius)
+
+      ChangeImpact.new(
         target_file,
-        file_metrics,
-        blast_radius,
-        affected_components
+        risk_score,
+        affected_files,
+        affected_components,
+        suggested_reviewers,
+        risk_factors
       )
-
-    suggested_reviewers = suggest_reviewers(graph, target_file, blast_radius)
-
-    ChangeImpact.new(
-      target_file,
-      risk_score,
-      affected_files,
-      affected_components,
-      suggested_reviewers,
-      risk_factors
-    )
+    end
   end
+
+  @spec validate_file_exists_in_graph(String.t(), FileGraph.t()) :: :ok | {:error, String.t()}
+  defp validate_file_exists_in_graph(file, %FileGraph{nodes: nodes}) do
+    if Map.has_key?(nodes, file) do
+      :ok
+    else
+      {:error, "File '#{file}' not found in the file graph"}
+    end
+  end
+
+  @max_size_factor 2.0
+  @size_divisor 5
+
+  @max_complexity_factor 2.5
+  @complexity_divisor 10
+
+  @max_revision_factor 2.5
+  @revision_divisor 10
+
+  @max_cross_component_factor 3.0
+  @cross_component_multiplier 0.8
+
+  @max_total_score 10.0
 
   @doc """
   Calculates a risk score based on multiple factors.
@@ -143,22 +188,26 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
         ) :: float()
   def calculate_risk_score(blast_radius, file_metrics, affected_components, _options \\ []) do
     # Size factor (0-2 points): based on blast radius size
-    size_factor = min(length(blast_radius) / 5, 2.0)
+    size_factor = min(length(blast_radius) / @size_divisor, @max_size_factor)
 
     # Complexity factor (0-2.5 points): based on code complexity
-    complexity_factor = min(file_metrics.complexity / 10, 2.5)
+    complexity_factor = min(file_metrics.complexity / @complexity_divisor, @max_complexity_factor)
 
     # Revision factor (0-2.5 points): based on change frequency
-    revision_factor = min(file_metrics.revisions / 10, 2.5)
+    revision_factor = min(file_metrics.revisions / @revision_divisor, @max_revision_factor)
 
     # Cross-component factor (0-3 points): based on architectural impact
-    cross_component_factor = min(map_size(affected_components) * 0.8, 3.0)
+    cross_component_factor =
+      min(
+        map_size(affected_components) * @cross_component_multiplier,
+        @max_cross_component_factor
+      )
 
     # Calculate total score (max 10.0)
     total_score = size_factor + complexity_factor + revision_factor + cross_component_factor
 
-    # Cap at 10.0
-    min(total_score, 10.0)
+    # Cap at max score
+    min(total_score, @max_total_score)
   end
 
   @doc """

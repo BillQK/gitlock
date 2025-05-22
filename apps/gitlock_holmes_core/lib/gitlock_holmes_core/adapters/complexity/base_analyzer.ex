@@ -8,6 +8,15 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
   It supports analyzing a single file or a directory of files by delegating to
   `analyze_file/1`.
   """
+  # Define a standardized error type
+  @typedoc "Standard error format for complexity analyzers"
+  # File I/O errors
+  @type complexity_error ::
+          {:io_error, String.t(), term()}
+          # Parsing errors
+          | {:parse_error, String.t(), term()}
+          # Analysis errors
+          | {:analysis_error, String.t(), term()}
 
   @doc """
   When used, provides default implementations for the `ComplexityAnalyzerPort` behavior.
@@ -31,6 +40,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       @behaviour GitlockHolmesCore.Ports.ComplexityAnalyzerPort
 
       alias GitlockHolmesCore.Domain.Values.ComplexityMetrics
+      alias GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer
 
       # Determine if this is a delegating analyzer that doesn't calculate complexity directly
       @is_delegating_analyzer unquote(Keyword.get(opts, :delegating, false))
@@ -52,24 +62,26 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       @impl true
       @spec analyze_file(String.t()) ::
               {:ok, ComplexityMetrics.t()}
-              | {:error, {:io, String.t(), term()}}
+              | {:error, BaseAnalyzer.complexity_error()}
       def analyze_file(file_path) do
-        case File.read(file_path) do
-          {:ok, content} ->
-            metrics =
-              ComplexityMetrics.new(
-                file_path,
-                count_lines(content),
-                calculate_complexity(content, file_path),
-                detect_language(file_path)
-              )
+        with {:ok, content} <- File.read(file_path) |> handle_io_error(file_path),
+             {:ok, complexity} <- calculate_complexity(content, file_path) do
+          metrics =
+            ComplexityMetrics.new(
+              file_path,
+              count_lines(content),
+              complexity,
+              detect_language(file_path)
+            )
 
-            {:ok, metrics}
-
-          {:error, reason} ->
-            {:error, {:io, file_path, reason}}
+          {:ok, metrics}
         end
       end
+
+      defp handle_io_error({:ok, content}, _file_path), do: {:ok, content}
+
+      defp handle_io_error({:error, reason}, file_path),
+        do: {:error, {:io_error, file_path, reason}}
 
       @doc """
       Recursively analyze supported files in `directory` concurrently.
@@ -104,16 +116,39 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
               relative_path = Path.relative_to(m.file_path, directory)
               Map.put(acc, relative_path, m)
 
-            {:ok, {:error, {:io, path, reason}}}, acc ->
-              Map.put(acc, path, %{error: "I/O error: #{inspect(reason)}"})
+            {:ok, {:error, error}}, acc ->
+              # Format error for the specific file, include a default metrics struct
+              # with a warning flag set
+              error_description = format_error(error)
+              relative_path = Path.relative_to(error_description.file_path, directory)
+
+              Map.put(acc, relative_path, %{
+                file_path: error_description.file_path,
+                loc: 0,
+                cyclomatic_complexity: 1,
+                language: :unknown,
+                error: error_description.message
+              })
 
             {:exit, reason}, acc ->
-              Map.put(acc, "exit_#{inspect(reason)}", %{error: "Task crashed"})
+              Map.put(acc, "exit_#{inspect(reason)}", %{error: "Task crashed: #{inspect(reason)}"})
           end)
         else
           {:error, "Invalid or inaccessible directory: #{directory}"}
         end
       end
+
+      defp format_error({:io_error, file_path, reason}),
+        do: %{file_path: file_path, message: "I/O error: #{inspect(reason)}"}
+
+      defp format_error({:parse_error, file_path, reason}),
+        do: %{file_path: file_path, message: "Parse error: #{inspect(reason)}"}
+
+      defp format_error({:analysis_error, file_path, reason}),
+        do: %{file_path: file_path, message: "Analysis error: #{inspect(reason)}"}
+
+      defp format_error(other),
+        do: %{file_path: "unknown", message: "Unknown error: #{inspect(other)}"}
 
       defp collect_all_files(dir) do
         Path.wildcard(Path.join([dir, "**", "*"]))

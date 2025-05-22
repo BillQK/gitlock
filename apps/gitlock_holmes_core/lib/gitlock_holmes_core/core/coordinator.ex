@@ -38,19 +38,53 @@ defmodule GitlockHolmesCore.Core.Coordinator do
   """
   @spec investigate(atom(), String.t(), map()) :: {:ok, String.t()} | {:error, String.t()}
   def investigate(type, repo_path, options \\ %{}) do
-    options = Map.merge(%{format: "csv", vcs: "git"}, options)
-
-    with {:ok, inv_mod} <- fetch_investigation(type),
+    with :ok <- validate_type(type),
+         :ok <- validate_repo_path(repo_path),
+         options <- Map.merge(%{format: "csv", vcs: "git"}, options),
+         {:ok, inv_mod} <- fetch_investigation(type),
          {:ok, vcs_mod} <- fetch_vcs(options.vcs),
          {:ok, reporter} <- fetch_reporter(options.format),
-         {:ok, analyzer} <- fetch_analyzer(type, options),
-         do: inv_mod.investigate(repo_path, vcs_mod, reporter, analyzer, options)
+         {:ok, analyzer} <- fetch_analyzer(type, options) do
+      inv_mod.investigate(repo_path, vcs_mod, reporter, analyzer, options)
+    else
+      {:error, reason} ->
+        {:error, "Investigation failed: #{reason}"}
+    end
+  end
+
+  @spec validate_type(atom()) :: :ok | {:error, String.t()}
+  defp validate_type(type) when is_atom(type) do
+    if Map.has_key?(@investigations, type) do
+      :ok
+    else
+      available_types = Map.keys(@investigations) |> Enum.map(&to_string/1) |> Enum.join(", ")
+
+      {:error,
+       "Unknown investigation type: #{inspect(type)}. Available types: #{available_types}"}
+    end
+  end
+
+  defp validate_type(type),
+    do: {:error, "Investigation type must be an atom, got: #{inspect(type)}"}
+
+  @spec validate_repo_path(term()) :: :ok | {:error, String.t()}
+  defp validate_repo_path(nil), do: {:error, "Repository path cannot be nil"}
+
+  defp validate_repo_path(path) when not is_binary(path),
+    do: {:error, "Repository path must be a string, got: #{inspect(path)}"}
+
+  defp validate_repo_path(path) do
+    if File.exists?(path) do
+      :ok
+    else
+      {:error, "Repository path does not exist: #{path}"}
+    end
   end
 
   defp fetch_investigation(type) do
-    case @investigations[type] do
-      nil -> {:error, "Unknown investigation: #{inspect(type)}"}
-      mod -> {:ok, mod}
+    case Map.fetch(@investigations, type) do
+      {:ok, mod} -> {:ok, mod}
+      :error -> {:error, "Unknown investigation: #{inspect(type)}"}
     end
   end
 

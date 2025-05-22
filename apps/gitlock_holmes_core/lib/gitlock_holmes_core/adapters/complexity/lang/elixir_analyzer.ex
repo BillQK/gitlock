@@ -8,20 +8,25 @@ defmodule GitlockHolmesCore.Adapters.Complexity.Lang.ElixirAnalyzer do
 
   def supported_extensions, do: [".ex", ".exs"]
 
-  # Must be a public function to override the BaseAnalyzer
-  def calculate_complexity(content, _file_path) do
+  def calculate_complexity(content, file_path) do
     try do
-      # Parse the code to AST
-      {:ok, ast} = Code.string_to_quoted(content)
+      # Handle the result from Code.string_to_quoted without pattern matching
+      case Code.string_to_quoted(content) do
+        {:ok, ast} ->
+          # Calculate complexity (starting at 1 for baseline)
+          complexity = 1 + count_complexity(ast)
+          complexity
 
-      # Calculate complexity (starting at 1 for baseline)
-      complexity = 1 + count_complexity(ast)
-
-      # Return complexity value
-      complexity
+        {:error, {line, error, _token}} ->
+          # Log the error but still return a default value
+          IO.warn("#{file_path}: Syntax error on line #{line}: #{error}")
+          -1
+      end
     rescue
-      # Default complexity if parsing fails
-      _ -> 1
+      e ->
+        # Log the exception but still return a default value
+        IO.warn("#{file_path}: Error analyzing code: #{Exception.message(e)}")
+        -1
     end
   end
 
