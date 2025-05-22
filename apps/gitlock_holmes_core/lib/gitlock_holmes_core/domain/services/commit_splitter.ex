@@ -16,12 +16,12 @@ defmodule GitlockHolmesCore.Domain.Services.CommitSplitter do
     * `{:ok, {sorted, early, recent}}` on success
     * `{:error, reason}` if input is invalid
   """
-  @spec split_commits([Commit.t()]) :: {:ok, split_result()} | {:error, String.t()}
+  @spec split_commits([Commit.t()]) :: split_result() | {:error, String.t()}
   def split_commits(commits) when is_list(commits) and length(commits) > 0 do
     sorted = Enum.sort_by(commits, & &1.date)
     mid = div(length(sorted), 2)
     {early, recent} = Enum.split(sorted, mid)
-    {:ok, {sorted, early, recent}}
+    {sorted, early, recent}
   end
 
   def split_commits([]) do

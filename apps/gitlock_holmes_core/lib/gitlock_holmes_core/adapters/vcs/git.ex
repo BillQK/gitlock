@@ -15,9 +15,8 @@ defmodule GitlockHolmesCore.Adapters.VCS.Git do
   @impl true
   @spec get_commit_history(String.t(), map()) :: get_history_result()
   def get_commit_history(log_file, _options) do
-    with {:ok, content} <- File.read(log_file) |> annotate_error({:io, log_file}),
-         {:ok, commits} <- parse_git_log(content) do
-      {:ok, commits}
+    with {:ok, content} <- File.read(log_file) |> annotate_error({:io, log_file}) do
+      parse_git_log(content)
     end
   end
 
@@ -44,46 +43,59 @@ defmodule GitlockHolmesCore.Adapters.VCS.Git do
   end
 
   @spec parse_commit(String.t()) :: {:ok, Commit.t()} | {:error, error_reason()}
+  @spec parse_commit(String.t()) :: {:ok, Commit.t()} | {:error, error_reason()}
   defp parse_commit(commit_text) do
-    try do
-      # Just a simplified example of parsing a Git commit
-      case String.split(commit_text, "\n", trim: true) do
-        [] ->
-          {:error, {:commit, "Empty commit text"}}
+    with {:ok, lines} <- extract_lines(commit_text),
+         {:ok, header, file_lines} <- split_header_and_files(lines),
+         {:ok, id, date, author_name} <- parse_header(header),
+         {:ok, file_changes} <- parse_file_changes(file_lines) do
+      # Create the commit with parsed data
+      author = Author.new(author_name)
+      {:ok, Commit.new(id, author, date, "", file_changes)}
+    end
+  end
 
-        [header | file_lines] ->
-          # Extract header info for the new format: --commit_id--date--author
-          case Regex.run(~r/--(.+?)--(.+?)--(.+)/, header) do
-            [_, id, date, author] ->
-              # Parse file changes
-              file_changes =
-                file_lines
-                |> Enum.filter(&String.contains?(&1, "\t"))
-                |> Enum.reduce_while({:ok, []}, fn line, {:ok, changes} ->
-                  case String.split(line, "\t", parts: 3) do
-                    [added, deleted, file] ->
-                      {:cont, {:ok, [FileChange.new(file, added, deleted) | changes]}}
+  # Extract lines from commit text
+  defp extract_lines(""), do: {:error, {:commit, "Empty commit text"}}
 
-                    _ ->
-                      {:halt, {:error, {:commit, "Malformed file change line: #{line}"}}}
-                  end
-                end)
+  defp extract_lines(commit_text) do
+    lines = String.split(commit_text, "\n", trim: true)
+    if Enum.empty?(lines), do: {:error, {:commit, "Empty commit text"}}, else: {:ok, lines}
+  end
 
-              case file_changes do
-                {:ok, changes} ->
-                  author = Author.new(author)
-                  {:ok, Commit.new(id, author, date, "", Enum.reverse(changes))}
+  # Split header and file lines
+  defp split_header_and_files([]), do: {:error, {:commit, "No header line found"}}
+  defp split_header_and_files([header | file_lines]), do: {:ok, header, file_lines}
 
-                error ->
-                  error
-              end
+  # Parse header information
+  defp parse_header(header) do
+    case Regex.run(~r/--(.+?)--(.+?)--(.+)/, header) do
+      [_, id, date, author] -> {:ok, id, date, author}
+      _ -> {:error, {:commit, "Invalid commit header format: #{header}"}}
+    end
+  end
 
-            nil ->
-              {:error, {:commit, "Invalid commit header format: #{header}"}}
-          end
-      end
-    rescue
-      e -> {:error, {:commit, "Failed to parse commit: #{Exception.message(e)}"}}
+  # Parse file changes
+  defp parse_file_changes(file_lines) do
+    file_lines
+    |> Enum.filter(&String.contains?(&1, "\t"))
+    |> Enum.reduce_while({:ok, []}, fn line, {:ok, changes} ->
+      parse_file_change_line(line, changes)
+    end)
+    |> case do
+      {:ok, changes} -> {:ok, Enum.reverse(changes)}
+      error -> error
+    end
+  end
+
+  # Parse a single file change line
+  defp parse_file_change_line(line, changes) do
+    case String.split(line, "\t", parts: 3) do
+      [added, deleted, file] ->
+        {:cont, {:ok, [FileChange.new(file, added, deleted) | changes]}}
+
+      _ ->
+        {:halt, {:error, {:commit, "Malformed file change line: #{line}"}}}
     end
   end
 

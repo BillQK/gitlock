@@ -57,7 +57,7 @@ defmodule GitlockHolmesCore.Core.Coordinator do
     if Map.has_key?(@investigations, type) do
       :ok
     else
-      available_types = Map.keys(@investigations) |> Enum.map(&to_string/1) |> Enum.join(", ")
+      available_types = Map.keys(@investigations) |> Enum.map_join(&to_string/1, ".")
 
       {:error,
        "Unknown investigation type: #{inspect(type)}. Available types: #{available_types}"}
