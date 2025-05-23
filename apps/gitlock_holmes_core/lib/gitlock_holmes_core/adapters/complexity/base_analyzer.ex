@@ -36,6 +36,8 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       # Determine if this is a delegating analyzer that doesn't calculate complexity directly
       @is_delegating_analyzer unquote(Keyword.get(opts, :delegating, false))
 
+      @file_system GitlockHolmesCore.Adapters.FileSystem.LocalFileSystem
+
       @doc """
       Analyzes the complexity of a file.
 
@@ -55,7 +57,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
               {:ok, ComplexityMetrics.t()}
               | {:error, {:io, String.t(), term()}}
       def analyze_file(file_path) do
-        case File.read(file_path) do
+        case @file_system.read_file(file_path) do
           {:ok, content} ->
             metrics =
               ComplexityMetrics.new(
@@ -90,13 +92,13 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       @spec analyze_directory(directory :: String.t(), opts :: map()) ::
               %{String.t() => map()} | {:error, String.t()}
       def analyze_directory(directory, opts \\ %{}) do
-        if File.dir?(directory) do
+        if @file_system.dir?(directory) do
           supported_ext = supported_extensions()
 
           directory
           |> collect_all_files()
           |> Enum.filter(fn file ->
-            ext = Path.extname(file)
+            ext = @file_system.extname(file)
             "*" in supported_ext || ext in supported_ext
           end)
           |> Task.async_stream(&analyze_file/1, on_timeout: :kill_task)
@@ -117,7 +119,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
       end
 
       defp collect_all_files(dir) do
-        Path.wildcard(Path.join([dir, "**", "*"]))
+        @file_system.wildcard(Path.join([dir, "**", "*"]))
         |> Enum.filter(&File.regular?/1)
       end
 
@@ -128,7 +130,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
 
       @spec detect_language(file_path :: String.t()) :: atom()
       defp detect_language(file_path) do
-        ext = Path.extname(file_path)
+        ext = @file_system.extname(file_path)
 
         cond do
           ext in [".ex", ".exs"] -> :elixir
