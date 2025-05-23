@@ -135,6 +135,7 @@ defmodule GitlockHolmesCore.Adapters.Complexity.BaseAnalyzer do
         cond do
           ext in [".ex", ".exs"] -> :elixir
           ext in [".js", ".jsx"] -> :javascript
+          ext in [".ts", ".tsx"] -> :typescript
           ext in [".rb"] -> :ruby
           ext in [".py"] -> :python
           ext in [".java"] -> :java

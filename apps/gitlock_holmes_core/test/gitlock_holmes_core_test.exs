@@ -6,3 +6,4 @@ defmodule GitlockHolmesCoreTest do
     assert GitlockHolmesCore.hello() == :world
   end
 end
+
