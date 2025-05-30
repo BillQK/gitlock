@@ -27,9 +27,9 @@ defmodule GitlockHolmesCore.Application.UseCases.AnalyzeBlastRadius do
            complexity_map <- get_complexity_map(deps.analyzer, options),
            active_files <- get_active_files(deps.file_system, options) do
         graph =
-          FileGraphBuilder.create_from_commits(commits, complexity_map, options)
+          FileGraphBuilder.create_from_commits(commits, complexity_map, active_files, options)
 
-        impacts = ChangeAnalyzer.analyze_changes(target_files, graph, active_files, options)
+        impacts = ChangeAnalyzer.analyze_changes(target_files, graph, options)
 
         {:ok, impacts}
       end

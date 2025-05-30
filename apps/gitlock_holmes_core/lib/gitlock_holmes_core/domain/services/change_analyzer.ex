@@ -108,15 +108,17 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
         |> ComputeCouplings.blast_radius(target_file, blast_threshold, max_radius)
         |> filter_existing_files(active_files)
 
+      active_blast_radius = filter_active_files(blast_radius, graph)
+
       file_metrics = FileGraph.file_metrics(graph, target_file)
-      affected_files = format_affected_files(graph, blast_radius)
+      affected_files = format_affected_files(graph, active_blast_radius)
 
       affected_components =
         ComponentImpactAnalysis.calculate_cross_component_impact(graph, blast_radius)
 
       risk_score =
         calculate_risk_score(
-          blast_radius,
+          active_blast_radius,
           file_metrics,
           affected_components,
           options
@@ -126,7 +128,7 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
         identify_risk_factors(
           target_file,
           file_metrics,
-          blast_radius,
+          active_blast_radius,
           affected_components
         )
 
@@ -143,9 +145,12 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
     end
   end
 
-  defp filter_existing_files(impacts, active_files) do
-    Enum.filter(impacts, fn {file, _, _} ->
-      Enum.member?(active_files, file)
+  defp filter_active_files(blast_radius, graph) do
+    Enum.filter(blast_radius, fn {file_path, _impact, _distance} ->
+      case Map.get(graph.nodes, file_path) do
+        nil -> false
+        node_meta -> node_meta.active == true
+      end
     end)
   end
 
