@@ -11,6 +11,7 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
 
   It provides the core business logic for impact assessment 
   """
+  alias GitlockHolmesCore.Domain.Services.ComponentImpactAnalysis
   alias GitlockHolmesCore.Domain.Values.ChangeImpact
   alias GitlockHolmesCore.Domain.Values.FileGraph
   alias GitlockHolmesCore.Domain.Services.ComputeCouplings
@@ -107,7 +108,9 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
 
       file_metrics = FileGraph.file_metrics(graph, target_file)
       affected_files = format_affected_files(graph, blast_radius)
-      affected_components = FileGraph.cross_component_impact(graph, blast_radius)
+
+      affected_components =
+        ComponentImpactAnalysis.calculate_cross_component_impact(graph, blast_radius)
 
       risk_score =
         calculate_risk_score(
