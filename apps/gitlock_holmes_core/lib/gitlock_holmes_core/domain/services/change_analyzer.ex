@@ -53,13 +53,13 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
         %ChangeImpact{entity: "lib/user/profile.ex", ...}
       ]  
   """
-  @spec analyze_changes([String.t()], FileGraph.t(), map()) ::
+  @spec analyze_changes([String.t()], FileGraph.t(), [String.t()], map()) ::
           [ChangeImpact.t()] | {:error, String.t()}
-  def analyze_changes(target_files, graph, options \\ %{}) do
+  def analyze_changes(target_files, graph, active_files, options \\ %{}) do
     with :ok <- validate_target_files(target_files),
          :ok <- FileGraph.validate_graph(graph) do
       Enum.map(target_files, fn file ->
-        analyze_file_impact(file, graph, options)
+        analyze_file_impact(file, graph, active_files, options)
       end)
     end
   end
@@ -95,16 +95,18 @@ defmodule GitlockHolmesCore.Domain.Services.ChangeAnalyzer do
       iex> impact.impact_severity
       :high
   """
-  @spec analyze_file_impact(String.t(), FileGraph.t(), map()) ::
+  @spec analyze_file_impact(String.t(), FileGraph.t(), [String.t()], map()) ::
           ChangeImpact.t() | {:error, String.t()}
-  def analyze_file_impact(target_file, graph, options \\ %{}) do
+  def analyze_file_impact(target_file, graph, active_files, options \\ %{}) do
     with :ok <- FileGraph.validate_file_exists_in_graph(target_file, graph) do
       # Set default options if not provided 
       blast_threshold = Map.get(options, :blast_threshold, 0.3)
       max_radius = Map.get(options, :max_radius, 2)
 
       blast_radius =
-        ComputeCouplings.blast_radius(graph, target_file, blast_threshold, max_radius)
+        graph
+        |> ComputeCouplings.blast_radius(target_file, blast_threshold, max_radius)
+        |> filter_existing_files(active_files)
 
       active_blast_radius = filter_active_files(blast_radius, graph)
 
