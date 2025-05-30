@@ -10,6 +10,7 @@ defmodule GitlockHolmesCore.Application do
     children = [
       # Starts a worker by calling: GitlockHolmes.Worker.start_link(arg)
       # {GitlockHolmes.Worker, arg}
+      GitlockHolmesCore.Infrastructure.AdapterRegistry
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
