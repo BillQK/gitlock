@@ -33,6 +33,9 @@ defmodule GitlockHolmesCore.Infrastructure.AdapterRegistry do
       },
       complexity_analyzer: %{
         "dispatch" => GitlockHolmesCore.Adapters.Complexity.DispatchAnalyzer
+      },
+      file_system: %{
+        "local_file_system" => GitlockHolmesCore.Adapters.FileSystem.LocalFileSystem
       }
     }
 

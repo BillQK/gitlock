@@ -64,4 +64,38 @@ defmodule GitlockHolmesCore.Ports.FileSystemPort do
     * `String.t()` - The string of the extension
   """
   @callback extname(file_path :: String.t()) :: String.t()
+
+  @doc """
+  Returns true if the file exists
+
+
+  ## Parameters
+    * `file_path` - The file path with the extension
+    
+  ## Returns
+    * `Boolean` - True or False
+  """
+  @callback exists?(file_path :: String.t()) :: boolean()
+  @doc """
+  Lists all regular files recursively from a base path.
+
+  This function traverses the directory tree starting from `base_path`
+  and returns all regular files found. Symbolic links are not followed
+  to avoid infinite loops.
+
+  ## Parameters
+    * `base_path` - Starting directory for the file listing
+
+  ## Returns
+    * List of relative file paths from the base path
+    * Empty list if base path doesn't exist or isn't a directory
+
+  ## Examples
+      iex> FileSystem.list_all_files("lib")
+      ["core/domain.ex", "core/services/analyzer.ex", ...]
+      
+      iex> FileSystem.list_all_files("nonexistent")
+      []
+  """
+  @callback list_all_files(base_path :: String.t()) :: [String.t()]
 end

@@ -29,4 +29,21 @@ defmodule GitlockHolmesCore.Adapters.FileSystem.LocalFileSystem do
   def extname(file_path) do
     Path.extname(file_path)
   end
+
+  @impl true
+  def exists?(file_path) do
+    File.exists?(file_path)
+  end
+
+  @impl true
+  def list_all_files(base_path) do
+    base_path
+    |> do_list_files()
+    |> Enum.map(&Path.relative_to(&1, base_path))
+  end
+
+  defp do_list_files(path) do
+    Path.wildcard(Path.join([path, "**", "*"]))
+    |> Enum.filter(&File.regular?/1)
+  end
 end

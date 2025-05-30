@@ -8,8 +8,11 @@ defmodule GitlockHolmesCore.Application.UseCases.AnalyzeBlastRadius do
   def resolve_dependencies(options) do
     with {:ok, vcs} <- AdapterRegistry.get_adapter(:vcs, options[:vcs] || "git"),
          {:ok, reporter} <- AdapterRegistry.get_adapter(:reporter, options[:format] || "csv"),
-         {:ok, analyzer} <- resolve_complexity_analyzer(options) do
-      {:ok, %{vcs: vcs, reporter: reporter, analyzer: analyzer}}
+         {:ok, file_system} <-
+           AdapterRegistry.get_adapter(:file_system, options[:file_system] || "local_file_system"),
+         {:ok, analyzer} <-
+           resolve_complexity_analyzer(options) do
+      {:ok, %{vcs: vcs, reporter: reporter, analyzer: analyzer, file_system: file_system}}
     end
   end
 
@@ -21,9 +24,12 @@ defmodule GitlockHolmesCore.Application.UseCases.AnalyzeBlastRadius do
       {:error, "No target_files specified. Use --target-files option"}
     else
       with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options),
-           complexity_map <- get_complexity_map(deps.analyzer, options) do
-        graph = FileGraphBuilder.create_from_commits(commits, complexity_map, options)
-        impacts = ChangeAnalyzer.analyze_changes(target_files, graph, options)
+           complexity_map <- get_complexity_map(deps.analyzer, options),
+           active_files <- get_active_files(deps.file_system, options) do
+        graph =
+          FileGraphBuilder.create_from_commits(commits, complexity_map, options)
+
+        impacts = ChangeAnalyzer.analyze_changes(target_files, graph, active_files, options)
 
         {:ok, impacts}
       end
@@ -56,6 +62,12 @@ defmodule GitlockHolmesCore.Application.UseCases.AnalyzeBlastRadius do
       nil -> %{}
       dir -> ComplexityCollector.collect_complexity(analyzer, dir)
     end
+  end
+
+  defp get_active_files(file_system, options) do
+    base_path = options[:dir] || "."
+    files = file_system.list_all_files(base_path)
+    MapSet.new(files)
   end
 
   defp format_as_map(impact) do
