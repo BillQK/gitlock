@@ -92,9 +92,19 @@ defmodule GitlockHolmesCore.Domain.Services.FileGraphBuilder do
     iex> length(basic_graph.edges) > 0
     true
   """
-  @spec create_from_commits([Commit.t()], %{String.t() => ComplexityMetrics.t()}, map()) ::
+  @spec create_from_commits(
+          [Commit.t()],
+          %{String.t() => ComplexityMetrics.t()},
+          MapSet.t(),
+          map()
+        ) ::
           FileGraph.t()
-  def create_from_commits(commits, complexity_map \\ %{}, options \\ %{}) do
+  def create_from_commits(
+        commits,
+        complexity_map \\ %{},
+        active_files_set \\ MapSet.new(),
+        options \\ %{}
+      ) do
     # Get coupling data from commit history
     {coupling_data, file_revisions} = CochangeAnalyzer.analyze_commits(commits)
 
@@ -103,7 +113,15 @@ defmodule GitlockHolmesCore.Domain.Services.FileGraphBuilder do
     authors_by_file = extract_authors_by_file(commits)
 
     # Build graph nodes with metadata 
-    nodes = build_nodes(file_paths, authors_by_file, file_revisions, complexity_map, options)
+    nodes =
+      build_nodes(
+        file_paths,
+        authors_by_file,
+        file_revisions,
+        complexity_map,
+        active_files_set,
+        options
+      )
 
     # Build graph edges from coupling data 
     edges = build_edges(coupling_data, file_revisions)
@@ -165,9 +183,17 @@ defmodule GitlockHolmesCore.Domain.Services.FileGraphBuilder do
           %{String.t() => [String.t()]},
           %{String.t() => non_neg_integer()},
           %{String.t() => ComplexityMetrics.t()},
+          MapSet.t(),
           map()
         ) :: %{String.t() => map()}
-  def build_nodes(file_paths, authors_by_file, file_revisions, complexity_map, options) do
+  def build_nodes(
+        file_paths,
+        authors_by_file,
+        file_revisions,
+        complexity_map,
+        active_files_set,
+        options
+      ) do
     component_mapping = Map.get(options, :component_mapping, &detect_component/1)
 
     file_paths
@@ -187,13 +213,16 @@ defmodule GitlockHolmesCore.Domain.Services.FileGraphBuilder do
       # Get authors for this file
       authors = Map.get(authors_by_file, file_path, [])
 
+      is_active = MapSet.member?(active_files_set, file_path)
+
       # Create node metadata 
       metadata = %{
         revisions: revisions,
         complexity: complexity,
         loc: loc,
         component: component,
-        authors: authors
+        authors: authors,
+        active: is_active
       }
 
       {file_path, metadata}

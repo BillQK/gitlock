@@ -14,9 +14,8 @@ defmodule GitlockHolmesCore.Application.UseCase do
       @spec execute(String.t(), map()) :: {:ok, String.t()} | {:error, String.t()}
       def execute(repo_path, options) do
         with {:ok, dependencies} <- resolve_dependencies(options),
-             {:ok, domain_result} <- run_domain_logic(repo_path, dependencies, options),
-             {:ok, formatted_result} <- format_result(domain_result, dependencies, options) do
-          {:ok, formatted_result}
+             {:ok, domain_result} <- run_domain_logic(repo_path, dependencies, options) do
+          {:ok, format_result} = format_result(domain_result, dependencies, options)
         end
       end
 
