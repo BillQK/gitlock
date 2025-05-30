@@ -1,0 +1,502 @@
+--923dad4--2025-05-29--Khoi Ngo
+11	5	apps/gitlock_holmes_core/lib/gitlock_holmes_core.ex
+1	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application.ex
+26	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_case.ex
+32	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_case_factory.ex
+75	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_cases/analyze_blast_radius.ex
+43	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_cases/analyze_coupled_hotspots.ex
+28	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_cases/analyze_couplings.ex
+43	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_cases/analyze_hotspots.ex
+26	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_cases/analyze_knowledge_silos.ex
+26	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/application/use_cases/get_summary.ex
+0	107	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/coordinator.ex
+0	98	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/investigation.ex
+0	13	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/get_summary.ex
+0	49	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_blast_radius.ex
+0	12	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_coupled_hotspot.ex
+0	12	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_couplings.ex
+0	11	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_hotspots.ex
+0	18	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_knowledge_silos.ex
+4	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/change_analyzer.ex
+90	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/component_impact_analysis.ex
+0	90	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/values/file_graph.ex
+61	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/infrastructure/adapter_registry.ex
+1	0	apps/gitlock_holmes_core/mix.exs
+
+--2426ac1--2025-05-23--Khoi Ngo
+1	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/base_analyzer.ex
+2	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/dispatch_analyzer.ex
+133	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/lang/python_analyzer.ex
+1	0	apps/gitlock_holmes_core/test/gitlock_holmes_core_test.exs
+218	0	apps/gitlock_holmes_core/test/python_analyzer_test.exs
+
+--66dee66--2025-05-23--Khoi Ngo
+7	5	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/base_analyzer.ex
+32	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/file_system/local_file_system.ex
+67	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/ports/file_system_port.ex
+
+--f8d3b7e--2025-05-22--Khoi Ngo
+16	31	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/change_analyzer.ex
+5	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/compute_couplings.ex
+38	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/values/file_graph.ex
+
+--5988915--2025-05-21--Khoi Ngo
+2	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/base_analyzer.ex
+17	12	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/lang/elixir_analyzer.ex
+93	27	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/reporters/csv_reporter.ex
+83	52	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/vcs/git.ex
+42	8	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/coordinator.ex
+93	44	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/change_analyzer.ex
+23	3	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/commit_splitter.ex
+
+--3a6807d--2025-05-21--Khoi Ngo
+32	4	apps/gitlock_holmes_cli/lib/main.ex
+3	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/coordinator.ex
+3	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/investigation.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/get_summary.ex
+49	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_blast_radius.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_coupled_hotspot.ex
+1	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_couplings.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_hotspots.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_knowledge_silos.ex
+316	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/change_analyzer.ex
+263	13	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/compute_couplings.ex
+316	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/file_graph_builder.ex
+267	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/values/change_impact.ex
+303	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/values/file_graph.ex
+
+--9156459--2025-05-15--Khoi Ngo
+7	1	apps/gitlock_holmes_cli/lib/main.ex
+26	16	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/base_analyzer.ex
+49	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/dispatch_analyzer.ex
+102	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/lang/elixir_analyzer.ex
+72	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/lang/javascript_analyzer.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/complexity/{ => lang}/mock_analyzer.ex
+5	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/coordinator.ex
+
+--000e2af--2025-05-14--Khoi Ngo
+-	-	.DS_Store
+1	0	.tool-versions
+4	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/reporters/json_reporter.ex
+6	0	mix.exs
+3	0	mix.lock
+
+--1a86006--2025-05-14--Khoi Ngo
+1	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/summary.ex
+
+--bc2b3ba--2025-05-13--Khoi Ngo
+17	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/investigation.ex
+
+--3201e21--2025-05-13--Khoi Ngo
+1	0	.tool-versions
+1	1	apps/gitlock_holmes_cli/mix.exs
+1	1	apps/gitlock_holmes_core/mix.exs
+2	2	apps/gitlock_holmes_phx/mix.exs
+1	1	mix.exs
+
+--c59f6c5--2025-05-06--Khoi Ngo
+1	0	apps/gitlock_holmes_phx/mix.exs
+
+--11384bd--2025-05-06--Khoi Ngo
+5	0	apps/gitlock_holmes_phx/.formatter.exs
+37	0	apps/gitlock_holmes_phx/.gitignore
+18	0	apps/gitlock_holmes_phx/README.md
+5	0	apps/gitlock_holmes_phx/assets/css/app.css
+44	0	apps/gitlock_holmes_phx/assets/js/app.js
+74	0	apps/gitlock_holmes_phx/assets/tailwind.config.js
+165	0	apps/gitlock_holmes_phx/assets/vendor/topbar.js
+9	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx.ex
+35	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx/application.ex
+3	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx/mailer.ex
+116	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web.ex
+676	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/components/core_components.ex
+14	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/components/layouts.ex
+32	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/components/layouts/app.html.heex
+17	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/components/layouts/root.html.heex
+24	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/controllers/error_html.ex
+21	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/controllers/error_json.ex
+9	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/controllers/page_controller.ex
+10	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/controllers/page_html.ex
+222	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/controllers/page_html/home.html.heex
+52	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/endpoint.ex
+25	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/gettext.ex
+44	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/router.ex
+70	0	apps/gitlock_holmes_phx/lib/gitlock_holmes_phx_web/telemetry.ex
+83	0	apps/gitlock_holmes_phx/mix.exs
+11	0	apps/gitlock_holmes_phx/priv/gettext/en/LC_MESSAGES/errors.po
+10	0	apps/gitlock_holmes_phx/priv/gettext/errors.pot
+-	-	apps/gitlock_holmes_phx/priv/static/favicon.ico
+6	0	apps/gitlock_holmes_phx/priv/static/images/logo.svg
+5	0	apps/gitlock_holmes_phx/priv/static/robots.txt
+14	0	apps/gitlock_holmes_phx/test/gitlock_holmes_phx_web/controllers/error_html_test.exs
+12	0	apps/gitlock_holmes_phx/test/gitlock_holmes_phx_web/controllers/error_json_test.exs
+8	0	apps/gitlock_holmes_phx/test/gitlock_holmes_phx_web/controllers/page_controller_test.exs
+37	0	apps/gitlock_holmes_phx/test/support/conn_case.ex
+1	0	apps/gitlock_holmes_phx/test/test_helper.exs
+67	0	config/config.exs
+75	0	config/dev.exs
+21	0	config/prod.exs
+102	0	config/runtime.exs
+24	0	config/test.exs
+31	0	mix.lock
+
+--264c2b8--2025-05-06--Khoi Ngo
+0	4	apps/gitlock_holmes_cli/lib/main.ex
+
+--e83eded--2025-05-03--Khoi Ngo
+2	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/reporters/json_reporter.ex
+
+--abdff22--2025-05-03--Khoi Ngo
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/knowledge_silo_detection.ex
+
+--888c671--2025-05-02--Khoi Ngo
+5	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/reporters/csv_reporter.ex
+6	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/adapters/reporters/json_reporter.ex
+7	7	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/compute_couplings.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/coupled_hotspot_analysis.ex
+4	14	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/hotspot_detection.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/knowledge_silo_detection.ex
+95	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/values/hotspot.ex
+1	4	mix.exs
+
+--5eb3ee8--2025-04-28--Khoi Ngo
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/knowledge_silo_detection.ex
+
+--f2b4e00--2025-04-27--Khoi Ngo
+3	1	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/coordinator.ex
+18	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/core/investigations/methodology/identify_knowledge_silos.ex
+95	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/services/knowledge_silo_detection.ex
+85	0	apps/gitlock_holmes_core/lib/gitlock_holmes_core/domain/values/knowledge_silo.ex
+
+--ba92a27--2025-04-27--Khoi Ngo
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/adapters/complexity/base_analyzer.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/adapters/complexity/mock_analyzer.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/adapters/reporters/csv_reporter.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/adapters/reporters/json_reporter.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/adapters/vcs/git.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/application.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/core/coordinator.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/core/investigations/investigation.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/core/investigations/methodology/get_summary.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/core/investigations/methodology/identify_coupled_hotspot.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/core/investigations/methodology/identify_couplings.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/core/investigations/methodology/identify_hotspots.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/entities/author.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/entities/commit.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/cochange_analyzer.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/commit_splitter.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/complexity_collector.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/compute_couplings.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/coupled_hotspot_analysis.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/coupling_detection.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/hotspot_detection.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/services/summary.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/values/combined_risk.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/values/complexity_metrics.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/values/couplings_metrics.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/domain/values/file_change.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/ports/complexity_analyzer_port.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/ports/report_port.ex
+0	0	apps/gitlock_holmes_core/lib/{gitlock_holmes => gitlock_holmes_core}/ports/version_control_port.ex
+
+--3b43aec--2025-04-27--Khoi Ngo
+2	1	.gitignore
+1	1	apps/gitlock_holmes_cli/lib/main.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/adapters/complexity/mock_analyzer.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/adapters/reporters/csv_reporter.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/adapters/reporters/json_reporter.ex
+5	5	apps/gitlock_holmes_core/lib/gitlock_holmes/adapters/vcs/git.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes/application.ex
+5	5	apps/gitlock_holmes_core/lib/gitlock_holmes/core/coordinator.ex
+5	5	apps/gitlock_holmes_core/lib/gitlock_holmes/core/investigations/investigation.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/core/investigations/methodology/get_summary.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/core/investigations/methodology/identify_coupled_hotspot.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/core/investigations/methodology/identify_couplings.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/core/investigations/methodology/identify_hotspots.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/entities/author.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/entities/commit.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/cochange_analyzer.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/commit_splitter.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/complexity_collector.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/compute_couplings.ex
+5	5	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/coupled_hotspot_analysis.ex
+4	4	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/coupling_detection.ex
+3	3	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/hotspot_detection.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/services/summary.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/values/combined_risk.ex
+1	2	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/values/complexity_metrics.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/values/couplings_metrics.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes/domain/values/file_change.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/ports/complexity_analyzer_port.ex
+1	1	apps/gitlock_holmes_core/lib/gitlock_holmes/ports/report_port.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes/ports/version_control_port.ex
+2	2	apps/gitlock_holmes_core/lib/gitlock_holmes_core.ex
+
+--cd85a6a--2025-04-27--Khoi Ngo
+-	-	.DS_Store
+2	1	.formatter.exs
+4	9	.gitignore
+0	1	.tool-versions
+1	17	README.md
+4	0	apps/gitlock_holmes_cli/.formatter.exs
+26	0	apps/gitlock_holmes_cli/.gitignore
+20	0	apps/gitlock_holmes_cli/README.md
+2	0	apps/gitlock_holmes_cli/lib/gitlock_holmes_cli.ex
+8	30	{lib/gitlock_holmes/adapters/inbound/cli => apps/gitlock_holmes_cli/lib}/main.ex
+39	0	apps/gitlock_holmes_cli/mix.exs
+2	0	apps/gitlock_holmes_cli/test/gitlock_holmes_cli_test.exs
+0	0	{test => apps/gitlock_holmes_cli/test}/test_helper.exs
+4	0	apps/gitlock_holmes_core/.formatter.exs
+26	0	apps/gitlock_holmes_core/.gitignore
+21	0	apps/gitlock_holmes_core/README.md
+1	1	{lib/gitlock_holmes/adapters/outbound => apps/gitlock_holmes_core/lib/gitlock_holmes/adapters}/complexity/base_analyzer.ex
+2	2	{lib/gitlock_holmes/adapters/outbound => apps/gitlock_holmes_core/lib/gitlock_holmes/adapters}/complexity/mock_analyzer.ex
+1	1	{lib/gitlock_holmes/adapters/outbound => apps/gitlock_holmes_core/lib/gitlock_holmes/adapters}/reporters/csv_reporter.ex
+1	1	{lib/gitlock_holmes/adapters/outbound => apps/gitlock_holmes_core/lib/gitlock_holmes/adapters}/reporters/json_reporter.ex
+1	1	{lib/gitlock_holmes/adapters/outbound => apps/gitlock_holmes_core/lib/gitlock_holmes/adapters}/vcs/git.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/application.ex
+3	3	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/core/coordinator.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/core/investigations/investigation.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/core/investigations/methodology/get_summary.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/core/investigations/methodology/identify_coupled_hotspot.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/core/investigations/methodology/identify_couplings.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/core/investigations/methodology/identify_hotspots.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/entities/author.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/entities/commit.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/cochange_analyzer.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/commit_splitter.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/complexity_collector.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/compute_couplings.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/coupled_hotspot_analysis.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/coupling_detection.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/hotspot_detection.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/services/summary.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/values/combined_risk.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/values/complexity_metrics.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/values/couplings_metrics.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/domain/values/file_change.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/ports/complexity_analyzer_port.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/ports/report_port.ex
+0	0	{lib => apps/gitlock_holmes_core/lib}/gitlock_holmes/ports/version_control_port.ex
+0	0	lib/gitlock_holmes.ex => apps/gitlock_holmes_core/lib/gitlock_holmes_core.ex
+31	0	apps/gitlock_holmes_core/mix.exs
+8	0	apps/gitlock_holmes_core/test/gitlock_holmes_core_test.exs
+1	0	apps/gitlock_holmes_core/test/test_helper.exs
+18	0	config/config.exs
+14	19	mix.exs
+0	8	test/gitlock_holmes_test.exs
+
+--07c4224--2025-04-25--Khoi Ngo
+1	1	lib/gitlock_holmes/core/coordinator.ex
+
+--2daed32--2025-04-25--Khoi Ngo
+1	1	lib/gitlock_holmes/adapters/inbound/cli/main.ex
+
+--3b75ac2--2025-04-25--Khoi Ngo
+2	2	lib/gitlock_holmes/adapters/inbound/cli/main.ex
+2	2	lib/gitlock_holmes/core/coordinator.ex
+1	1	mix.exs
+
+--ad720ed--2025-04-25--Khoi Ngo
+4	80	lib/gitlock_holmes.ex
+9	3	lib/gitlock_holmes/adapters/{ui/cli.ex => inbound/cli/main.ex}
+1	1	lib/gitlock_holmes/adapters/{ => outbound}/complexity/base_analyzer.ex
+2	2	lib/gitlock_holmes/adapters/{ => outbound}/complexity/mock_analyzer.ex
+1	2	lib/gitlock_holmes/adapters/{ => outbound}/reporters/csv_reporter.ex
+1	1	lib/gitlock_holmes/adapters/{ => outbound}/reporters/json_reporter.ex
+2	2	lib/gitlock_holmes/adapters/{ => outbound}/vcs/git.ex
+0	0	lib/gitlock_holmes/adapters/sessions/in_memory_session.ex
+0	0	lib/gitlock_holmes/adapters/sessions/session_supervisor.ex
+66	0	lib/gitlock_holmes/core/coordinator.ex
+2	2	lib/gitlock_holmes/{ => core}/investigations/investigation.ex
+2	2	lib/gitlock_holmes/{ => core}/investigations/methodology/get_summary.ex
+2	2	lib/gitlock_holmes/{ => core}/investigations/methodology/identify_coupled_hotspot.ex
+2	2	lib/gitlock_holmes/{ => core}/investigations/methodology/identify_couplings.ex
+2	2	lib/gitlock_holmes/{ => core}/investigations/methodology/identify_hotspots.ex
+1	1	lib/gitlock_holmes/ports/complexity_analyzer_port.ex
+0	30	lib/gitlock_holmes/ports/session_port.ex
+
+--63d0f2f--2025-04-25--Khoi Ngo
+9	26	lib/gitlock_holmes/domain/services/compute_couplings.ex
+4	18	lib/gitlock_holmes/domain/services/coupled_hotspot_analysis.ex
+2	3	lib/gitlock_holmes/domain/services/coupling_detection.ex
+88	0	lib/gitlock_holmes/domain/values/combined_risk.ex
+61	6	lib/gitlock_holmes/domain/values/complexity_metrics.ex
+31	0	lib/gitlock_holmes/domain/values/couplings_metrics.ex
+
+--d05ffe0--2025-04-25--Khoi Ngo
+1	1	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+1	1	lib/gitlock_holmes/domain/entities/commit.ex
+1	1	lib/gitlock_holmes/domain/services/complexity_collector.ex
+2	1	lib/gitlock_holmes/domain/services/coupled_hotspot_analysis.ex
+1	2	lib/gitlock_holmes/domain/services/hotspot_detection.ex
+1	1	lib/gitlock_holmes/domain/{entities => values}/complexity_metrics.ex
+1	1	lib/gitlock_holmes/domain/{entities => values}/file_change.ex
+4	2	lib/gitlock_holmes/investigations/investigation.ex
+
+--82ffa9a--2025-04-25--Khoi Ngo
+--2eb12e7--2025-04-25--Khoi Ngo
+78	8	lib/gitlock_holmes.ex
+0	5	lib/gitlock_holmes/adapters/ui/cli.ex
+40	0	lib/gitlock_holmes/domain/services/cochange_analyzer.ex
+14	0	lib/gitlock_holmes/domain/services/commit_splitter.ex
+73	0	lib/gitlock_holmes/domain/services/compute_couplings.ex
+9	120	lib/gitlock_holmes/domain/services/coupling_detection.ex
+
+--ae319fa--2025-04-25--Khoi Ngo
+78	8	lib/gitlock_holmes.ex
+0	5	lib/gitlock_holmes/adapters/ui/cli.ex
+40	0	lib/gitlock_holmes/domain/services/cochange_analyzer.ex
+14	0	lib/gitlock_holmes/domain/services/commit_splitter.ex
+73	0	lib/gitlock_holmes/domain/services/compute_couplings.ex
+9	120	lib/gitlock_holmes/domain/services/coupling_detection.ex
+
+--c658693--2025-04-25--Khoi Ngo
+4	4	lib/gitlock_holmes/adapters/ui/cli.ex
+
+--66fe0a6--2025-04-24--Khoi Ngo
+72	42	lib/gitlock_holmes/investigations/investigation.ex
+3	11	lib/gitlock_holmes/investigations/methodology/get_summary.ex
+3	11	lib/gitlock_holmes/investigations/methodology/identify_coupled_hotspot.ex
+3	10	lib/gitlock_holmes/investigations/methodology/identify_couplings.ex
+3	24	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+
+--91dce13--2025-04-24--Khoi Ngo
+58	0	lib/gitlock_holmes/domain/services/coupled_hotspot_analysis.ex
+
+--737ec7a--2025-04-23--Khoi Ngo
+2	0	lib/gitlock_holmes/adapters/ui/cli.ex
+1	5	lib/gitlock_holmes/domain/services/complexity_collector.ex
+38	0	lib/gitlock_holmes/domain/services/coupled_hotspot_analysis.ex
+0	13	lib/gitlock_holmes/investigations/methodology/get_summary.ex
+20	0	lib/gitlock_holmes/investigations/methodology/identify_coupled_hotspot.ex
+1	30	lib/gitlock_holmes/investigations/methodology/identify_couplings.ex
+1	18	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+
+--96f961f--2025-04-23--Khoi Ngo
+20	0	lib/gitlock_holmes/domain/services/complexity_collector.ex
+2	1	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+
+--bd88d1f--2025-04-23--Khoi Ngo
+4	3	lib/gitlock_holmes/adapters/ui/cli.ex
+46	0	lib/gitlock_holmes/domain/services/summary.ex
+34	0	lib/gitlock_holmes/investigations/methodology/get_summary.ex
+
+--916171d--2025-04-23--Khoi Ngo
+13	8	lib/gitlock_holmes/adapters/ui/cli.ex
+2	3	lib/gitlock_holmes/domain/entities/commit.ex
+153	0	lib/gitlock_holmes/domain/services/coupling_detection.ex
+49	0	lib/gitlock_holmes/investigations/methodology/identify_couplings.ex
+1	0	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+
+--1acc873--2025-04-22--Khoi Ngo
+5	1	lib/gitlock_holmes/adapters/reporters/json_reporter.ex
+
+--cf35005--2025-04-22--Khoi Ngo
+-	-	.DS_Store
+2	0	.gitignore
+1	1	lib/gitlock_holmes/adapters/reporters/json_reporter.ex
+3	3	lib/gitlock_holmes/adapters/ui/cli.ex
+
+--5e5b281--2025-04-22--Khoi Ngo
+27	1	lib/gitlock_holmes/ports/version_control_port.ex
+
+--0a7a23b--2025-04-22--Khoi Ngo
+14	0	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+
+--1298ed7--2025-04-22--Khoi Ngo
+6	2	.gitignore
+25	15	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+1	2	lib/gitlock_holmes/adapters/complexity/mock_analyzer.ex
+8	0	lib/gitlock_holmes/adapters/reporters/json_reporter.ex
+3	1	lib/gitlock_holmes/adapters/ui/cli.ex
+0	1	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+31	4	lib/gitlock_holmes/ports/complexity_analyzer_port.ex
+27	2	lib/gitlock_holmes/ports/report_port.ex
+8	1	mix.exs
+
+--dc1b6b8--2025-04-22--Khoi Ngo
+13	22	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+
+--4ec08b9--2025-04-22--Khoi Ngo
+-	-	gitlock_holmes
+
+--f59f78a--2025-04-22--Khoi Ngo
+3	0	.gitignore
+
+--07fdff7--2025-04-22--Khoi Ngo
+--5772dd6--2025-04-22--Khoi Ngo
+--7d97461--2025-04-22--Khoi Ngo
+--baaea43--2025-04-22--Khoi Ngo
+-	-	gitlock_holmes
+5	8	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+0	0	lib/gitlock_holmes/adapters/reporters/{csv_presenter.ex => csv_reporter.ex}
+0	1652	output.csv
+
+--537cb6d--2025-04-22--Khoi Ngo
+-	-	gitlock_holmes
+5	8	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+0	0	lib/gitlock_holmes/adapters/reporters/{csv_presenter.ex => csv_reporters.ex}
+0	1652	output.csv
+
+--b0a87f6--2025-04-22--Khoi Ngo
+-	-	gitlock_holmes
+31	23	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+5	0	lib/gitlock_holmes/adapters/complexity/mock_analyzer.ex
+1652	0	output.csv
+
+--d8070a4--2025-04-21--Khoi Ngo
+0	1652	output.csv
+
+--16dc305--2025-04-21--Khoi Ngo
+-	-	gitlock_holmes
+43	8	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+1	0	lib/gitlock_holmes/adapters/complexity/mock_analyzer.ex
+18	17	lib/gitlock_holmes/adapters/ui/cli.ex
+5	24	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+2	0	lib/gitlock_holmes/ports/complexity_analyzer_port.ex
+1651	1651	output.csv
+
+--58d63ab--2025-04-21--Khoi Ngo
+-	-	gitlock_holmes
+103	0	lib/gitlock_holmes/adapters/complexity/base_analyzer.ex
+7	0	lib/gitlock_holmes/adapters/complexity/mock_analyzer.ex
+24	11	lib/gitlock_holmes/adapters/reporters/csv_presenter.ex
+7	1	lib/gitlock_holmes/adapters/ui/cli.ex
+57	19	lib/gitlock_holmes/domain/services/hotspot_detection.ex
+14	2	lib/gitlock_holmes/investigations/investigation.ex
+33	3	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+8	0	lib/gitlock_holmes/ports/complexity_analyzer_port.ex
+1652	1652	output.csv
+
+--cacd4f4--2025-04-21--Khoi Ngo
+-	-	.DS_Store
+4	0	.formatter.exs
+26	0	.gitignore
+1	0	.tool-versions
+20	0	README.md
+7211	0	git_log.txt
+-	-	gitlock_holmes
+19	0	lib/gitlock_holmes.ex
+38	0	lib/gitlock_holmes/adapters/reporters/csv_presenter.ex
+0	0	lib/gitlock_holmes/adapters/sessions/in_memory_session.ex
+0	0	lib/gitlock_holmes/adapters/sessions/session_supervisor.ex
+128	0	lib/gitlock_holmes/adapters/ui/cli.ex
+76	0	lib/gitlock_holmes/adapters/vcs/git.ex
+20	0	lib/gitlock_holmes/application.ex
+96	0	lib/gitlock_holmes/domain/entities/author.ex
+107	0	lib/gitlock_holmes/domain/entities/commit.ex
+40	0	lib/gitlock_holmes/domain/entities/complexity_metrics.ex
+104	0	lib/gitlock_holmes/domain/entities/file_change.ex
+54	0	lib/gitlock_holmes/domain/services/hotspot_detection.ex
+36	0	lib/gitlock_holmes/investigations/investigation.ex
+37	0	lib/gitlock_holmes/investigations/methodology/identify_hotspots.ex
+7	0	lib/gitlock_holmes/ports/report_port.ex
+30	0	lib/gitlock_holmes/ports/session_port.ex
+8	0	lib/gitlock_holmes/ports/version_control_port.ex
+31	0	mix.exs
+6	0	mix.lock
+1652	0	output.csv
+8	0	test/gitlock_holmes_test.exs
+1	0	test/test_helper.exs
