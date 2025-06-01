@@ -23,14 +23,17 @@ defmodule GitlockHolmesCore.Infrastructure.AdapterRegistry do
 
   @impl true
   def init(_opts) do
+    # Load adapter configurations from the application environment
     registry = %{
-      vcs: %{
-        "git" => GitlockHolmesCore.Adapters.VCS.Git
-      },
-      reporter: %{
-        "csv" => GitlockHolmesCore.Adapters.Reporters.CsvReporter,
-        "json" => GitlockHolmesCore.Adapters.Reporters.JsonReporter
-      },
+      vcs:
+        Application.get_env(:gitlock_holmes_core, :vcs_adapters, %{
+          "git" => GitlockHolmesCore.Adapters.VCS.Git
+        }),
+      reporter:
+        Application.get_env(:gitlock_holmes_core, :reporter_adapters, %{
+          "csv" => GitlockHolmesCore.Adapters.Reporters.CsvReporter,
+          "json" => GitlockHolmesCore.Adapters.Reporters.JsonReporter
+        }),
       complexity_analyzer: %{
         "dispatch" => GitlockHolmesCore.Adapters.Complexity.DispatchAnalyzer
       },
@@ -44,7 +47,11 @@ defmodule GitlockHolmesCore.Infrastructure.AdapterRegistry do
 
   @impl true
   def handle_call({:register, type, key, adapter}, _from, registry) do
-    new_registry = put_in(registry, [type, key], adapter)
+    new_registry =
+      update_in(registry, [type], fn adapters ->
+        Map.put(adapters || %{}, key, adapter)
+      end)
+
     {:reply, :ok, new_registry}
   end
 

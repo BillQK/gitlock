@@ -36,35 +36,60 @@ defmodule GitlockHolmesCore.Domain.Services.ComputeCouplings do
           integer()
         ) :: [CouplingMetrics.t()]
   def calculate_coupling_strength(all, early, recent, file_counts, min_coupling, min_windows) do
-    Enum.map(all, fn {{file1, file2}, shared} ->
-      total1 = Map.get(file_counts, file1, 1)
-      total2 = Map.get(file_counts, file2, 1)
-      avg = (total1 + total2) / 2.0
+    # Handle empty coupling data
+    if map_size(all) == 0 do
+      []
+    else
+      Enum.map(all, fn {{file1, file2}, shared} ->
+        total1 = Map.get(file_counts, file1, 1)
+        total2 = Map.get(file_counts, file2, 1)
+        avg = (total1 + total2) / 2.0
 
-      degree = shared / avg * 100.0
+        degree = shared / avg * 100.0
 
-      early_shared = Map.get(early, {file1, file2}, 0)
-      early_avg = avg / 2
-      early_degree = if early_avg > 0, do: early_shared / early_avg * 100.0, else: 0.0
+        # Calculate trend only if we have data in both periods
+        trend =
+          calculate_trend(
+            {file1, file2},
+            shared,
+            early,
+            recent,
+            avg,
+            map_size(early) > 0 && map_size(recent) > 0
+          )
 
-      recent_shared = Map.get(recent, {file1, file2}, 0)
-      recent_avg = avg / 2
-      recent_degree = if recent_avg > 0, do: recent_shared / recent_avg * 100.0, else: 0.0
+        %CouplingMetrics{
+          entity: file1,
+          coupled: file2,
+          degree: Float.round(degree, 1),
+          windows: shared,
+          trend: trend
+        }
+      end)
+      |> Enum.filter(fn %{degree: degree, windows: windows} ->
+        degree >= min_coupling and windows >= min_windows
+      end)
+      |> Enum.sort_by(& &1.degree, :desc)
+    end
+  end
 
-      trend = Float.round(recent_degree - early_degree, 1)
+  # Calculate trend with better handling of edge cases
+  defp calculate_trend({file1, file2}, _total_shared, early, recent, avg, true) do
+    early_shared = Map.get(early, {file1, file2}, 0)
+    recent_shared = Map.get(recent, {file1, file2}, 0)
 
-      %CouplingMetrics{
-        entity: file1,
-        coupled: file2,
-        degree: Float.round(degree, 1),
-        windows: shared,
-        trend: trend
-      }
-    end)
-    |> Enum.filter(fn %{degree: degree, windows: windows} ->
-      degree >= min_coupling and windows >= min_windows
-    end)
-    |> Enum.sort_by(& &1.degree, :desc)
+    # Use half the average for each period
+    period_avg = avg / 2
+
+    early_degree = if period_avg > 0, do: early_shared / period_avg * 100.0, else: 0.0
+    recent_degree = if period_avg > 0, do: recent_shared / period_avg * 100.0, else: 0.0
+
+    Float.round(recent_degree - early_degree, 1)
+  end
+
+  defp calculate_trend(_, _, _, _, _, false) do
+    # Not enough data to calculate trend
+    0.0
   end
 
   @doc """

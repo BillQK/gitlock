@@ -22,23 +22,19 @@ defmodule GitlockHolmesCore.Adapters.VCS.Git do
 
   @spec parse_git_log(String.t()) :: {:ok, [Commit.t()]} | {:error, error_reason()}
   defp parse_git_log(content) do
-    try do
-      result =
-        content
-        |> String.split("\n\n", trim: true)
-        |> Enum.reduce_while({:ok, []}, fn commit_text, {:ok, commits} ->
-          case parse_commit(commit_text) do
-            {:ok, commit} -> {:cont, {:ok, [commit | commits]}}
-            {:error, reason} -> {:halt, {:error, reason}}
-          end
-        end)
+    result =
+      content
+      |> String.split("\n\n", trim: true)
+      |> Enum.reduce_while({:ok, []}, fn commit_text, {:ok, commits} ->
+        case parse_commit(commit_text) do
+          {:ok, commit} -> {:cont, {:ok, [commit | commits]}}
+          {:error, reason} -> {:halt, {:error, reason}}
+        end
+      end)
 
-      case result do
-        {:ok, commits} -> {:ok, Enum.reverse(commits)}
-        error -> error
-      end
-    rescue
-      e -> {:error, {:parse, "Failed to parse git log: #{Exception.message(e)}"}}
+    case result do
+      {:ok, commits} -> {:ok, Enum.reverse(commits)}
+      error -> error
     end
   end
 
@@ -55,16 +51,11 @@ defmodule GitlockHolmesCore.Adapters.VCS.Git do
     end
   end
 
-  # Extract lines from commit text
-  defp extract_lines(""), do: {:error, {:commit, "Empty commit text"}}
-
   defp extract_lines(commit_text) do
     lines = String.split(commit_text, "\n", trim: true)
     if Enum.empty?(lines), do: {:error, {:commit, "Empty commit text"}}, else: {:ok, lines}
   end
 
-  # Split header and file lines
-  defp split_header_and_files([]), do: {:error, {:commit, "No header line found"}}
   defp split_header_and_files([header | file_lines]), do: {:ok, header, file_lines}
 
   # Parse header information
@@ -84,7 +75,6 @@ defmodule GitlockHolmesCore.Adapters.VCS.Git do
     end)
     |> case do
       {:ok, changes} -> {:ok, Enum.reverse(changes)}
-      error -> error
     end
   end
 
@@ -93,9 +83,6 @@ defmodule GitlockHolmesCore.Adapters.VCS.Git do
     case String.split(line, "\t", parts: 3) do
       [added, deleted, file] ->
         {:cont, {:ok, [FileChange.new(file, added, deleted) | changes]}}
-
-      _ ->
-        {:halt, {:error, {:commit, "Malformed file change line: #{line}"}}}
     end
   end
 

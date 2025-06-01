@@ -10,13 +10,20 @@ defmodule GitlockHolmesCore.Domain.Services.CommitSplitter do
   Splits a list of commits into full, early (first half), and recent (second half).
 
   ## Parameters
-    * `commits` - A non-empty list of commits
+    * `commits` - A list of commits
     
   ## Returns
-    * `{:ok, {sorted, early, recent}}` on success
-    * `{:error, reason}` if input is invalid
+    * `{sorted, early, recent}` on success
+    * For empty lists, returns `{[], [], []}`
+    * For single commit, returns `{[commit], [commit], []}`
   """
-  @spec split_commits([Commit.t()]) :: split_result() | {:error, String.t()}
+  @spec split_commits([Commit.t()]) :: split_result()
+  def split_commits([]), do: {[], [], []}
+
+  def split_commits([single_commit]) do
+    {[single_commit], [single_commit], []}
+  end
+
   def split_commits(commits) when is_list(commits) and length(commits) > 0 do
     sorted = Enum.sort_by(commits, & &1.date)
     mid = div(length(sorted), 2)
@@ -24,11 +31,7 @@ defmodule GitlockHolmesCore.Domain.Services.CommitSplitter do
     {sorted, early, recent}
   end
 
-  def split_commits([]) do
-    {:error, "Cannot split an empty commit list"}
-  end
-
   def split_commits(invalid) do
-    {:error, "Expected a list of commits, got: #{inspect(invalid)}"}
+    raise ArgumentError, "Expected a list of commits, got: #{inspect(invalid)}"
   end
 end
