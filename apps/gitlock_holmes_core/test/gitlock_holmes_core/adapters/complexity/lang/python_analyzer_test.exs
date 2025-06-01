@@ -1,5 +1,5 @@
 defmodule GitlockHolmesCore.Adapters.Complexity.Lang.PythonAnalyzerTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   alias GitlockHolmesCore.Adapters.Complexity.Lang.PythonAnalyzer
 
   describe "supported_extensions/0" do

@@ -20,13 +20,24 @@ defmodule GitlockHolmesCore.Domain.Services.CouplingDetection do
 
   ## Returns
   - A list of coupling results sorted by descending degree.
+  - Returns empty list for empty input or insufficient data.
   """
   @spec detect_couplings([Commit.t()], float(), pos_integer()) :: [CouplingMetrics.t()]
-  def detect_couplings(commits, min_coupling \\ 1.0, min_windows \\ 5) do
+  def detect_couplings(commits, min_coupling \\ 1.0, min_windows \\ 5)
+
+  def detect_couplings([], _min_coupling, _min_windows), do: []
+
+  def detect_couplings(commits, _min_coupling, _min_windows) when length(commits) < 2 do
+    []
+  end
+
+  def detect_couplings(commits, min_coupling, min_windows) do
     {full, early, recent} = CommitSplitter.split_commits(commits)
 
     {coupling_data, file_commit_counts} = CochangeAnalyzer.analyze_commits(full)
+
     {early_data, _} = CochangeAnalyzer.analyze_commits(early)
+
     {recent_data, _} = CochangeAnalyzer.analyze_commits(recent)
 
     ComputeCouplings.calculate_coupling_strength(

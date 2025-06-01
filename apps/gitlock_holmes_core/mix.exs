@@ -10,8 +10,16 @@ defmodule GitlockHolmesCore.MixProject do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.18",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -23,10 +31,21 @@ defmodule GitlockHolmesCore.MixProject do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:jason, "~> 1.4"}
+      # Production dependencies
+      {:jason, "~> 1.4"},
+
+      # Test dependencies
+      {:stream_data, "~> 1.1", only: [:test, :dev]},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:briefly, "~> 0.5", only: :test},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 end
