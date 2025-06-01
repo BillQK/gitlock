@@ -218,8 +218,7 @@ defmodule GitlockHolmesCore.Adapters.VCS.GitTest do
         # Generate log content
         log_content =
           commits_data
-          |> Enum.map(&format_commit_for_log/1)
-          |> Enum.join("\n\n")
+          |> Enum.map_join("\n\n", &format_commit_for_log/1)
 
         # Create temp file using Briefly
         {:ok, path} = Briefly.create()
@@ -325,10 +324,9 @@ defmodule GitlockHolmesCore.Adapters.VCS.GitTest do
 
     changes =
       commit_data.changes
-      |> Enum.map(fn change ->
+      |> Enum.map_join("\n", fn change ->
         "#{change.added}\t#{change.deleted}\t#{change.path}"
       end)
-      |> Enum.join("\n")
 
     if changes == "" do
       header

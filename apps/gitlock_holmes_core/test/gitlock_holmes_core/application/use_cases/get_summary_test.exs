@@ -1,32 +1,17 @@
 defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
   use ExUnit.Case, async: true
 
-  import Mox
+  import GitlockHolmesCore.TestSupport.AdaptersSetup, only: [setup_unique_adapters: 0]
 
-  alias GitlockHolmesCore.Application.UseCases.GetSummary
-  alias GitlockHolmesCore.Infrastructure.AdapterRegistry
-  alias GitlockHolmesCore.Domain.Entities.{Commit, Author}
-  alias GitlockHolmesCore.Domain.Values.FileChange
-
-  # Use the same mock module names as defined in mocks.ex
   alias GitlockHolmesCore.Mocks.VersionControlMock
   alias GitlockHolmesCore.Mocks.ReporterMock
 
-  # Verify all expectations are met after each test
-  setup :verify_on_exit!
+  alias GitlockHolmesCore.Application.UseCases.GetSummary
+  alias GitlockHolmesCore.Domain.Entities.{Commit, Author}
+  alias GitlockHolmesCore.Domain.Values.FileChange
 
-  setup do
-    # Register mocks for each test
-    :ok = AdapterRegistry.register_adapter(:vcs, "test_git", VersionControlMock)
-    :ok = AdapterRegistry.register_adapter(:reporter, "test_csv", ReporterMock)
-    :ok = AdapterRegistry.register_adapter(:reporter, "test_json", ReporterMock)
-
-    # Also register with the default names
-    :ok = AdapterRegistry.register_adapter(:vcs, "git", VersionControlMock)
-    :ok = AdapterRegistry.register_adapter(:reporter, "csv", ReporterMock)
-
-    :ok
-  end
+  # Set up unique adapters for each test
+  setup_unique_adapters()
 
   # Helper to create test commits - fixed to always use count parameter
   defp create_test_commits(count) do
@@ -49,10 +34,10 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
   end
 
   describe "execute/2 - full workflow" do
-    test "successfully generates summary with default adapters" do
+    test "successfully generates summary with default adapters", %{adapter_keys: keys} do
       commits = create_test_commits(5)
 
-      # Setup mocks
+      # Setup mocks with the unique adapter keys from context
       VersionControlMock
       |> expect(:get_commit_history, fn _path, _opts ->
         {:ok, commits}
@@ -69,12 +54,17 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
         {:ok, "Summary report generated"}
       end)
 
-      result = GetSummary.execute("/path/to/repo.log", %{vcs: "test_git", format: "test_csv"})
+      # Use the unique adapter keys in the options
+      result =
+        GetSummary.execute("/path/to/repo.log", %{
+          vcs: keys.vcs,
+          format: keys.csv_reporter
+        })
 
       assert {:ok, "Summary report generated"} = result
     end
 
-    test "successfully generates summary with custom options" do
+    test "successfully generates summary with custom options", %{adapter_keys: keys} do
       commits = create_test_commits(2)
 
       VersionControlMock
@@ -92,8 +82,8 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
       end)
 
       options = %{
-        vcs: "test_git",
-        format: "test_csv",
+        vcs: keys.vcs,
+        format: keys.csv_reporter,
         custom_option: "value"
       }
 
@@ -104,23 +94,23 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
   end
 
   describe "resolve_dependencies/1" do
-    test "resolves default dependencies when no options provided" do
-      # Register default adapters
-
-      assert {:ok, deps} = GetSummary.resolve_dependencies(%{})
+    test "resolves default dependencies when no options provided", %{adapter_keys: keys} do
+      # Register the generated unique adapters as the default adapters
+      options = %{vcs: keys.vcs, format: keys.csv_reporter}
+      assert {:ok, deps} = GetSummary.resolve_dependencies(options)
 
       assert deps.vcs == VersionControlMock
       assert deps.reporter == ReporterMock
     end
 
-    test "resolves custom VCS adapter" do
-      assert {:ok, deps} = GetSummary.resolve_dependencies(%{vcs: "test_git"})
+    test "resolves custom VCS adapter", %{adapter_keys: keys} do
+      assert {:ok, deps} = GetSummary.resolve_dependencies(%{vcs: keys.vcs})
 
       assert deps.vcs == VersionControlMock
     end
 
-    test "resolves custom reporter based on format" do
-      assert {:ok, deps} = GetSummary.resolve_dependencies(%{format: "test_json"})
+    test "resolves custom reporter based on format", %{adapter_keys: keys} do
+      assert {:ok, deps} = GetSummary.resolve_dependencies(%{format: keys.json_reporter})
 
       assert deps.reporter == ReporterMock
     end
@@ -233,7 +223,7 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
   end
 
   describe "edge cases" do
-    test "handles commits with duplicate authors" do
+    test "handles commits with duplicate authors", %{adapter_keys: keys} do
       # Create commits with same author
       author = Author.new("Alice", "alice@example.com")
 
@@ -256,11 +246,11 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
         {:ok, "Summary"}
       end)
 
-      result = GetSummary.execute("/repo.log", %{vcs: "test_git", format: "test_csv"})
+      result = GetSummary.execute("/repo.log", %{vcs: keys.vcs, format: keys.csv_reporter})
       assert {:ok, "Summary"} = result
     end
 
-    test "handles commits with no file changes" do
+    test "handles commits with no file changes", %{adapter_keys: keys} do
       author = Author.new("Bob", "bob@example.com")
 
       commits = [
@@ -279,7 +269,7 @@ defmodule GitlockHolmesCore.Application.UseCases.GetSummaryTest do
         {:ok, "Summary"}
       end)
 
-      result = GetSummary.execute("/repo.log", %{vcs: "test_git", format: "test_csv"})
+      result = GetSummary.execute("/repo.log", %{vcs: keys.vcs, format: keys.csv_reporter})
       assert {:ok, "Summary"} = result
     end
   end

@@ -1,23 +1,11 @@
 defmodule GitlockHolmesCoreTest do
   use ExUnit.Case, async: true
 
-  import Mox
+  import GitlockHolmesCore.TestSupport.AdaptersSetup, only: [setup_real_adapters: 0]
 
   alias GitlockHolmesCore
 
-  setup do
-    # Create a stub that always returns a file not found error with the input path
-    stub(GitlockHolmesCore.Mocks.VersionControlMock, :get_commit_history, fn path, _opts ->
-      {:error, {:io, path, :enoent}}
-    end)
-
-    # Return a simple report format
-    stub(GitlockHolmesCore.Mocks.ReporterMock, :report, fn data, _opts ->
-      {:ok, "Report: #{inspect(data)}"}
-    end)
-
-    :ok
-  end
+  setup_real_adapters()
 
   describe "investigate/3 - delegation behavior" do
     test "delegates to UseCaseFactory with correct investigation type" do
@@ -29,10 +17,11 @@ defmodule GitlockHolmesCoreTest do
       assert {:error, "Unknown investigation type: definitely_not_a_valid_type"} = result
     end
 
-    test "passes through the return value from use case execution" do
+    test "passes through the return value from use case execution", %{adapter_keys: adapter_keys} do
       # When given a valid investigation type, it should return whatever the use case returns
       # Test with a non-existent file to get a predictable error
-      result = GitlockHolmesCore.investigate(:summary, "/this/file/does/not/exist.log")
+      options = AdaptersSetup.test_options(adapter_keys)
+      result = GitlockHolmesCore.investigate(:summary, "/this/file/does/not/exist.log", options)
 
       # Should get an error from the actual use case trying to read the file
       assert {:error, error} = result
@@ -40,34 +29,38 @@ defmodule GitlockHolmesCoreTest do
       assert {:io, "/this/file/does/not/exist.log", :enoent} = error
     end
 
-    test "forwards repo_path to use case unchanged" do
+    test "forwards repo_path to use case unchanged", %{adapter_keys: adapter_keys} do
       # Use a unique path that we can identify in the error
       unique_path = "/very/unique/path/#{System.unique_integer()}.log"
+      options = AdaptersSetup.test_options(adapter_keys)
 
-      result = GitlockHolmesCore.investigate(:summary, unique_path)
+      result = GitlockHolmesCore.investigate(:summary, unique_path, options)
 
       # The error should contain our unique path
       assert {:error, {:io, ^unique_path, :enoent}} = result
     end
 
-    test "forwards options to use case unchanged" do
+    test "forwards options to use case unchanged", %{adapter_keys: adapter_keys} do
       # For blast_radius, we can test that options are passed through
       # by not providing required options
-      result = GitlockHolmesCore.investigate(:blast_radius, "any.log", %{dir: "/tmp"})
+      options = AdaptersSetup.test_options(adapter_keys, %{dir: "/tmp"})
+      result = GitlockHolmesCore.investigate(:blast_radius, "any.log", options)
 
       # Should get error about missing target_files from the use case
       assert {:error, "No target_files specified. Use --target-files option"} = result
     end
 
-    test "provides empty map as default options" do
-      # When no options provided, should pass empty map
-      # This works with any investigation type
-      result1 = GitlockHolmesCore.investigate(:summary, "/nonexistent.log")
-      result2 = GitlockHolmesCore.investigate(:summary, "/nonexistent.log", %{})
+    test "provides empty map as default options", %{adapter_keys: adapter_keys} do
+      # When no options provided, should still work with the real adapters
+      # Create a unique path that won't exist
+      nonexistent_path = "/nonexistent_#{System.unique_integer()}.log"
 
-      # Both should produce the same error
-      assert {:error, {:io, "/nonexistent.log", :enoent}} = result1
-      assert {:error, {:io, "/nonexistent.log", :enoent}} = result2
+      # Try with explicit empty options
+      options = AdaptersSetup.test_options(adapter_keys)
+      result = GitlockHolmesCore.investigate(:summary, nonexistent_path, options)
+
+      # Should get the expected error
+      assert {:error, {:io, ^nonexistent_path, :enoent}} = result
     end
   end
 
@@ -84,7 +77,6 @@ defmodule GitlockHolmesCoreTest do
     test "returns all expected investigation types" do
       result = GitlockHolmesCore.available_investigations()
 
-      # These are the types we know UseCaseFactory supports
       expected = [
         :hotspots,
         :couplings,
@@ -99,7 +91,7 @@ defmodule GitlockHolmesCoreTest do
   end
 
   describe "contract testing" do
-    test "investigate always returns {:ok, _} or {:error, _}" do
+    test "investigate always returns {:ok, _} or {:error, _}", %{adapter_keys: adapter_keys} do
       # Test various inputs to ensure consistent return format
       test_cases = [
         {:valid_type_bad_file, :summary, "/nonexistent.log", %{}},
@@ -108,8 +100,9 @@ defmodule GitlockHolmesCoreTest do
         {:empty_opts, :summary, "/bad/path", %{}}
       ]
 
-      for {_name, type, path, opts} <- test_cases do
-        result = GitlockHolmesCore.investigate(type, path, opts)
+      for {_name, type, path, additional_opts} <- test_cases do
+        options = AdaptersSetup.test_options(adapter_keys, additional_opts)
+        result = GitlockHolmesCore.investigate(type, path, options)
 
         # Check the shape of the result
         assert tuple_size(result) == 2
@@ -141,7 +134,7 @@ defmodule GitlockHolmesCoreTest do
       assert length(exports) < 5
     end
 
-    test "no business logic in facade" do
+    test "no business logic in facade", %{adapter_keys: adapter_keys} do
       # The facade should immediately delegate, meaning errors come from
       # the delegated modules, not from GitlockHolmesCore itself
 
@@ -150,7 +143,8 @@ defmodule GitlockHolmesCoreTest do
       assert msg1 == "Unknown investigation type: bad_type"
 
       # This error comes from the use case (VCS adapter)
-      {:error, error} = GitlockHolmesCore.investigate(:summary, "/bad/path")
+      options = AdaptersSetup.test_options(adapter_keys)
+      {:error, error} = GitlockHolmesCore.investigate(:summary, "/bad/path", options)
       assert {:io, "/bad/path", :enoent} = error
     end
   end

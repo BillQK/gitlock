@@ -23,17 +23,14 @@ defmodule GitlockHolmesCore.Infrastructure.AdapterRegistry do
 
   @impl true
   def init(_opts) do
-    # Load adapter configurations from the application environment
     registry = %{
-      vcs:
-        Application.get_env(:gitlock_holmes_core, :vcs_adapters, %{
-          "git" => GitlockHolmesCore.Adapters.VCS.Git
-        }),
-      reporter:
-        Application.get_env(:gitlock_holmes_core, :reporter_adapters, %{
-          "csv" => GitlockHolmesCore.Adapters.Reporters.CsvReporter,
-          "json" => GitlockHolmesCore.Adapters.Reporters.JsonReporter
-        }),
+      vcs: %{
+        "git" => GitlockHolmesCore.Adapters.VCS.Git
+      },
+      reporter: %{
+        "csv" => GitlockHolmesCore.Adapters.Reporters.CsvReporter,
+        "json" => GitlockHolmesCore.Adapters.Reporters.JsonReporter
+      },
       complexity_analyzer: %{
         "dispatch" => GitlockHolmesCore.Adapters.Complexity.DispatchAnalyzer
       },

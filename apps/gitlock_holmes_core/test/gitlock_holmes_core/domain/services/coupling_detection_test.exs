@@ -67,7 +67,7 @@ defmodule GitlockHolmesCore.Domain.Services.CouplingDetectionTest do
       # With high threshold (50%), should filter out weak coupling
       couplings = CouplingDetection.detect_couplings(commits, 50.0, 1)
       # Coupling is too weak (only 1/5 = 20%)
-      assert length(couplings) == 0
+      assert Enum.empty?(couplings)
 
       # With low threshold, should include the coupling
       couplings = CouplingDetection.detect_couplings(commits, 10.0, 1)
@@ -90,7 +90,7 @@ defmodule GitlockHolmesCore.Domain.Services.CouplingDetectionTest do
       # Require at least 3 shared commits
       couplings = CouplingDetection.detect_couplings(commits, 1.0, 3)
       # No pair has 3+ shared commits
-      assert length(couplings) == 0
+      assert Enum.empty?(couplings)
 
       # Require at least 2 shared commits
       couplings = CouplingDetection.detect_couplings(commits, 1.0, 2)
