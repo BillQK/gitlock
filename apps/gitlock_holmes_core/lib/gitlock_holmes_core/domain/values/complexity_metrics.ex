@@ -53,7 +53,8 @@ defmodule GitlockHolmesCore.Domain.Values.ComplexityMetrics do
     A float representing complexity per line of code
   """
   @spec complexity_density(t()) :: float()
-  def complexity_density(%__MODULE__{loc: loc, cyclomatic_complexity: cc}) when loc > 0 do
+  def complexity_density(%__MODULE__{loc: loc, cyclomatic_complexity: cc})
+      when is_number(loc) and is_number(cc) and loc > 0 do
     cc / loc
   end
 

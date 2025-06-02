@@ -67,27 +67,44 @@ defmodule GitlockHolmesCore.Domain.Services.KnowledgeSiloDetection do
   @doc """
   Determines risk level based on ownership ratio and commit metrics.
 
-  High risk when:
-  - Ownership ratio > 80% AND number of commits > 10
-  - OR Ownership ratio > 90% AND number of commits > 5
+  High risk when any of:
+  - Ownership ratio > 90% AND number of commits > 3 (severe knowledge concentration)
+  - Ownership ratio > 80% AND number of commits > 8
+  - Ownership ratio > 70% AND number of commits > 15
+  - Only one author with > 8 commits (complete knowledge monopoly)
 
-  Medium risk when:
-  - Ownership ratio > 70% AND number of commits > 5
-  - OR Ownership ratio > 80% AND number of commits > 3
+  Medium risk when any of:
+  - Ownership ratio > 80% AND number of commits > 3
+  - Ownership ratio > 70% AND number of commits > 5 
+  - Ownership ratio > 60% AND number of commits > 10
+  - Only one author with 4-8 commits
 
   Low risk otherwise.
   """
   @spec risk_level_from_metrics(float(), integer(), integer()) :: :high | :medium | :low
   def risk_level_from_metrics(ownership_ratio, commit_count, author_count)
-      when (ownership_ratio > 0.8 and commit_count > 10) or
-             (ownership_ratio > 0.9 and commit_count > 5) or
-             (author_count == 1 and commit_count > 10) do
+      # Severe knowledge concentration scenarios
+      # Very high concentration with minimal commits
+      # High concentration with moderate commits
+      # Moderate concentration with many commits
+      # Complete knowledge monopoly
+      when (ownership_ratio > 90 and commit_count > 3) or
+             (ownership_ratio > 80 and commit_count > 8) or
+             (ownership_ratio > 70 and commit_count > 15) or
+             (author_count == 1 and commit_count > 8) do
     :high
   end
 
-  def risk_level_from_metrics(ownership_ratio, commit_count, _author_count)
-      when (ownership_ratio > 0.7 and commit_count > 5) or
-             (ownership_ratio > 0.8 and commit_count > 3) do
+  def risk_level_from_metrics(ownership_ratio, commit_count, author_count)
+      # Concerning but not severe knowledge concentration
+      # High concentration with few commits
+      # Moderate concentration with several commits
+      # Lower concentration with many commits
+      # Complete monopoly but minimal history
+      when (ownership_ratio > 80 and commit_count > 3) or
+             (ownership_ratio > 70 and commit_count > 5) or
+             (ownership_ratio > 60 and commit_count > 10) or
+             (author_count == 1 and commit_count > 3) do
     :medium
   end
 

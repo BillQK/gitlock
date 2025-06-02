@@ -91,16 +91,23 @@ defmodule GitlockHolmesCore.Domain.Entities.Commit do
 
   ## Examples
 
-      iex> file_change1 = %FileChange{insertions: 10, deletions: 5}
-      iex> file_change2 = %FileChange{insertions: 3, deletions: 2}
+      iex> file_change1 = %FileChange{loc_added: 10, loc_deleted: : 5}
+      iex> file_change2 = %FileChange{loc_added: : 3, loc_deleted: 2}
       iex> commit = %Commit{file_changes: [file_change1, file_change2]}
       iex> Commit.total_churn(commit)
       20
+
+      iex> commit_with_binary = %Commit{file_changes: [
+      iex>   %FileChange{loc_added: 10, loc_deleted: 5},
+      iex>   %FileChange{loc_added: "-", loc_deleted: "-"}
+      iex> ]}
+      iex> Commit.total_churn(commit_with_binary)
+      15
   """
   @spec total_churn(commit :: t()) :: non_neg_integer()
   def total_churn(%__MODULE__{file_changes: file_changes}) do
     Enum.reduce(file_changes, 0, fn change, total ->
-      total + (change.insertions || 0) + (change.deletions || 0)
+      total + FileChange.total_churn(change)
     end)
   end
 end

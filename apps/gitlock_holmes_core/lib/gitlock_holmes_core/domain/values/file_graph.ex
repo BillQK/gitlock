@@ -144,9 +144,9 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraph do
 
       metadata ->
         %{
-          complexity: metadata.complexity,
-          loc: metadata.loc,
-          revisions: metadata.revisions
+          complexity: Map.get(metadata, :complexity, 0),
+          loc: Map.get(metadata, :loc, 0),
+          revisions: Map.get(metadata, :revisions, 0)
         }
     end
   end

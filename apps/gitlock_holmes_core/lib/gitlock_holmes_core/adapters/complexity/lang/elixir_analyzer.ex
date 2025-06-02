@@ -17,15 +17,14 @@ defmodule GitlockHolmesCore.Adapters.Complexity.Lang.ElixirAnalyzer do
           complexity = 1 + count_complexity(ast)
           complexity
 
-        {:error, {line, error, _token}} ->
-          # Log the error but still return a default value
-          IO.warn("#{file_path}: Syntax error on line #{line}: #{error}")
+        {:error, {_line, _error, _token}} ->
+          # Log a simpler error message
           -1
       end
     rescue
-      e ->
-        # Log the exception but still return a default value
-        IO.warn("#{file_path}: Error analyzing code: #{Exception.message(e)}")
+      _e ->
+        # Use a more generic error message to avoid string conversion issues
+        IO.warn("#{file_path}: Error analyzing code")
         -1
     end
   end

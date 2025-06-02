@@ -80,9 +80,18 @@ defmodule GitlockHolmesCore.Domain.Values.CombinedRisk do
   """
   @spec to_string(t()) :: String.t()
   def to_string(%__MODULE__{} = risk) do
-    "#{Path.basename(risk.entity)} & #{Path.basename(risk.coupled)}: " <>
-      "score=#{Float.round(risk.combined_risk_score, 1)}, " <>
-      "trend=#{if risk.trend >= 0, do: "+", else: ""}#{Float.round(risk.trend, 1)}, " <>
+    # Default values for nil fields
+    entity = risk.entity || "unknown"
+    coupled = risk.coupled || "unknown"
+    # Handle nil values for score
+    score = risk.combined_risk_score || 0.0
+    # Handle nil values for trend
+    trend = risk.trend || 0.0
+    trend_sign = if trend >= 0, do: "+", else: ""
+
+    "#{Path.basename(entity)} & #{Path.basename(coupled)}: " <>
+      "score=#{Float.round(score, 1)}, " <>
+      "trend=#{trend_sign}#{Float.round(trend, 1)}, " <>
       "category=#{risk_category(risk)}"
   end
 end

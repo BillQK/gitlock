@@ -5,10 +5,21 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
 
   describe "new/3" do
     test "creates a new graph with the provided nodes, edges, and metadata" do
-      # Fix: Use proper node structure
       nodes = %{
-        "file_a.ex" => %{complexity: 10, loc: 100, component: "core"},
-        "file_b.ex" => %{complexity: 5, loc: 50, component: "utils"}
+        "file_a.ex" => %{
+          complexity: 10,
+          loc: 100,
+          component: "core",
+          revisions: 5,
+          authors: ["Alice"]
+        },
+        "file_b.ex" => %{
+          complexity: 5,
+          loc: 50,
+          component: "utils",
+          revisions: 3,
+          authors: ["Bob"]
+        }
       }
 
       edges = [
@@ -23,11 +34,17 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
       assert graph.edges == edges
       assert graph.metadata == metadata
     end
+
+    test "creates empty graph when no data provided" do
+      graph = FileGraph.new(%{}, [], %{})
+      assert map_size(graph.nodes) == 0
+      assert length(graph.edges) == 0
+      assert map_size(graph.metadata) == 0
+    end
   end
 
   describe "components/1" do
     test "returns unique component names" do
-      # Fix: Ensure components are accessed correctly
       nodes = %{
         "file_a.ex" => %{component: "core"},
         "file_b.ex" => %{component: "utils"},
@@ -45,7 +62,6 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
     end
 
     test "handles missing component values" do
-      # Fix: Handle missing component keys properly
       nodes = %{
         "file_a.ex" => %{component: "core"},
         # No component key
@@ -59,6 +75,11 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
       components = FileGraph.components(graph)
       assert length(components) == 1
       assert "core" in components
+    end
+
+    test "returns empty list for empty graph" do
+      graph = %FileGraph{nodes: %{}, edges: [], metadata: %{}}
+      assert FileGraph.components(graph) == []
     end
   end
 
@@ -85,6 +106,22 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
 
       metrics = FileGraph.file_metrics(graph, "non_existent.ex")
       assert metrics.complexity == 0
+      assert metrics.loc == 0
+      assert metrics.revisions == 0
+    end
+
+    test "handles missing metrics within file data" do
+      # Test when file exists but some metrics are missing
+      nodes = %{
+        # Missing loc and revisions
+        "incomplete.ex" => %{complexity: 5}
+      }
+
+      graph = %FileGraph{nodes: nodes, edges: [], metadata: %{}}
+
+      metrics = FileGraph.file_metrics(graph, "incomplete.ex")
+      assert metrics.complexity == 5
+      # Should default these missing values
       assert metrics.loc == 0
       assert metrics.revisions == 0
     end
@@ -120,6 +157,85 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
       missing_files = FileGraph.files_in_component(graph, "missing")
       assert Enum.empty?(missing_files)
     end
+
+    test "handles empty graph" do
+      graph = %FileGraph{nodes: %{}, edges: [], metadata: %{}}
+      assert FileGraph.files_in_component(graph, "any") == []
+    end
+  end
+
+  describe "coupling_strength/3" do
+    test "retrieves coupling strength between two files" do
+      # Using a map for edges to simulate the get/2 behavior
+      edges = %{
+        {"file_a.ex", "file_b.ex"} => %{coupling_strength: 0.75}
+      }
+
+      graph = %FileGraph{nodes: %{}, edges: edges, metadata: %{}}
+
+      # Test with files in order
+      assert FileGraph.coupling_strength(graph, "file_a.ex", "file_b.ex") == 0.75
+
+      # Test with files in reverse order
+      assert FileGraph.coupling_strength(graph, "file_b.ex", "file_a.ex") == 0.75
+    end
+
+    test "returns zero when no coupling exists" do
+      edges = %{}
+      graph = %FileGraph{nodes: %{}, edges: edges, metadata: %{}}
+
+      assert FileGraph.coupling_strength(graph, "file_a.ex", "file_b.ex") == 0.0
+    end
+  end
+
+  describe "coupled_files/4" do
+    test "returns files coupled to the target file above threshold" do
+      edges = %{
+        {"file_a.ex", "file_b.ex"} => %{coupling_strength: 0.8},
+        {"file_a.ex", "file_c.ex"} => %{coupling_strength: 0.5},
+        {"file_a.ex", "file_d.ex"} => %{coupling_strength: 0.3}
+      }
+
+      graph = %FileGraph{nodes: %{}, edges: edges, metadata: %{}}
+
+      # Get files coupled to file_a.ex with strength >= 0.5
+      coupled = FileGraph.coupled_files(graph, "file_a.ex", 0.5, 10)
+
+      assert length(coupled) == 2
+
+      # Should be sorted by strength (descending)
+      assert Enum.at(coupled, 0) == {"file_b.ex", 0.8}
+      assert Enum.at(coupled, 1) == {"file_c.ex", 0.5}
+    end
+
+    test "respects limit parameter" do
+      edges = %{
+        {"file_a.ex", "file_b.ex"} => %{coupling_strength: 0.8},
+        {"file_a.ex", "file_c.ex"} => %{coupling_strength: 0.7},
+        {"file_a.ex", "file_d.ex"} => %{coupling_strength: 0.6}
+      }
+
+      graph = %FileGraph{nodes: %{}, edges: edges, metadata: %{}}
+
+      # Limit to 2 results
+      coupled = FileGraph.coupled_files(graph, "file_a.ex", 0.0, 2)
+
+      assert length(coupled) == 2
+      # Should take top 2 by strength
+      assert Enum.at(coupled, 0) == {"file_b.ex", 0.8}
+      assert Enum.at(coupled, 1) == {"file_c.ex", 0.7}
+    end
+
+    test "returns empty list when no couplings above threshold" do
+      edges = %{
+        {"file_a.ex", "file_b.ex"} => %{coupling_strength: 0.3}
+      }
+
+      graph = %FileGraph{nodes: %{}, edges: edges, metadata: %{}}
+
+      coupled = FileGraph.coupled_files(graph, "file_a.ex", 0.5, 10)
+      assert coupled == []
+    end
   end
 
   describe "validation functions" do
@@ -128,6 +244,8 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
       assert :ok = FileGraph.validate_graph(valid_graph)
 
       assert {:error, _} = FileGraph.validate_graph("not a graph")
+      assert {:error, _} = FileGraph.validate_graph(%{some: "map"})
+      assert {:error, _} = FileGraph.validate_graph(nil)
     end
 
     test "validate_file_exists_in_graph/2 checks file existence" do
@@ -135,7 +253,11 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraphTest do
       graph = %FileGraph{nodes: nodes, edges: [], metadata: %{}}
 
       assert :ok = FileGraph.validate_file_exists_in_graph("file_a.ex", graph)
+
+      # Test with various non-existent files
       assert {:error, _} = FileGraph.validate_file_exists_in_graph("missing.ex", graph)
+      assert {:error, _} = FileGraph.validate_file_exists_in_graph("", graph)
+      assert {:error, _} = FileGraph.validate_file_exists_in_graph(nil, graph)
     end
   end
 end
