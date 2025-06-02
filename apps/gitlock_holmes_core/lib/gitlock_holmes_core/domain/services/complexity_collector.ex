@@ -11,6 +11,12 @@ defmodule GitlockHolmesCore.Domain.Services.ComplexityCollector do
   @spec collect_complexity(analyzer_port(), String.t()) ::
           %{String.t() => ComplexityMetrics.t()}
   def collect_complexity(analyzer, dir) do
-    analyzer.analyze_directory(dir)
+    case analyzer.analyze_directory(dir, %{}) do
+      # Return empty map on error
+      {:error, _reason} -> %{}
+      result when is_map(result) -> result
+      # Handle any unexpected return type
+      _ -> %{}
+    end
   end
 end

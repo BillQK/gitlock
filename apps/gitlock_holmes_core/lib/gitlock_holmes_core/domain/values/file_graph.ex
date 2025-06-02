@@ -115,7 +115,9 @@ defmodule GitlockHolmesCore.Domain.Values.FileGraph do
   @spec components(t()) :: [String.t()]
   def components(%__MODULE__{nodes: nodes}) do
     nodes
-    |> Enum.map(fn {_file, metadata} -> metadata.component end)
+    |> Enum.map(fn {_file, metadata} ->
+      Map.get(metadata, :component)
+    end)
     |> Enum.filter(&(&1 != nil))
     |> Enum.uniq()
   end

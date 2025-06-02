@@ -28,7 +28,10 @@ defmodule GitlockHolmesCore.Application.UseCases.AnalyzeCoupledHotspots do
 
   defp resolve_complexity_analyzer(options) do
     if Map.has_key?(options, :dir) do
-      AdapterRegistry.get_adapter(:complexity_analyzer, "dispatch")
+      AdapterRegistry.get_adapter(
+        :complexity_analyzer,
+        options[:complexity_analyzer] || "dispatch"
+      )
     else
       {:error, "Directory path required for coupled hotspot analysis"}
     end
