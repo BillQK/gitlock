@@ -4,6 +4,8 @@
   <p align="center"><em>Uncovering the hidden stories in your codebase</em></p>
 </p>
 
+[![Elixir CI](https://github.com/BillQK/gitlock/actions/workflows/elixir.yml/badge.svg)](https://github.com/BillQK/gitlock/actions/workflows/elixir.yml)
+
 <p align="center">
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
