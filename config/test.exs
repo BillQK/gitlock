@@ -2,13 +2,13 @@ import Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :gitlock_holmes_phx, GitlockHolmesPhxWeb.Endpoint,
+config :gitlock_phx, GitlockPhxWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "vyPtV5lSycmez8mPYH+JVE/d8PacmYC3B2blk3vay0dzct+mVyJyvSghk4x5epKl",
   server: false
 
 # In test we don't send emails
-config :gitlock_holmes_phx, GitlockHolmesPhx.Mailer, adapter: Swoosh.Adapters.Test
+config :gitlock_phx, GitlockPhx.Mailer, adapter: Swoosh.Adapters.Test
 
 # Disable swoosh api client as it is only required for production adapters
 config :swoosh, :api_client, false

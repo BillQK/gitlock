@@ -16,18 +16,18 @@
 # General application configuration
 import Config
 
-config :gitlock_holmes_phx,
+config :gitlock_phx,
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
-config :gitlock_holmes_phx, GitlockHolmesPhxWeb.Endpoint,
+config :gitlock_phx, GitlockPhxWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: GitlockHolmesPhxWeb.ErrorHTML, json: GitlockHolmesPhxWeb.ErrorJSON],
+    formats: [html: GitlockPhxWeb.ErrorHTML, json: GitlockPhxWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: GitlockHolmesPhx.PubSub,
+  pubsub_server: GitlockPhx.PubSub,
   live_view: [signing_salt: "FttmPYMe"]
 
 # Configures the mailer
@@ -37,28 +37,28 @@ config :gitlock_holmes_phx, GitlockHolmesPhxWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :gitlock_holmes_phx, GitlockHolmesPhx.Mailer, adapter: Swoosh.Adapters.Local
+config :gitlock_phx, GitlockPhx.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  gitlock_holmes_phx: [
+  gitlock_phx: [
     args:
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../apps/gitlock_holmes_phx/assets", __DIR__),
+    cd: Path.expand("../apps/gitlock_phx/assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
 # Configure tailwind (the version is required)
 config :tailwind,
   version: "3.4.3",
-  gitlock_holmes_phx: [
+  gitlock_phx: [
     args: ~w(
       --config=tailwind.config.js
       --input=css/app.css
       --output=../priv/static/assets/app.css
     ),
-    cd: Path.expand("../apps/gitlock_holmes_phx/assets", __DIR__)
+    cd: Path.expand("../apps/gitlock_phx/assets", __DIR__)
   ]
 
 # Configures Elixir's Logger

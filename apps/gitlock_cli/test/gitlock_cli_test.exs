@@ -1,0 +1,2 @@
+defmodule GitlockCLITest do
+end

@@ -1,0 +1,2 @@
+defmodule GitlockCLI do
+end

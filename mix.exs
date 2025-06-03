@@ -1,4 +1,4 @@
-defmodule GitlockHolmes.MixProject do
+defmodule Gitlock.MixProject do
   use Mix.Project
 
   def project do
@@ -30,7 +30,7 @@ defmodule GitlockHolmes.MixProject do
 
   defp aliases do
     [
-      "escript.build": ["do --app gitlock_holmes_cli escript.build"]
+      "escript.build": ["do --app gitlock_cli escript.build"]
     ]
   end
 end

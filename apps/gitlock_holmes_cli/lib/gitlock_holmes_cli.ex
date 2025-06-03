@@ -1,2 +1,0 @@
-defmodule GitlockHolmesCLI do
-end

@@ -28,4 +28,7 @@ erl_crash.dump
 # Output
 /output/
 
+# Input 
+/input/
+
 .DS_Store

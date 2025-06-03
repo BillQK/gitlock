@@ -1,6 +1,5 @@
-
 <p align="center">
-  <img src="assets/logo.svg" alt="GitlockHolmes Logo" width="250"/>
+  <img src="assets/logo.svg" alt="Gitlock Logo" width="250"/>
   <p align="center"><em>Uncovering the hidden stories in your codebase</em></p>
 </p>
 
@@ -18,7 +17,7 @@
 
 **Gitlock** is a code forensics tool inspired by Adam Tornhill's "Your Code as Crime Scene" methodology. It analyzes your Git repository history to identify hotspots, knowledge silos, and other code health indicators that can help prioritize refactoring efforts and improve code quality.
 
-> _"Just as detectives use forensic techniques to reconstruct crime scenes, GitlockHolmes examines your codebase's history to reveal the story behind your code."_
+> _"Just as detectives use forensic techniques to reconstruct crime scenes, Gitlock examines your codebase's history to reveal the story behind your code."_
 
 ## Features
 
@@ -36,32 +35,32 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gitlock_holmes.git
-cd gitlock_holmes
+git clone https://github.com/yourusername/gitlock.git
+cd gitlock
 
 # Install dependencies and build
 mix deps.get
 mix build.all
 
 # Optional: Add to your path
-cp bin/gitlock_holmes /usr/local/bin/
+cp bin/gitlock /usr/local/bin/
 ```
 
 ### Using Mix (Coming soon)
 
 ```bash
 # Not yet available
-mix escript.install hex gitlock_holmes
+mix escript.install hex gitlock
 ```
 
 ### Docker (Coming soon)
 
 ```bash
 # Pull the Docker image
-docker pull yourusername/gitlock_holmes:latest
+docker pull yourusername/gitlock:latest
 
-# Run GitlockHolmes in Docker
-docker run -v $(pwd):/code yourusername/gitlock_holmes:latest hotspots --repo /code
+# Run Gitlock in Docker
+docker run -v $(pwd):/code yourusername/gitlock:latest hotspots --repo /code
 ```
 
 ## Quick Start
@@ -70,19 +69,19 @@ Analyze your repository with individual commands:
 
 ```bash
 # Find hotspots (complex, frequently changed files)
-gitlock_holmes hotspots --repo /path/to/repo --dir /path/to/code
+gitlock hotspots --repo /path/to/repo --dir /path/to/code
 
 # Identify knowledge silos (files with concentrated ownership)
-gitlock_holmes knowledge-silos --repo /path/to/repo
+gitlock knowledge-silos --repo /path/to/repo
 ```
 
 ## Usage
 
-GitlockHolmes provides several investigation types that analyze your code from different perspectives:
+Gitlock provides several investigation types that analyze your code from different perspectives:
 
 ```bash
 # General usage
-gitlock_holmes [investigation] [options]
+gitlock [investigation] [options]
 ```
 
 ### Available Investigations
@@ -98,7 +97,7 @@ gitlock_holmes [investigation] [options]
 
 ### Repository Source Options
 
-GitlockHolmes accepts input from multiple sources:
+Gitlock accepts input from multiple sources:
 
 | Option         | Description                                       | Default |
 | -------------- | ------------------------------------------------- | ------- |
@@ -124,10 +123,10 @@ You can combine these options to precisely define your analysis scope:
 
 ```bash
 # Analyze only changes from the last 3 months by a specific author
-gitlock_holmes hotspots --repo ./my_project --since "3 months ago" --author "Jane Smith"
+gitlock hotspots --repo ./my_project --since "3 months ago" --author "Jane Smith"
 
 # Analyze only the main branch's lib directory from 2023
-gitlock_holmes couplings --repo ./my_project --branch main --paths lib/ --since 2023-01-01 --until 2023-12-31
+gitlock couplings --repo ./my_project --branch main --paths lib/ --since 2023-01-01 --until 2023-12-31
 ```
 
 ### Common Options
@@ -147,51 +146,51 @@ gitlock_holmes couplings --repo ./my_project --branch main --paths lib/ --since 
 Get an overall repository summary:
 
 ```bash
-gitlock_holmes summary --repo /path/to/repo
+gitlock summary --repo /path/to/repo
 ```
 
 Find the top 10 hotspots in JSON format:
 
 ```bash
-gitlock_holmes hotspots --repo /path/to/repo --dir /path/to/code --format json --limit 10
+gitlock hotspots --repo /path/to/repo --dir /path/to/code --format json --limit 10
 ```
 
 Identify knowledge silos and save to a CSV file:
 
 ```bash
-gitlock_holmes knowledge-silos --repo /path/to/repo --output silos.csv
+gitlock knowledge-silos --repo /path/to/repo --output silos.csv
 ```
 
 Find temporal coupling with at least 50% coupling:
 
 ```bash
-gitlock_holmes couplings --repo /path/to/repo --min-coupling 50
+gitlock couplings --repo /path/to/repo --min-coupling 50
 ```
 
 Analyze the impact of changing a specific file:
 
 ```bash
-gitlock_holmes blast-radius --repo /path/to/repo --dir /path/to/code --target-files lib/important_file.ex
+gitlock blast-radius --repo /path/to/repo --dir /path/to/code --target-files lib/important_file.ex
 ```
 
 Output directly to the terminal:
 
 ```bash
-gitlock_holmes summary --repo /path/to/repo --format stdout
+gitlock summary --repo /path/to/repo --format stdout
 ```
 
 Analyze only commits from a specific time period:
 
 ```bash
-gitlock_holmes hotspots --repo /path/to/repo --dir /path/to/code --since 2023-01-01 --until 2023-06-30
+gitlock hotspots --repo /path/to/repo --dir /path/to/code --since 2023-01-01 --until 2023-06-30
 ```
 
 ### Legacy Command Style (Backward Compatibility)
 
-GitlockHolmes also supports a legacy command style:
+Gitlock also supports a legacy command style:
 
 ```bash
-gitlock_holmes --investigation hotspots --log ./git_log.txt --vcs git
+gitlock --investigation hotspots --log ./git_log.txt --vcs git
 ```
 
 ### Preparing Git Log
@@ -213,7 +212,7 @@ git log --all -M -C --numstat --date=short --pretty=format:'--%h--%cd--%cn' > gi
 Then use this log file for analysis:
 
 ```bash
-gitlock_holmes summary --repo git_log.txt
+gitlock summary --repo git_log.txt
 ```
 
 ## Understanding Results
@@ -323,11 +322,11 @@ Key metrics:
 
 ### Programmatic API
 
-GitlockHolmes can be used programmatically in Elixir projects:
+Gitlock can be used programmatically in Elixir projects:
 
 ```elixir
 # Run a hotspots analysis
-{:ok, results} = GitlockHolmesCore.investigate(:hotspots, "/path/to/repo", %{
+{:ok, results} = GitlockCore.investigate(:hotspots, "/path/to/repo", %{
   dir: "/path/to/code",
   format: "json"
 })
@@ -342,7 +341,7 @@ See `examples/analyze_repository.exs` for a complete example.
 
 ### Integration with CI/CD
 
-Add GitlockHolmes to your CI/CD pipeline to monitor code health:
+Add Gitlock to your CI/CD pipeline to monitor code health:
 
 ```yaml
 # Example GitHub Action workflow
@@ -364,18 +363,18 @@ jobs:
           elixir-version: "1.14"
           otp-version: "25"
 
-      - name: Install GitlockHolmes
+      - name: Install Gitlock
         run: |
-          git clone https://github.com/yourusername/gitlock_holmes.git
-          cd gitlock_holmes
+          git clone https://github.com/yourusername/gitlock.git
+          cd gitlock
           mix deps.get
           mix build.all
-          sudo cp bin/gitlock_holmes /usr/local/bin/
+          sudo cp bin/gitlock /usr/local/bin/
 
       - name: Analyze code health
         run: |
-          gitlock_holmes hotspots --repo . --dir . --output hotspots.csv
-          gitlock_holmes knowledge-silos --repo . --output silos.csv
+          gitlock hotspots --repo . --dir . --output hotspots.csv
+          gitlock knowledge-silos --repo . --output silos.csv
 
       - name: Upload reports
         uses: actions/upload-artifact@v3
@@ -386,14 +385,14 @@ jobs:
 
 ### Working with Remote Repositories
 
-GitlockHolmes can analyze remote repositories directly:
+Gitlock can analyze remote repositories directly:
 
 ```bash
 # Clone and analyze a remote repository
-gitlock_holmes hotspots --url https://github.com/user/repo.git --dir ./temp_dir
+gitlock hotspots --url https://github.com/user/repo.git --dir ./temp_dir
 
 # Analyze a specific branch of a remote repository
-gitlock_holmes hotspots --url https://github.com/user/repo.git --branch develop --dir ./temp_dir
+gitlock hotspots --url https://github.com/user/repo.git --branch develop --dir ./temp_dir
 ```
 
 ### Analyzing Specific Time Periods
@@ -408,19 +407,19 @@ Use the prepare_git_log.sh script to focus on a specific time period:
 ./scripts/prepare_git_log.sh --repo ./my_project --since 2023-01-01 --until 2023-06-30 --output h1_2023_log.txt
 
 # Analyze the filtered log
-gitlock_holmes hotspots --repo recent_log.txt --dir ./my_project
+gitlock hotspots --repo recent_log.txt --dir ./my_project
 ```
 
 ## FAQ
 
 **Q: How is cyclomatic complexity calculated?**  
-A: GitlockHolmes uses language-specific analyzers to calculate cyclomatic complexity by counting decision points (if statements, loops, etc.). We support Elixir, JavaScript, Python, and more.
+A: Gitlock uses language-specific analyzers to calculate cyclomatic complexity by counting decision points (if statements, loops, etc.). We support Elixir, JavaScript, Python, and more.
 
 **Q: How many commits should I analyze?**  
 A: For most repositories, analyzing 3-6 months of history provides a good balance between meaningful insights and performance. You can use the `--since` parameter or `prepare_git_log.sh` script to limit the history.
 
 **Q: Are binary files included in the analysis?**  
-A: GitlockHolmes identifies binary files and excludes them from complexity analysis, but still includes them in coupling and revision-based analyses.
+A: Gitlock identifies binary files and excludes them from complexity analysis, but still includes them in coupling and revision-based analyses.
 
 **Q: How is the "risk score" calculated?**  
 A: The risk score is a combination of complexity, change frequency, and size factors. The formula gives more weight to files that are both complex and frequently changed.
@@ -437,12 +436,12 @@ A: Yes, use the `--branch`, `--since` and `--until` parameters or the `prepare_g
 **Q: What's the difference between using `--repo` and `--log`?**  
 A: The `--repo` option is more versatile and can handle local repositories, log files, or remote URLs. The `--log` option is maintained for backward compatibility but is deprecated.
 
-**Q: Do I need to have Git installed to use GitlockHolmes?**  
-A: Yes, GitlockHolmes requires Git to be installed when analyzing repositories directly. When analyzing pre-generated log files, Git is not required.
+**Q: Do I need to have Git installed to use Gitlock?**  
+A: Yes, Gitlock requires Git to be installed when analyzing repositories directly. When analyzing pre-generated log files, Git is not required.
 
 ## Performance Considerations
 
-GitlockHolmes analyzes Git history and performs complexity calculations, which can be resource-intensive for large repositories:
+Gitlock analyzes Git history and performs complexity calculations, which can be resource-intensive for large repositories:
 
 - **Memory usage**: Analyzing large repositories (10,000+ commits) can require 1-2GB of RAM
 - **Execution time**: Full analysis might take 1-5 minutes for medium-sized repositories
@@ -478,9 +477,9 @@ For very large repositories, consider:
 - **Code Maat**: Original command-line tool by Adam Tornhill
 - **CodeClimate**: Quality analysis but less focus on historical patterns
 
-## Why GitlockHolmes?
+## Why Gitlock?
 
-While other tools focus on static code analysis, GitlockHolmes looks at the evolution of your codebase over time, revealing patterns that aren't visible from looking at the code in isolation.
+While other tools focus on static code analysis, Gitlock looks at the evolution of your codebase over time, revealing patterns that aren't visible from looking at the code in isolation.
 
 ## Contributing
 
@@ -490,8 +489,8 @@ Contributions are welcome! Check out the [Contributing Guide](CONTRIBUTING.md) f
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gitlock_holmes.git
-cd gitlock_holmes
+git clone https://github.com/yourusername/gitlock.git
+cd gitlock
 
 # Install dependencies
 mix deps.get
@@ -514,5 +513,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <p align="center">
-  Made with ❤️ by the GitlockHolmes team
+  Made with ❤️ by the Gitlock team
 </p>
