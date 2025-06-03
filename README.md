@@ -1,4 +1,3 @@
-# GitlockHolmes: Forensic Code Analysis Tool
 
 <p align="center">
   <img src="assets/logo.svg" alt="GitlockHolmes Logo" width="250"/>
@@ -17,7 +16,7 @@
   <a href="#license">License</a>
 </p>
 
-**GitlockHolmes** is a code forensics tool inspired by Adam Tornhill's "Your Code as Crime Scene" methodology. It analyzes your Git repository history to identify hotspots, knowledge silos, and other code health indicators that can help prioritize refactoring efforts and improve code quality.
+**Gitlock** is a code forensics tool inspired by Adam Tornhill's "Your Code as Crime Scene" methodology. It analyzes your Git repository history to identify hotspots, knowledge silos, and other code health indicators that can help prioritize refactoring efforts and improve code quality.
 
 > _"Just as detectives use forensic techniques to reconstruct crime scenes, GitlockHolmes examines your codebase's history to reveal the story behind your code."_
 
