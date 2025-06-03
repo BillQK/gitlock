@@ -1,7 +1,7 @@
 # GitlockHolmes: Forensic Code Analysis Tool
 
 <p align="center">
-  <img src="assets/logo.png" alt="GitlockHolmes Logo" width="250"/>
+  <img src="assets/logo.svg" alt="GitlockHolmes Logo" width="250"/>
   <p align="center"><em>Uncovering the hidden stories in your codebase</em></p>
 </p>
 
