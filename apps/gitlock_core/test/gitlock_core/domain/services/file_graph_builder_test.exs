@@ -45,7 +45,7 @@ defmodule GitlockCore.Domain.Services.FileGraphBuilderTest do
     test "handles empty commit list" do
       graph = FileGraphBuilder.create_from_commits([])
       assert map_size(graph.nodes) == 0
-      assert length(graph.edges) == 0
+      assert Enum.empty?(graph.node)
     end
 
     # Helper for creating test commits

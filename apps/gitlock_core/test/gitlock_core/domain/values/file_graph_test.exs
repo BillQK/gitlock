@@ -38,7 +38,7 @@ defmodule GitlockCore.Domain.Values.FileGraphTest do
     test "creates empty graph when no data provided" do
       graph = FileGraph.new(%{}, [], %{})
       assert map_size(graph.nodes) == 0
-      assert length(graph.edges) == 0
+      assert Enum.empty?(graph.edge)
       assert map_size(graph.metadata) == 0
     end
   end
