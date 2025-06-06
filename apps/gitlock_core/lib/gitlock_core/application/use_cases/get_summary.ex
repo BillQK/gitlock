@@ -1,7 +1,7 @@
 defmodule GitlockCore.Application.UseCases.GetSummary do
   use GitlockCore.Application.UseCase
 
-  alias GitlockCore.Domain.Services.Summary
+  alias GitlockCore.Domain.Services.{Summary, FileHistoryService}
 
   @impl true
   def resolve_dependencies(options) do
@@ -14,7 +14,9 @@ defmodule GitlockCore.Application.UseCases.GetSummary do
   @impl true
   def run_domain_logic(repo_path, deps, options) do
     with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options) do
-      summary_stats = Summary.summarize(commits)
+      history = FileHistoryService.build_history(commits)
+      normalizes = FileHistoryService.normalize_commits(commits, history)
+      summary_stats = Summary.summarize(normalizes)
       {:ok, summary_stats}
     end
   end

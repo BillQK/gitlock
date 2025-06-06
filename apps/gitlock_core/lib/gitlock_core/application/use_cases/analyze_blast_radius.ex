@@ -2,7 +2,12 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadius do
   alias GitlockCore.Domain.Values.ChangeImpact
   use GitlockCore.Application.UseCase
 
-  alias GitlockCore.Domain.Services.{ChangeAnalyzer, FileGraphBuilder, ComplexityCollector}
+  alias GitlockCore.Domain.Services.{
+    ChangeAnalyzer,
+    FileGraphBuilder,
+    ComplexityCollector,
+    FileHistoryService
+  }
 
   @impl true
   def resolve_dependencies(options) do
@@ -26,8 +31,11 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadius do
       with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options),
            complexity_map <- get_complexity_map(deps.analyzer, options),
            active_files <- get_active_files(deps.file_system, options) do
+        history = FileHistoryService.build_history(commits)
+        normalizes = FileHistoryService.normalize_commits(commits, history)
+
         graph =
-          FileGraphBuilder.create_from_commits(commits, complexity_map, active_files, options)
+          FileGraphBuilder.create_from_commits(normalizes, complexity_map, active_files, options)
 
         impacts = ChangeAnalyzer.analyze_changes(target_files, graph, options)
 
