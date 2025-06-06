@@ -1,7 +1,7 @@
 defmodule GitlockCore.Application.UseCases.AnalyzeKnowledgeSilos do
   use GitlockCore.Application.UseCase
 
-  alias GitlockCore.Domain.Services.KnowledgeSiloDetection
+  alias GitlockCore.Domain.Services.{KnowledgeSiloDetection, FileHistoryService}
 
   @impl true
   def resolve_dependencies(options) do
@@ -14,7 +14,9 @@ defmodule GitlockCore.Application.UseCases.AnalyzeKnowledgeSilos do
   @impl true
   def run_domain_logic(repo_path, deps, options) do
     with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options) do
-      knowledge_silos = KnowledgeSiloDetection.detect_knowledge_silos(commits)
+      history = FileHistoryService.build_history(commits)
+      normalizes = FileHistoryService.normalize_commits(commits, history)
+      knowledge_silos = KnowledgeSiloDetection.detect_knowledge_silos(normalizes)
       {:ok, knowledge_silos}
     end
   end

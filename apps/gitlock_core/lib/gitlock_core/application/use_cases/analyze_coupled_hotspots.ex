@@ -1,7 +1,11 @@
 defmodule GitlockCore.Application.UseCases.AnalyzeCoupledHotspots do
   use GitlockCore.Application.UseCase
 
-  alias GitlockCore.Domain.Services.{CoupledHotspotAnalysis, ComplexityCollector}
+  alias GitlockCore.Domain.Services.{
+    CoupledHotspotAnalysis,
+    ComplexityCollector,
+    FileHistoryService
+  }
 
   @impl true
   def resolve_dependencies(options) do
@@ -16,7 +20,10 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCoupledHotspots do
   def run_domain_logic(repo_path, deps, options) do
     with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options),
          complexity_map <- get_complexity_map(deps.analyzer, options) do
-      coupled_hotspots = CoupledHotspotAnalysis.detect_combined(commits, complexity_map)
+      history = FileHistoryService.build_history(commits)
+      normalizes = FileHistoryService.normalize_commits(commits, history)
+
+      coupled_hotspots = CoupledHotspotAnalysis.detect_combined(normalizes, complexity_map)
       {:ok, coupled_hotspots}
     end
   end

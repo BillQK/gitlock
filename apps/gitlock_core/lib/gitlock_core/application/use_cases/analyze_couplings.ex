@@ -1,7 +1,7 @@
 defmodule GitlockCore.Application.UseCases.AnalyzeCouplings do
   use GitlockCore.Application.UseCase
 
-  alias GitlockCore.Domain.Services.CouplingDetection
+  alias GitlockCore.Domain.Services.{FileHistoryService, CouplingDetection}
 
   @impl true
   def resolve_dependencies(options) do
@@ -16,7 +16,11 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCouplings do
     with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options) do
       min_coupling = Map.get(options, :min_coupling, 1.0)
       min_windows = Map.get(options, :min_windows, 5)
-      results = CouplingDetection.detect_couplings(commits, min_coupling, min_windows)
+
+      history = FileHistoryService.build_history(commits)
+      normalizes = FileHistoryService.normalize_commits(commits, history)
+
+      results = CouplingDetection.detect_couplings(normalizes, min_coupling, min_windows)
       {:ok, results}
     end
   end

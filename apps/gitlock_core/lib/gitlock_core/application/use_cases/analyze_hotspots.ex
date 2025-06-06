@@ -1,7 +1,7 @@
 defmodule GitlockCore.Application.UseCases.AnalyzeHotspots do
   use GitlockCore.Application.UseCase
 
-  alias GitlockCore.Domain.Services.{HotspotDetection, ComplexityCollector}
+  alias GitlockCore.Domain.Services.{HotspotDetection, ComplexityCollector, FileHistoryService}
 
   @impl true
   def resolve_dependencies(options) do
@@ -16,7 +16,10 @@ defmodule GitlockCore.Application.UseCases.AnalyzeHotspots do
   def run_domain_logic(repo_path, deps, options) do
     with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options),
          complexity_map <- get_complexity_map(deps.analyzer, options) do
-      results = HotspotDetection.detect_hotspots(commits, complexity_map)
+      history = FileHistoryService.build_history(commits)
+      normalizes = FileHistoryService.normalize_commits(commits, history)
+
+      results = HotspotDetection.detect_hotspots(normalizes, complexity_map)
       {:ok, results}
     end
   end
