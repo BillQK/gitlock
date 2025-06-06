@@ -8,32 +8,84 @@ name: Elixir CI
 on:
   push:
     branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
 
 permissions:
   contents: read
 
 jobs:
   build:
-
     name: Build and test
     runs-on: ubuntu-22.04
 
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: gitlock_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Elixir
-      uses: erlef/setup-beam@61e01a43a562a89bfc54c7f9a378ff67b03e4a21 # v1.16.0
-      with:
-        elixir-version: '1.18.3' # [Required] Define the Elixir version
-        otp-version: '27.3.4'      # [Required] Define the Erlang/OTP version
-    - name: Restore dependencies cache
-      uses: actions/cache@v3
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
-    - name: Install dependencies
-      run: mix deps.get
-    - name: Run tests
-      run: mix test
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@61e01a43a562a89bfc54c7f9a378ff67b03e4a21 # v1.16.0
+        with:
+          elixir-version: "1.18.3"
+          otp-version: "27.3.4"
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile dependencies
+        run: mix deps.compile
+
+      # Code Quality Checks
+      - name: Check formatting
+        run: mix format --check-formatted
+
+      - name: Run Credo
+        run: mix credo --strict
+        continue-on-error: true # Optional: remove this to fail on warnings
+
+      - name: Check for unused dependencies
+        run: mix deps.unlock --check-unused
+        continue-on-error: true
+
+      # Database Setup for Phoenix App
+      - name: Setup database
+        run: |
+          cd apps/gitlock_phx
+          mix ecto.create
+          mix ecto.migrate
+        env:
+          MIX_ENV: test
+
+      # Run Tests
+      - name: Run tests
+        run: mix test
+        env:
+          MIX_ENV: test
+
+      # Optional: Run test coverage
+      - name: Run test coverage
+        run: mix test --cover
+        env:
+          MIX_ENV: test
+        continue-on-error: true
