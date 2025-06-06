@@ -140,4 +140,3 @@ defmodule GitlockCore.Adapters.Complexity.Lang.JavascriptAnalyzerTest do
     end
   end
 end
-

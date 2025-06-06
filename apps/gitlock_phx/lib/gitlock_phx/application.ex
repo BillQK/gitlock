@@ -9,10 +9,9 @@ defmodule GitlockPhx.Application do
   def start(_type, _args) do
     children = [
       GitlockPhxWeb.Telemetry,
+      GitlockPhx.Repo,
       {DNSCluster, query: Application.get_env(:gitlock_phx, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: GitlockPhx.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: GitlockPhx.Finch},
       # Start a worker by calling: GitlockPhx.Worker.start_link(arg)
       # {GitlockPhx.Worker, arg},
       # Start to serve requests, typically the last entry

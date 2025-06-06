@@ -13,4 +13,3 @@ defmodule GitlockCore.Adapters.Complexity.BaseAnalyzerTest do
   #   assert true
   # end
 end
-

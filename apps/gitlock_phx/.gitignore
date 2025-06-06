@@ -23,7 +23,7 @@ erl_crash.dump
 /tmp/
 
 # Ignore package tarball (built via "mix hex.build").
-gitlock_holmes_phx-*.tar
+gitlock_phx-*.tar
 
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
@@ -35,4 +35,3 @@ gitlock_holmes_phx-*.tar
 npm-debug.log
 /assets/node_modules/
 
-.DS_Store

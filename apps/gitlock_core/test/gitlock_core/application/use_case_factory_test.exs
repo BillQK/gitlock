@@ -13,4 +13,3 @@ defmodule GitlockCore.Application.UseCaseFactoryTest do
   #   assert true
   # end
 end
-

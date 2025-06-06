@@ -38,9 +38,7 @@ defmodule GitlockPhxWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: GitlockPhxWeb.Layouts]
+      use Phoenix.Controller, formats: [:html, :json]
 
       use Gettext, backend: GitlockPhxWeb.Gettext
 
@@ -52,8 +50,7 @@ defmodule GitlockPhxWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {GitlockPhxWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -90,8 +87,9 @@ defmodule GitlockPhxWeb do
       # Core UI components
       import GitlockPhxWeb.CoreComponents
 
-      # Shortcut for generating JS commands
+      # Common modules used in templates
       alias Phoenix.LiveView.JS
+      alias GitlockPhxWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

@@ -152,4 +152,3 @@ defmodule GitlockCore.Domain.Services.CoupledHotspotAnalysisTest do
     }
   end
 end
-

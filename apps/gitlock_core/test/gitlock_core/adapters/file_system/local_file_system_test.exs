@@ -3,7 +3,6 @@ defmodule GitlockCore.Adapters.FileSystem.LocalFileSystemTest do
 
   alias GitlockCore.Adapters.FileSystem.LocalFileSystem
 
-
   # Use Briefly for temporary files and directories
   setup do
     # Create a temporary directory for tests

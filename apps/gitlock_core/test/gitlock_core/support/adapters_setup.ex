@@ -82,8 +82,7 @@ defmodule GitlockCore.TestSupport.AdaptersSetup do
       {:reporter, adapter_keys.json_reporter, GitlockCore.Adapters.Reporters.JsonReporter},
       {:complexity_analyzer, adapter_keys.complexity,
        GitlockCore.Adapters.Complexity.DispatchAnalyzer},
-      {:file_system, adapter_keys.file_system,
-       GitlockCore.Adapters.FileSystem.LocalFileSystem}
+      {:file_system, adapter_keys.file_system, GitlockCore.Adapters.FileSystem.LocalFileSystem}
     ]
 
     register_adapters(registrations)

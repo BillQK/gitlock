@@ -1,5 +1,15 @@
 import Config
 
+# Configure your database
+config :gitlock_phx, GitlockPhx.Repo,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "gitlock_phx_dev",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -9,11 +19,11 @@ import Config
 config :gitlock_phx, GitlockPhxWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 3000],
+  http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "HdGeb6ceE6FqtCkiBfqqpjel/EoyCMClcR3fX2ICSjB10QU+S9JJ2divhh6hPA7j",
+  secret_key_base: "K966iHPm7n+pF66q4rDM/m6R284ZJ3k3WxX5lHqOjk45AGU23pwvMkZvgC1w6UL4",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:gitlock_phx, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:gitlock_phx, ~w(--watch)]}
@@ -45,10 +55,11 @@ config :gitlock_phx, GitlockPhxWeb.Endpoint,
 # Watch static and templates for browser reloading.
 config :gitlock_phx, GitlockPhxWeb.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/gitlock_phx_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/gitlock_phx_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
@@ -56,7 +67,7 @@ config :gitlock_phx, GitlockPhxWeb.Endpoint,
 config :gitlock_phx, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :default_formatter, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -66,7 +77,8 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :phoenix_live_view,
-  # Include HEEx debug annotations as HTML comments in rendered markup
+  # Include HEEx debug annotations as HTML comments in rendered markup.
+  # Changing this configuration will require mix clean and a full recompile.
   debug_heex_annotations: true,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true

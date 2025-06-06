@@ -8,7 +8,6 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCoupledHotspotsTest do
   alias GitlockCore.Domain.Entities.{Commit, Author}
   alias GitlockCore.Domain.Values.{FileChange, ComplexityMetrics, CombinedRisk}
 
-
   # Set up unique adapters for each test
   setup_unique_adapters()
 
