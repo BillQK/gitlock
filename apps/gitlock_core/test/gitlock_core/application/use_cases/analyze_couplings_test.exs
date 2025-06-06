@@ -6,7 +6,7 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCouplingsTest do
   alias GitlockCore.Mocks.{VersionControlMock, ReporterMock}
   alias GitlockCore.Application.UseCases.AnalyzeCouplings
   alias GitlockCore.Domain.Entities.{Commit, Author}
-  alias GitlockCore.Domain.Values.{FileChange, CouplingMetrics}
+  alias GitlockCore.Domain.Values.{FileChange, CouplingsMetrics}
 
   # Set up unique adapters for each test
   setup_unique_adapters()
@@ -56,7 +56,7 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCouplingsTest do
 
         # First result should be a coupling between module_a and module_b
         coupling = hd(results)
-        assert %CouplingMetrics{} = coupling
+        assert %CouplingsMetrics{} = coupling
         assert coupling.entity in ["lib/module_a.ex", "lib/module_b.ex"]
         assert coupling.coupled in ["lib/module_a.ex", "lib/module_b.ex"]
         assert coupling.entity != coupling.coupled

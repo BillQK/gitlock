@@ -8,6 +8,22 @@ defmodule GitlockCLI.Main do
   """
 
   @version "0.1.0"
+  @investigation_aliases %{
+    "hotspot" => "hotspots",
+    "hotspots" => "hotspots",
+    "coupling" => "couplings",
+    "couplings" => "couplings",
+    "knowledge-silo" => "knowledge_silos",
+    "knowledge_silos" => "knowledge_silos",
+    "silo" => "knowledge_silos",
+    "silos" => "knowledge_silos",
+    "coupled-hotspot" => "coupled-hotspots",
+    "coupled_hotspots" => "coupled_hotspots",
+    "summary" => "summary",
+    "blast-radius" => "blast_radius",
+    "blast" => "blast_radius",
+    "impact" => "blast_radius"
+  }
 
   @doc """
   Entry point for the CLI application.
@@ -112,116 +128,97 @@ defmodule GitlockCLI.Main do
   defp run_investigation(options, remaining_args) do
     start_time = :os.timestamp()
 
-    # Determine investigation type (from positional arg or --investigation flag)
-    investigation_type =
-      cond do
-        # New style: First positional argument is the investigation type
-        Enum.any?(remaining_args) ->
-          normalize_investigation_type(List.first(remaining_args))
+    case get_investigation_type(options, remaining_args) do
+      nil ->
+        handle_no_investigation()
 
-        # Legacy style: --investigation flag
-        options[:investigation] || options[:i] ->
-          normalize_investigation_type(options[:investigation] || options[:i])
+      investigation_type ->
+        args = prepare_remaining_args(remaining_args)
+        execute_investigation(investigation_type, options, args, start_time)
+    end
+  end
 
-        # No investigation specified
-        true ->
-          nil
-      end
+  # Extract investigation type determination
+  defp get_investigation_type(options, remaining_args) do
+    cond do
+      # New style: First positional argument is the investigation type
+      Enum.any?(remaining_args) ->
+        normalize_investigation_type(List.first(remaining_args))
 
-    # Prepare arguments and run investigation if type is specified
-    if investigation_type do
-      # Get remaining args (excluding investigation name if it was positional)
-      args = if Enum.any?(remaining_args), do: Enum.drop(remaining_args, 1), else: []
+      # Legacy style: --investigation flag
+      options[:investigation] || options[:i] ->
+        normalize_investigation_type(options[:investigation] || options[:i])
 
-      if investigation_type in GitlockCore.available_investigations() do
-        options_map = prepare_options(options, args)
+      # No investigation specified
+      true ->
+        nil
+    end
+  end
 
-        # Determine repo path and source type
-        {repo_source, source_type} = determine_repo_source(options_map)
+  # Prepare remaining arguments
+  defp prepare_remaining_args(remaining_args) do
+    if Enum.any?(remaining_args), do: Enum.drop(remaining_args, 1), else: []
+  end
 
-        # Add source_type to options for the Git adapter
-        options_map = Map.put(options_map, :source_type, source_type)
+  # Handle case when no investigation is specified
+  defp handle_no_investigation do
+    IO.puts("Error: No investigation specified.")
+    IO.puts("Specify an investigation with --investigation TYPE or as the first argument.")
+    display_help([])
+    System.halt(1)
+  end
 
-        # Log the investigation being run
-        IO.puts("Running #{investigation_type} analysis on #{repo_source}...")
-
-        # Run the investigation
-        case GitlockCore.investigate(investigation_type, repo_source, options_map) do
-          {:ok, result} ->
-            handle_success(result, options_map, investigation_type)
-
-          {:error, reason} ->
-            handle_error(reason)
+  defp execute_investigation(investigation_result, options, args, start_time) do
+    case investigation_result do
+      {:ok, investigation_type} ->
+        if String.to_atom(investigation_type) in GitlockCore.available_investigations() do
+          do_execute_investigation(String.to_atom(investigation_type), options, args, start_time)
+        else
+          display_unknown_investigation(investigation_type)
         end
 
-        # Report execution time
-        end_time = :os.timestamp()
-        execution_time = :timer.now_diff(end_time, start_time) / 1_000_000
-        IO.puts("Execution Time: #{Float.round(execution_time, 3)}s")
-      else
-        display_unknown_investigation(to_string(investigation_type))
-      end
-    else
-      IO.puts("Error: No investigation specified.")
-      IO.puts("Specify an investigation with --investigation TYPE or as the first argument.")
-      display_help([])
-      System.halt(1)
+      {:error, reason} ->
+        IO.puts("Error: #{reason}")
+        display_help([])
+        System.halt(1)
     end
+  end
+
+  # Actually run the investigation
+  defp do_execute_investigation(investigation_type, options, args, start_time) do
+    options_map = prepare_options(options, args)
+    {repo_source, source_type} = determine_repo_source(options_map)
+    options_map = Map.put(options_map, :source_type, source_type)
+
+    IO.puts("Running #{investigation_type} analysis on #{repo_source}...")
+
+    case GitlockCore.investigate(investigation_type, repo_source, options_map) do
+      {:ok, result} ->
+        handle_success(result, options_map, investigation_type)
+
+      {:error, reason} ->
+        handle_error(reason)
+    end
+
+    report_execution_time(start_time)
+  end
+
+  # Report execution time
+  defp report_execution_time(start_time) do
+    end_time = :os.timestamp()
+    execution_time = :timer.now_diff(end_time, start_time) / 1_000_000
+    IO.puts("Execution Time: #{Float.round(execution_time, 3)}s")
   end
 
   # Converts investigation names to the canonical atom form.
   # Supports both underscore and dash formats.
-  defp normalize_investigation_type(name) when is_binary(name) do
-    case name do
-      "hotspots" ->
-        :hotspots
+  defp normalize_investigation_type(type) do
+    normalized = type |> to_string() |> String.downcase() |> String.trim()
 
-      "knowledge_silos" ->
-        :knowledge_silos
-
-      "knowledge-silos" ->
-        :knowledge_silos
-
-      "couplings" ->
-        :couplings
-
-      "coupled_hotspots" ->
-        :coupled_hotspots
-
-      "coupled-hotspots" ->
-        :coupled_hotspots
-
-      "blast_radius" ->
-        :blast_radius
-
-      "blast-radius" ->
-        :blast_radius
-
-      "summary" ->
-        :summary
-
-      "code_health" ->
-        :code_health
-
-      "code-health" ->
-        :code_health
-
-      "team_communication" ->
-        :team_communication
-
-      "team-communication" ->
-        :team_communication
-
-      _ ->
-        # Convert dash-separated to underscore for atom
-        name
-        |> String.replace("-", "_")
-        |> String.to_atom()
+    case Map.get(@investigation_aliases, normalized) do
+      nil -> {:error, "Unknown investigation type: #{type}"}
+      investigation -> {:ok, investigation}
     end
-  end
-
-  defp normalize_investigation_type(name) when is_atom(name) do
-    normalize_investigation_type(Atom.to_string(name))
   end
 
   # Determines the repository source and type with priority order:
@@ -726,14 +723,6 @@ defmodule GitlockCLI.Main do
   # Returns a comma-separated string of available investigation types.
   defp available_investigations_string do
     GitlockCore.available_investigations()
-    |> Enum.map(&normalize_investigation_name/1)
-    |> Enum.join(", ")
-  end
-
-  # Normalizes investigation name atoms to user-friendly strings.
-  defp normalize_investigation_name(investigation) do
-    investigation
-    |> Atom.to_string()
-    |> String.replace("_", "-")
+    |> Enum.map_join(", ", &to_string/1)
   end
 end
