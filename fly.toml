@@ -27,3 +27,6 @@ primary_region = 'bos'
   memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
+
+[deploy]
+  release_command = "/app/bin/gitlock_phx eval 'GitlockPhx.Release.migrate'"
