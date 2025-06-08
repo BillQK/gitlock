@@ -8,13 +8,27 @@ defmodule Gitlock.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      releases: releases()
     ]
   end
 
   def application do
     [
       extra_applications: [:logger, :runtime_tools, :os_mon, :observer, :wx]
+    ]
+  end
+
+  defp releases do
+    [
+      gitlock_phx: [
+        applications: [
+          gitlock_core: :permanent,
+          gitlock_phx: :permanent
+        ],
+        include_executables_for: [:unix],
+        steps: [:assemble, :tar]
+      ]
     ]
   end
 
