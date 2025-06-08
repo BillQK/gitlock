@@ -29,4 +29,4 @@ primary_region = 'bos'
   cpus = 1
 
 [deploy]
-  release_command = "/app/bin/gitlock_phx eval 'GitlockPhx.Release.migrate'"
+  release_command = '/app/bin/gitlock_phx eval "Ecto.Migrator.with_repo(GitlockPhx.Repo, fn repo -> Ecto.Migrator.run(repo, :up, all: true) end)"'
