@@ -62,7 +62,6 @@ if (process.env.NODE_ENV === "development") {
       // Enable server log streaming to client.
       // Disable with reloader.disableServerLogs()
       reloader.enableServerLogs();
-
       // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
       //
       //   * click with "c" key pressed to open at caller location
@@ -85,7 +84,6 @@ if (process.env.NODE_ENV === "development") {
         },
         true,
       );
-
       window.liveReloader = reloader;
     },
   );
@@ -259,58 +257,6 @@ Hooks.AnimateNumber = {
     // Clean up animation frame if component is removed
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
-    }
-  },
-};
-// Enhanced ScrollAnimation Hook with simple floating
-Hooks.ScrollAnimation = {
-  mounted() {
-    // Apply initial styles
-    this.el.style.opacity = "0";
-    this.el.style.transform = "translateY(50px)";
-    this.el.style.transition = "all 0.8s ease";
-
-    // Optional: Get custom transition delay from data attribute
-    const delay = this.el.dataset.delay || "0";
-    if (delay !== "0") {
-      this.el.style.transitionDelay = `${delay}ms`;
-    }
-
-    // Setup intersection observer
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Animate in when element enters viewport
-            entry.target.style.opacity = "1";
-            entry.target.style.transform = "translateY(0px)";
-
-            // Add floating animation after initial animation
-            setTimeout(() => {
-              entry.target.classList.add("float-animation");
-            }, 800);
-
-            // Optional: Stop observing after animation
-            if (this.el.dataset.once !== "false") {
-              observer.unobserve(entry.target);
-            }
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px",
-      },
-    );
-
-    // Start observing
-    observer.observe(this.el);
-    this.observer = observer;
-  },
-
-  destroyed() {
-    if (this.observer) {
-      this.observer.disconnect();
     }
   },
 };
