@@ -2,6 +2,7 @@ defmodule GitlockPhxWeb.LandingHTML do
   use GitlockPhxWeb, :html
 
   embed_templates "landing_html/*"
+
   # Background Effects Component
   def background_effects(assigns) do
     ~H"""
