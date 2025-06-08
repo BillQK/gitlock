@@ -13,6 +13,8 @@ primary_region = 'bos'
   MIX_ENV = 'prod'
   PHX_SERVER = 'true'
   PORT = '4000'
+  ECTO_IPV6 = "true"
+  PHX_HOST = "gitlock.fly.dev"
 
 [http_service]
   internal_port = 4000
