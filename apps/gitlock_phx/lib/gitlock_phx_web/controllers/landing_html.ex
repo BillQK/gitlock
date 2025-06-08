@@ -269,6 +269,7 @@ defmodule GitlockPhxWeb.LandingHTML do
     </section>
     """
   end
+
   # Feature Card Component
   attr :title, :string, required: true
   attr :description, :string, required: true
@@ -277,7 +278,6 @@ defmodule GitlockPhxWeb.LandingHTML do
   attr :delay, :string, default: "0"
 
   def feature_card(assigns) do
-
     ~H"""
     <div class={"feature-card #{@class}"}>
       <div class={"feature-icon-wrapper feature-icon-#{@icon}"}>
@@ -892,7 +892,6 @@ defmodule GitlockPhxWeb.LandingHTML do
     </div>
     """
   end
-
 
   # CTA Section Component
   def cta_section(assigns) do
