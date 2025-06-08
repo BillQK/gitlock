@@ -8,6 +8,16 @@
       {assigns[:page_title] || "Uncover Hidden Stories in Your Codebase"}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <meta name="description" content="Gitlock - Investigate your code like a detective" />
+    <meta property="og:title" content="Gitlock - Code Investigation Tool" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Gitlock",
+        "description": "Code investigation and analysis tool"
+      }
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <script>

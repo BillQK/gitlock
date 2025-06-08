@@ -7,7 +7,7 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
   """
 
   alias GitlockCore.Domain.Entities.Commit
-  alias GitlockCore.Domain.Values.{FileChange, FileHistory}
+  alias GitlockCore.Domain.Values.{FileHistory}
 
   @doc """
   Builds a FileHistory value object from a list of commits.
