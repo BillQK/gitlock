@@ -96,15 +96,21 @@ defmodule MockGitlockCore do
   # Blast Radius - Requires both dir and target_files
   def investigate(:blast_radius, _source, options) do
     cond do
-      not options[:target_files] ->
+      not Map.has_key?(options, :target_files) ->
         {:error,
          {:validation, "Target files (--target-files) are required for blast radius analysis"}}
 
-      not options[:dir] ->
+      not Map.has_key?(options, :dir) ->
         {:error, {:validation, "Directory option (--dir) is required for blast radius analysis"}}
 
       true ->
-        target_files = List.wrap(options[:target_files])
+        # Handle both string and list formats for target_files
+        target_files =
+          case options[:target_files] do
+            files when is_list(files) -> files
+            file when is_binary(file) -> [file]
+            _ -> []
+          end
 
         results =
           Enum.map(target_files, fn file ->
@@ -114,80 +120,56 @@ defmodule MockGitlockCore do
                 String.contains?(file, "main") -> "high"
                 String.contains?(file, "core") -> "high"
                 String.contains?(file, "api") -> "medium"
+                String.contains?(file, "util") -> "medium"
                 true -> "low"
               end
 
-            risk_score =
+            # Generate a reason for the impact
+            reason =
               case impact do
-                "high" -> 8.5 + :rand.uniform() * 1.5
-                "medium" -> 5.0 + :rand.uniform() * 2.0
-                "low" -> 2.0 + :rand.uniform() * 2.0
+                "high" -> "Core component with many dependencies"
+                "medium" -> "Used by multiple components"
+                "low" -> "Limited usage in the codebase"
               end
 
-            affected_files =
-              case impact do
-                "high" -> 15 + :rand.uniform(10)
-                "medium" -> 8 + :rand.uniform(7)
-                "low" -> 3 + :rand.uniform(5)
-              end
-
-            affected_components = max(1, div(affected_files, 4))
-
-            reviewers =
-              case impact do
-                "high" -> "jane.doe,john.smith,bob.wilson"
-                "medium" -> "jane.doe,alice.brown"
-                "low" -> "charlie.davis"
-              end
-
-            "#{file},#{impact},#{Float.round(risk_score, 1)},#{affected_files},#{affected_components},\"#{reviewers}\""
+            "#{file},#{impact},\"#{reason}\""
           end)
 
-        header =
-          "entity,impact_severity,risk_score,affected_files_count,affected_components_count,suggested_reviewers"
+        header = "entity,impact_level,impact_reason"
+        results_str = Enum.join(results, "\n")
 
-        {:ok, header <> "\n" <> Enum.join(results, "\n") <> "\n"}
+        {:ok, "#{header}\n#{results_str}\n"}
     end
   end
 
-  # Team Communication
+  # Other investigations with placeholders
   def investigate(:team_communication, _source, _options) do
     {:ok,
      """
-     author,peer,shared,average,strength
-     jane.doe,john.smith,23,35,66
-     bob.wilson,alice.brown,18,28,64
-     john.smith,bob.wilson,15,24,63
-     alice.brown,jane.doe,12,21,57
-     charlie.davis,diana.miller,8,16,50
-     diana.miller,jane.doe,6,18,33
+     entity1,entity2,communication_score,num_interactions
+     john.doe,jane.smith,87.3,45
+     bob.wilson,alice.brown,72.1,36
+     charlie.davis,diana.miller,65.8,29
      """}
   end
 
-  # Code Health - Overall assessment
   def investigate(:code_health, _source, options) do
     if options[:dir] do
       {:ok,
        """
-       metric,value,status,recommendation
-       test_coverage,78.5,good,Increase to 85%+
-       complexity_trend,rising,warning,Refactor high complexity files
-       duplication_ratio,12.3,acceptable,Monitor for increases
-       technical_debt_hours,156,moderate,Address top 5 hotspots
-       maintainability_index,68,good,Focus on coupled hotspots
+       metric,value,trend,benchmark
+       code_coverage,78.2,positive,75.0
+       complexity_index,23.4,negative,20.0
+       knowledge_dispersion,65.7,stable,70.0
+       technical_debt_ratio,18.3,positive,25.0
        """}
     else
       {:error, {:validation, "Directory option (--dir) is required for code health analysis"}}
     end
   end
 
-  # Handle unknown investigation types
-  def investigate(unknown_type, _source, _options) do
-    {:error, {:analysis, "Unknown investigation type: #{unknown_type}"}}
-  end
-
-  # Simulate some error conditions based on source path
-  def investigate(_type, source, _options) when is_binary(source) do
+  # Simulated file reading - returns mock data or errors based on filename
+  def read_file(source, _options) do
     cond do
       String.contains?(source, "nonexistent") ->
         {:error, {:io, source, :enoent}}
