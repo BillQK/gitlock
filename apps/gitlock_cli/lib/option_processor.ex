@@ -1,149 +1,155 @@
 defmodule GitlockCLI.OptionProcessor do
   @moduledoc """
-  Handles preparation and normalization of command-line options.
-
-  Converts between legacy and new option formats, handles special cases like
-  target_files, and normalizes option keys to their canonical forms.
+  Processes and prepares options for the Gitlock CLI by normalizing values,
+  applying defaults, and handling special cases.
   """
 
   @doc """
-  Prepares options for investigation execution, handling special cases and normalization.
+  Prepares options by normalizing values and applying defaults.
+
+  Takes parsed options from OptionParser and any remaining arguments,
+  then returns a processed map of options.
   """
-  def prepare_options(options, _args) do
-    # Process target_files from both --target-files and --tf options
-    target_files = extract_and_process_target_files(options)
+  def prepare_options(parsed_options, remaining_args) do
+    # Convert the list of tuples to a map, but preserve multiple occurrences of the same key
+    options_map = handle_multiple_options(parsed_options)
 
-    # Convert options keyword list to map, handling aliases
-    base_options =
-      options
-      |> Enum.reduce(%{}, fn
-        {:target_files, _}, acc -> acc
-        {:tf, _}, acc -> acc
-        {key, value}, acc -> Map.put(acc, key, value)
-      end)
-      |> normalize_option_keys()
-
-    # Add target_files if present
-    if target_files && length(target_files) > 0 do
-      Map.put(base_options, :target_files, target_files)
-    else
-      base_options
-    end
+    options_map
+    |> normalize_aliases()
+    |> process_target_files(remaining_args)
+    |> process_special_options()
+    |> apply_defaults()
   end
 
-  @doc """
-  Normalizes option keys, converting both legacy and new option names to canonical form.
-  """
-  def normalize_option_keys(options) do
-    options
-    |> Enum.map(fn
-      # Legacy options to canonical form
-      {key, value} when key in [:l, :log] -> {:log, value}
-      {key, value} when key in [:rows] -> {:rows, value}
-      {key, value} when key in [:f, :format] -> {:format, value}
-      {key, value} when key in [:a, :arch_group] -> {:group, value}
-      {key, value} when key in [:t, :time_period] -> {:temporal_period, value}
-      # New options to canonical form
-      {key, value} when key in [:r, :repo] -> {:repo, value}
-      {key, value} when key in [:u, :url] -> {:url, value}
-      {key, value} when key in [:o, :output] -> {:output, value}
-      {key, value} when key in [:limit] -> {:rows, value}
-      {key, value} when key in [:d, :dir] -> {:dir, value}
-      {key, value} when key in [:bt, :blast_threshold] -> {:blast_threshold, value}
-      {key, value} when key in [:mr, :max_radius] -> {:max_radius, value}
-      # Preserve other options
-      {key, value} -> {key, value}
+  # Handles options with multiple occurrences (specifically for :keep options)
+  defp handle_multiple_options(options) do
+    # Group options by key
+    grouped = Enum.group_by(options, fn {k, _} -> k end, fn {_, v} -> v end)
+
+    # Create a map where keys with multiple values are preserved as lists
+    Enum.reduce(grouped, %{}, fn {key, values}, acc ->
+      if length(values) > 1 do
+        Map.put(acc, key, values)
+      else
+        Map.put(acc, key, List.first(values))
+      end
     end)
-    |> Map.new()
   end
 
-  @doc """
-  Validates that required options are present for specific investigation types.
-  """
-  def validate_required_options(investigation_type, options) do
-    case investigation_type do
-      type when type in [:hotspots, :coupled_hotspots, :blast_radius] ->
-        validate_complexity_analysis_options(options)
+  # Normalizes option aliases to their full names
+  defp normalize_aliases(options) do
+    options
+    |> maybe_use_alias(:r, :repo)
+    |> maybe_use_alias(:l, :log)
+    |> maybe_use_alias(:u, :url)
+    |> maybe_use_alias(:i, :investigation)
+    |> maybe_use_alias(:f, :format)
+    |> maybe_use_alias(:o, :output)
+    |> maybe_use_alias(:d, :dir)
+    |> maybe_use_alias(:a, :arch_group)
+    |> maybe_use_alias(:t, :time_period)
+    |> maybe_use_alias(:tf, :target_files)
+    |> maybe_use_alias(:bt, :blast_threshold)
+    |> maybe_use_alias(:mr, :max_radius)
+    |> handle_rows_as_limit()
+  end
 
-      :blast_radius ->
-        validate_blast_radius_options(options)
+  # Makes rows an alias for limit
+  defp handle_rows_as_limit(options) do
+    case options do
+      %{rows: rows} ->
+        # If both limit and rows are present, prefer rows
+        options
+        |> Map.put(:limit, rows)
+        # Keep rows for backward compatibility
+        |> Map.put(:rows, rows)
 
       _ ->
-        :ok
+        # If rows is not present, make sure limit gets copied to rows
+        case options do
+          %{limit: limit} -> Map.put(options, :rows, limit)
+          _ -> options
+        end
     end
   end
 
-  # Extracts and processes target_files options
-  defp extract_and_process_target_files(options) do
-    # Handle multiple --target-files or --tf options
-    multiple_target_files = extract_multiple_target_files(options)
-
-    # Handle comma-separated target files (legacy support)
-    comma_separated_files = extract_comma_separated_target_files(options)
-
-    case {multiple_target_files, comma_separated_files} do
-      {nil, nil} -> nil
-      {files, nil} when is_list(files) -> files
-      {nil, files} when is_list(files) -> files
-      {multiple, comma} -> multiple ++ comma
-    end
-    |> filter_empty_files()
-  end
-
-  # Extracts target_files options that can be specified multiple times
-  defp extract_multiple_target_files(options) do
-    target_files_entries =
-      options
-      |> Enum.filter(fn {key, _} -> key == :target_files or key == :tf end)
-
-    if Enum.empty?(target_files_entries) do
-      nil
-    else
-      Enum.map(target_files_entries, fn {_, value} -> value end)
-    end
-  end
-
-  # Handles comma-separated target files from the existing design
-  defp extract_comma_separated_target_files(options) do
-    value = options[:target_files] || options[:tf]
-
-    if value && is_binary(value) do
-      value
-      |> String.split(",")
-      |> Enum.map(&String.trim/1)
-    else
-      nil
-    end
-  end
-
-  # Filters out empty file names
-  defp filter_empty_files(nil), do: nil
-
-  defp filter_empty_files(files) do
-    filtered = Enum.filter(files, &(String.length(&1) > 0))
-    if Enum.empty?(filtered), do: nil, else: filtered
-  end
-
-  # Validates options required for complexity analysis
-  defp validate_complexity_analysis_options(options) do
-    if options[:dir] do
-      :ok
-    else
-      {:error, "Directory option (--dir) is required for complexity analysis"}
-    end
-  end
-
-  # Validates options specific to blast radius analysis
-  defp validate_blast_radius_options(options) do
+  # Uses the value from an alias if the main option is not present
+  defp maybe_use_alias(options, alias_key, main_key) do
     cond do
-      not options[:target_files] ->
-        {:error, "Target files (--target-files) are required for blast radius analysis"}
+      # If main option is not present but alias is, use the alias
+      is_nil(options[main_key]) && options[alias_key] ->
+        Map.put(options, main_key, options[alias_key])
 
-      not options[:dir] ->
-        {:error, "Directory option (--dir) is required for blast radius analysis"}
-
+      # Otherwise, keep options as is
       true ->
-        :ok
+        options
     end
+  end
+
+  # Processes target files from both options and remaining args
+  defp process_target_files(options, remaining_args) do
+    target_files =
+      options
+      |> extract_target_files()
+      |> merge_with_positional_files(remaining_args)
+      |> expand_comma_separated_files()
+      |> Enum.uniq()
+
+    if Enum.empty?(target_files) do
+      options
+    else
+      Map.put(options, :target_files, target_files)
+    end
+  end
+
+  # Extracts target files from options
+  defp extract_target_files(options) do
+    case options[:target_files] do
+      nil ->
+        []
+
+      # When we have a list of values (multiple --target-files)
+      files when is_list(files) ->
+        files
+
+      # Single value
+      file ->
+        [file]
+    end
+  end
+
+  # Merges with any files specified as positional arguments
+  defp merge_with_positional_files(target_files, remaining_args) do
+    target_files ++ remaining_args
+  end
+
+  # Expands any comma-separated file lists
+  defp expand_comma_separated_files(files) do
+    files
+    |> Enum.flat_map(fn file ->
+      if is_binary(file) && String.contains?(file, ",") do
+        String.split(file, ",", trim: true)
+      else
+        [file]
+      end
+    end)
+  end
+
+  # Processes special options that need custom handling
+  defp process_special_options(options) do
+    options
+  end
+
+  # Applies default values for options that weren't specified
+  defp apply_defaults(options) do
+    options
+    |> Map.put_new(:format, "text")
+    |> Map.put_new(:limit, 10)
+    # Ensure rows always exists
+    |> Map.put_new(:rows, Map.get(options, :limit, 10))
+    |> Map.put_new(:min_revs, 5)
+    |> Map.put_new(:min_coupling, 0.5)
+    |> Map.put_new(:blast_threshold, 0.1)
+    |> Map.put_new(:max_radius, 2)
   end
 end

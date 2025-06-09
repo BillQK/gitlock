@@ -9,6 +9,7 @@ defmodule GitlockCLI.Main do
   alias GitlockCLI.{ArgumentParser, InvestigationTypes, ErrorHandler, HelpDisplay, OutputHandler}
 
   @version "0.1.0"
+  @gitlock_core_module Application.compile_env(:gitlock_cli, :gitlock_core_module, GitlockCore)
 
   @doc """
   Entry point for the CLI application.
@@ -51,7 +52,7 @@ defmodule GitlockCLI.Main do
   defp run_investigation(investigation_type, args, start_time) do
     IO.puts("Running #{investigation_type} analysis on #{args.repo_source}...")
 
-    case GitlockCore.investigate(investigation_type, args.repo_source, args.options) do
+    case @gitlock_core_module.investigate(investigation_type, args.repo_source, args.options) do
       {:ok, result} ->
         OutputHandler.handle_success(result, args.options, investigation_type)
         report_execution_time(start_time)
