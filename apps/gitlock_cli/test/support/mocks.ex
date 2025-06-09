@@ -105,8 +105,6 @@ defmodule MockGitlockCore do
 
       true ->
         target_files = List.wrap(options[:target_files])
-        threshold = options[:blast_threshold] || 0.3
-        max_radius = options[:max_radius] || 2
 
         results =
           Enum.map(target_files, fn file ->
