@@ -30,3 +30,4 @@ primary_region = 'bos'
 
 [deploy]
   release_command = '/app/bin/gitlock_phx eval "Ecto.Migrator.with_repo(GitlockPhx.Repo, fn repo -> Ecto.Migrator.run(repo, :up, all: true) end)"'
+  release_command_timeout = 0

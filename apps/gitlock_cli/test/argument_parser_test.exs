@@ -1,5 +1,5 @@
 defmodule GitlockCLI.ArgumentParserTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
   alias GitlockCLI.ArgumentParser
 
   describe "parse/1 - help and version" do

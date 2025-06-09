@@ -1,5 +1,5 @@
 defmodule MockGitlockCoreTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   describe "available_investigations/0" do
     test "returns list of supported investigation types" do

@@ -62,7 +62,8 @@ defmodule GitlockCLI.OutputHandler do
   """
   def generate_timestamped_filename(investigation_type, format \\ "csv") do
     timestamp = generate_timestamp()
-    "output/#{investigation_type}-#{timestamp}.#{format}"
+    output_dir = Application.get_env(:gitlock_cli, :output_dir, "output")
+    Path.join(output_dir, "#{investigation_type}-#{timestamp}.#{format}")
   end
 
   @doc """
@@ -124,6 +125,39 @@ defmodule GitlockCLI.OutputHandler do
         "Output is quite large (#{size_mb} MB). Consider using --limit to reduce results."
       )
     end
+  end
+
+  @doc """
+  Outputs content to stdout according to the specified format.
+  This function is added to meet test expectations.
+  """
+  def output_to_stdout(content, options) do
+    # Format content if needed
+    formatted_content = format_content(content, options[:format])
+
+    # Output to stdout
+    IO.puts(formatted_content)
+  end
+
+  @doc """
+  Outputs content to a file according to the specified format and options.
+  This function is added to meet test expectations.
+  """
+  def output_to_file(content, investigation_type, options, output_file) do
+    # Format content if needed
+    formatted_content = format_content(content, options[:format])
+
+    # Write to the specified file
+    write_to_file(formatted_content, output_file)
+  end
+
+  @doc """
+  Generate an output filename based on investigation type and format.
+  This function is an alias for generate_timestamped_filename for backward compatibility.
+  """
+  def generate_output_filename(investigation_type, options) do
+    format = options[:format] || "csv"
+    generate_timestamped_filename(investigation_type, format)
   end
 
   # Ensures the directory for a file path exists

@@ -26,3 +26,5 @@ gitlock_holmes_cli-*.tar
 /tmp/
 
 .DS_Store
+
+/output/

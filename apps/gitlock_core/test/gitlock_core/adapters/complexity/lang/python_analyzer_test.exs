@@ -11,12 +11,7 @@ defmodule GitlockCore.Adapters.Complexity.Lang.PythonAnalyzerTest do
   describe "analyze_file/1" do
     setup do
       # Create a temporary directory for test files
-      test_dir = Path.join(System.tmp_dir!(), "python_analyzer_test_#{:rand.uniform(10000)}")
-      File.mkdir_p!(test_dir)
-
-      on_exit(fn ->
-        File.rm_rf!(test_dir)
-      end)
+      {:ok, test_dir} = Briefly.create(directory: true)
 
       {:ok, test_dir: test_dir}
     end
@@ -150,12 +145,7 @@ defmodule GitlockCore.Adapters.Complexity.Lang.PythonAnalyzerTest do
   describe "analyze_directory/2" do
     setup do
       # Create a temporary directory for test files
-      test_dir = Path.join(System.tmp_dir!(), "python_analyzer_dir_test_#{:rand.uniform(10000)}")
-      File.mkdir_p!(test_dir)
-
-      on_exit(fn ->
-        File.rm_rf!(test_dir)
-      end)
+      {:ok, test_dir} = Briefly.create(directory: true)
 
       {:ok, test_dir: test_dir}
     end

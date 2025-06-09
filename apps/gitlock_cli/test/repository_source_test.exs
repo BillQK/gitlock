@@ -1,5 +1,5 @@
 defmodule GitlockCLI.RepositorySourceTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import ExUnit.CaptureIO
 
   alias GitlockCLI.RepositorySource

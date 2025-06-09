@@ -1,5 +1,5 @@
 defmodule GitlockCLI.OptionProcessorTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias GitlockCLI.OptionProcessor
 
   describe "prepare_options/2" do
