@@ -57,7 +57,9 @@ RUN mix assets.deploy
 WORKDIR /app
 
 # Create release
+COPY rel rel
 RUN mix release gitlock_phx
+
 
 # Runtime stage
 FROM erlang:27-slim
@@ -95,6 +97,6 @@ COPY --from=builder --chown=nobody:root /app/_build/prod/rel/gitlock_phx ./
 
 USER nobody
 
-CMD ["/app/bin/gitlock_phx", "start"]
+CMD ["/app/bin/server"]
 
 EXPOSE 4000

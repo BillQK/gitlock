@@ -22,10 +22,8 @@ defmodule Gitlock.MixProject do
   defp releases do
     [
       gitlock_phx: [
-        applications: [
-          gitlock_core: :permanent,
-          gitlock_phx: :permanent
-        ],
+        version: "0.1.0",
+        applications: [gitlock_phx: :permanent],
         include_executables_for: [:unix],
         steps: [:assemble, :tar]
       ]

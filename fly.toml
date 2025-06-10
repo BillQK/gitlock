@@ -9,6 +9,9 @@ primary_region = 'bos'
 [build]
   dockerfile = 'Dockerfile'
 
+[deploy]
+  release_command = '/app/bin/migrate'
+
 [env]
   MIX_ENV = 'prod'
   PHX_SERVER = 'true'
@@ -28,6 +31,3 @@ primary_region = 'bos'
   cpu_kind = 'shared'
   cpus = 1
 
-[deploy]
-  release_command = '/app/bin/gitlock_phx eval "Ecto.Migrator.with_repo(GitlockPhx.Repo, fn repo -> Ecto.Migrator.run(repo, :up, all: true) end)"'
-  release_command_timeout = 0
