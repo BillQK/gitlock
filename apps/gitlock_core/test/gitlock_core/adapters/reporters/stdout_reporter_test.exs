@@ -8,8 +8,7 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporterTest do
     Hotspot,
     CouplingsMetrics,
     KnowledgeSilo,
-    ChangeImpact,
-    ComplexityMetrics
+    ChangeImpact
   }
 
   describe "report/2 - basic functionality" do

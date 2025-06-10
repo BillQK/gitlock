@@ -120,8 +120,7 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
         "No hotspots found."
       else
         data
-        |> Enum.map(&format_single_hotspot/1)
-        |> Enum.join("\n\n")
+        |> Enum.map_join("\n\n", &format_single_hotspot/1)
       end
 
     # Summary statistics
@@ -152,8 +151,7 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
         "No significant couplings found."
       else
         data
-        |> Enum.map(&format_single_coupling/1)
-        |> Enum.join("\n\n")
+        |> Enum.map_join("\n\n", &format_single_coupling/1)
       end
 
     # Insights section
@@ -161,7 +159,7 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
 
     Couplings Insights:
     • Total coupled pairs: #{length(data)}
-    • Strong couplings (>75%): #{count_strong_couplings(data, 75)}
+    • Strong couplings (>75%): #{count_strong_couplings(data)}
     • Medium couplings (50-75%): #{count_medium_couplings(data)}
     • Weak couplings (<50%): #{count_weak_couplings(data)}
     """
@@ -183,8 +181,7 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
         "No knowledge silos found."
       else
         data
-        |> Enum.map(&format_single_silo/1)
-        |> Enum.join("\n\n")
+        |> Enum.map_join("\n\n", &format_single_silo/1)
       end
 
     # Summary section
@@ -219,15 +216,14 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
     """
   end
 
-  defp format_analysis(:blast_radius, data, _all_data, options) do
+  defp format_analysis(:blast_radius, data, _all_data, _options) do
     # Format individual impact analyses
     formatted_impacts =
       if Enum.empty?(data) do
         "No impact analysis available."
       else
         data
-        |> Enum.map(&format_single_impact/1)
-        |> Enum.join("\n\n")
+        |> Enum.map_join("\n\n", &format_single_impact/1)
       end
 
     """
@@ -399,69 +395,6 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
 
   defp row_limit_notice(_, _, _), do: ""
 
-  defp format_hotspots(hotspots, _options) do
-    if Enum.empty?(hotspots) do
-      "No hotspots found."
-    else
-      headers = ~w[File Risk Revisions Complexity LOC]
-
-      rows =
-        Enum.map(hotspots, fn h ->
-          [
-            truncate_path(get_field(h, :entity), 50),
-            risk_badge(get_field(h, :risk_factor)),
-            to_string(get_field(h, :revisions)),
-            to_string(get_field(h, :complexity)),
-            to_string(get_field(h, :loc))
-          ]
-        end)
-
-      format_table(headers, rows)
-    end
-  end
-
-  defp format_couplings(couplings, _options) do
-    if Enum.empty?(couplings) do
-      "No significant couplings found."
-    else
-      headers = ~w[File1 File2 Couplings% Revisions]
-
-      rows =
-        Enum.map(couplings, fn c ->
-          [
-            truncate_path(get_field(c, :entity), 40),
-            truncate_path(get_field(c, :coupled), 40),
-            "#{Float.round(get_field(c, :degree, 0.0), 1)}%",
-            to_string(get_field(c, :windows, ""))
-          ]
-        end)
-
-      format_table(headers, rows)
-    end
-  end
-
-  defp format_knowledge_silos(silos, _options) do
-    if Enum.empty?(silos) do
-      "No knowledge silos found."
-    else
-      headers = ~w[File MainAuthor Ownership% Authors Commits Risk]
-
-      rows =
-        Enum.map(silos, fn s ->
-          [
-            truncate_path(get_field(s, :entity), 40),
-            truncate_name(get_field(s, :main_author), 20),
-            "#{get_field(s, :ownership_ratio)}%",
-            to_string(get_field(s, :num_authors)),
-            to_string(get_field(s, :num_commits)),
-            risk_badge(get_field(s, :risk_level))
-          ]
-        end)
-
-      format_table(headers, rows)
-    end
-  end
-
   defp format_coupled_hotspots(coupled_hotspots, _options) do
     if Enum.empty?(coupled_hotspots) do
       "No coupled hotspots found."
@@ -481,34 +414,6 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
         end)
 
       format_table(headers, rows)
-    end
-  end
-
-  defp format_blast_radius(impacts, _options) do
-    if Enum.empty?(impacts) do
-      "No impact analysis available."
-    else
-      Enum.map_join(impacts, "\n\n", fn impact ->
-        affected_files = get_field(impact, :affected_files, [])
-        affected_components = get_field(impact, :affected_components, %{})
-
-        # Convert affected_components map to list of strings
-        component_list =
-          case affected_components do
-            map when is_map(map) -> Map.keys(map)
-            _ -> []
-          end
-
-        """
-        File: #{get_field(impact, :entity)}
-        Impact Score: #{format_float(get_field(impact, :risk_score, get_field(impact, :impact_score)))}
-        Affected Files: #{length(affected_files)}
-        Affected Components: #{Enum.join(component_list, ", ")}
-
-        Top Affected Files:
-        #{format_affected_files(affected_files)}
-        """
-      end)
     end
   end
 
@@ -629,16 +534,6 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
     end
   end
 
-  defp truncate_name(name, max_length) do
-    name_str = to_string(name)
-
-    if String.length(name_str) > max_length do
-      String.slice(name_str, 0, max_length - 3) <> "..."
-    else
-      name_str
-    end
-  end
-
   defp format_key(key) do
     key
     |> to_string()
@@ -670,11 +565,6 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
   end
 
   defp format_number(n), do: to_string(n)
-
-  defp risk_badge(:high), do: "[HIGH]"
-  defp risk_badge(:medium), do: "[MED]"
-  defp risk_badge(:low), do: "[LOW]"
-  defp risk_badge(_), do: "[???]"
 
   defp format_trend(trend) when is_number(trend) and trend > 0 do
     "↑ #{Float.round(trend, 1)}%"
@@ -709,10 +599,10 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
     end)
   end
 
-  defp count_strong_couplings(data, threshold \\ 70) do
+  defp count_strong_couplings(data) do
     Enum.count(data, fn item ->
       degree = get_field(item, :degree)
-      is_number(degree) and degree > threshold
+      is_number(degree) and degree > 75
     end)
   end
 
