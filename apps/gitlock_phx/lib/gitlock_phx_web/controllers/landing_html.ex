@@ -198,7 +198,7 @@ defmodule GitlockPhxWeb.LandingHTML do
             <span class="indicator-item badge badge-sm bg-red-500/90 border border-red-400/50 text-white font-medium text-xs tracking-wider backdrop-blur-sm animate-pulse">
               BETA
             </span>
-    <div class="badge badge-lg bg-base-200/10 border border-base-300/20 text-base-content backdrop-blur-lg mb-12 animate-fade-in-up rounded-2xl px-8 py-3 tracking-wide hover:bg-base-200/20 hover:border-base-300/30 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
+            <div class="badge badge-lg bg-base-200/10 border border-base-300/20 text-base-content backdrop-blur-lg mb-12 animate-fade-in-up rounded-2xl px-8 py-3 tracking-wide hover:bg-base-200/20 hover:border-base-300/30 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
               <span class="gradient-text animate-gradient-text">Terminal Friendly</span>
             </div>
           </div>
