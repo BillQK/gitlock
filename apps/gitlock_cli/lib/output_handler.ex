@@ -143,7 +143,7 @@ defmodule GitlockCLI.OutputHandler do
   Outputs content to a file according to the specified format and options.
   This function is added to meet test expectations.
   """
-  def output_to_file(content, investigation_type, options, output_file) do
+  def output_to_file(content, _investigation_type, options, output_file) do
     # Format content if needed
     formatted_content = format_content(content, options[:format])
 

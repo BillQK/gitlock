@@ -61,7 +61,7 @@ if (process.env.NODE_ENV === "development") {
     ({ detail: reloader }) => {
       // Enable server log streaming to client.
       // Disable with reloader.disableServerLogs()
-      reloader.enableServerLogs()
+      reloader.enableServerLogs();
 
       // Open configured PLUG_EDITOR at file:line of the clicked element's HEEx component
       //
@@ -259,6 +259,39 @@ Hooks.AnimateNumber = {
     // Clean up animation frame if component is removed
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
+    }
+  },
+};
+Hooks.MobileMenu = {
+  mounted() {
+    // Get the mobile menu and button elements
+    this.mobileMenu = document.getElementById("mobile-menu");
+    this.mobileMenuButton = document.getElementById("mobile-menu-button");
+
+    // Add click event listener to the button
+    this.mobileMenuButton.addEventListener("click", () => this.toggleMenu());
+
+    // Store the menu state
+    this.menuOpen = false;
+  },
+
+  toggleMenu() {
+    if (this.menuOpen) {
+      // Close menu with ease-in
+      this.mobileMenu.style.transitionTimingFunction =
+        "cubic-bezier(0.4, 0, 1, 1)"; // ease-in
+      this.mobileMenu.style.maxHeight = "0";
+      this.mobileMenu.style.opacity = "0";
+      this.mobileMenu.style.borderColor = "rgba(255, 255, 255, 0)";
+      this.menuOpen = false;
+    } else {
+      // Open menu with ease-out
+      this.mobileMenu.style.transitionTimingFunction =
+        "cubic-bezier(0, 0, 0.2, 1)"; // ease-out
+      this.mobileMenu.style.maxHeight = "300px"; // Adjust based on your content
+      this.mobileMenu.style.opacity = "1";
+      this.mobileMenu.style.borderColor = "rgba(255, 255, 255, 0.1)";
+      this.menuOpen = true;
     }
   },
 };

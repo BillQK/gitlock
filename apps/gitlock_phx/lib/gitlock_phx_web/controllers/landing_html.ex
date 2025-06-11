@@ -73,6 +73,7 @@ defmodule GitlockPhxWeb.LandingHTML do
   def navigation(assigns) do
     ~H"""
     <nav
+      id="main-nav"
       class="fixed top-8 left-1/2 transform -translate-x-1/2 w-[90%] max-w-4xl z-50 transition-all duration-300"
       style="
         background: rgba(255, 255, 255, 0.05);
@@ -82,44 +83,106 @@ defmodule GitlockPhxWeb.LandingHTML do
         border-radius: 16px;
         box-shadow: 0 8px 32px 0 rgba(96, 165, 250, 0.1);
       "
+      phx-hook="MobileMenu"
     >
       <div class="flex justify-between items-center px-6 py-2">
+        <!-- Logo -->
         <div class="flex-1">
-          <div class="flex-1">
-            <img src={~p"/images/logo.svg"} alt="Gitlock" class="h-5" />
+          <img src={~p"/images/logo.svg"} alt="Gitlock" class="h-5" />
+        </div>
+        
+    <!-- Mobile Controls: Theme Toggle + Menu Button -->
+        <div class="flex items-center md:hidden">
+          <!-- Theme Toggle (Always Visible) -->
+          <div class="mr-2">
+            <Layouts.theme_toggle />
           </div>
+          
+    <!-- Hamburger Button -->
+          <button
+            id="mobile-menu-button"
+            class="rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 p-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
         </div>
-        <div class="flex-none">
-          <ul class="flex items-center gap-2">
-            <li>
-              <a
-                href="#features"
-                class="px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
-              >
-                Features
-              </a>
-            </li>
-            <li>
-              <a
-                href="#docs"
-                class="px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
-              >
-                Documentation
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://github.com/BillQK/gitlock"
-                class="px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
-              >
-                GitHub
-              </a>
-            </li>
-            <li class="ml-4">
-              <Layouts.theme_toggle />
-            </li>
-          </ul>
-        </div>
+        
+    <!-- Desktop Navigation -->
+        <ul class="hidden md:flex items-center gap-2">
+          <li>
+            <a
+              href="#features"
+              class="px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
+            >
+              Features
+            </a>
+          </li>
+          <li>
+            <a
+              href="#docs"
+              class="px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
+            >
+              Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/BillQK/gitlock"
+              class="px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
+            >
+              GitHub
+            </a>
+          </li>
+          <li class="ml-4">
+            <Layouts.theme_toggle />
+          </li>
+        </ul>
+      </div>
+      
+    <!-- Mobile Menu with Tailwind Animation -->
+      <div
+        id="mobile-menu"
+        class="md:hidden max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-out border-t border-white/10 border-opacity-0"
+      >
+        <ul class="flex flex-col px-4 py-3 space-y-2">
+          <li>
+            <a
+              href="#features"
+              class="block px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
+            >
+              Features
+            </a>
+          </li>
+          <li>
+            <a
+              href="#docs"
+              class="block px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
+            >
+              Documentation
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/BillQK/gitlock"
+              class="block px-4 py-2 rounded-lg text-base-content/70 hover:text-base-content hover:bg-white/5 transition-all duration-300"
+            >
+              GitHub
+            </a>
+          </li>
+        </ul>
       </div>
     </nav>
     """
