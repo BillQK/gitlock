@@ -192,10 +192,15 @@ defmodule GitlockPhxWeb.LandingHTML do
   def hero_section(assigns) do
     ~H"""
     <section class="hero min-h-screen relative z-10">
-      <div class="hero-content text-center max-w-4xl mx-auto px-4 pt-8">
+      <div class="hero-content text-center max-w-4xl mx-auto px-4 pt-36">
         <div class="w-full">
-          <div class="badge badge-lg badge-ghost gap-2 mb-12 animate-fade-in">
-            <span class="text-sm">Code Forensics</span>
+          <div class="indicator">
+            <span class="indicator-item badge badge-sm bg-red-500/90 border border-red-400/50 text-white font-medium text-xs tracking-wider backdrop-blur-sm animate-pulse">
+              BETA
+            </span>
+    <div class="badge badge-lg bg-base-200/10 border border-base-300/20 text-base-content backdrop-blur-lg mb-12 animate-fade-in-up rounded-2xl px-8 py-3 tracking-wide hover:bg-base-200/20 hover:border-base-300/30 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
+              <span class="gradient-text animate-gradient-text">Terminal Friendly</span>
+            </div>
           </div>
 
           <h1 class="text-5xl md:text-7xl font-black mb-8 animate-fade-in animation-delay-200">

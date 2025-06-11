@@ -56,8 +56,8 @@ body {
 /* ===== UTILITY CLASSES ===== */
 .glass-card {
   background: var(--glass-white) !important;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid var(--glass-border) !important;
 }
 
