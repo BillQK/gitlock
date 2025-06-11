@@ -485,3 +485,13 @@ body {
     font-size: 1.5rem;
   }
 }
+
+.logo-svg {
+  fill: black;
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo-svg {
+    fill: white;
+  }
+}
