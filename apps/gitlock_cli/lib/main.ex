@@ -8,7 +8,7 @@ defmodule GitlockCLI.Main do
 
   alias GitlockCLI.{ArgumentParser, InvestigationTypes, ErrorHandler, HelpDisplay, OutputHandler}
 
-  @version "0.1.0"
+  @version "0.1.1"
   @gitlock_core_module Application.compile_env(:gitlock_cli, :gitlock_core_module, GitlockCore)
 
   @doc """
