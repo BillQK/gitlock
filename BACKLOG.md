@@ -1,5 +1,17 @@
 # Gitlock Project Backlog
 
+## Sprint 6/11/2025 - 6/18/2025
+
+- [ ] Landing page - adding interactive demos and examples
+- [ ] Publish CLI tool to package managers (Homebrew for macOS, Hex.pm for Elixir ecosystem)
+- [ ] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
+
+## Sprint 6/18/2025 - 6/25/2025
+
+- [ ] Design and implement database schema for SaaS features (users, projects, analysis history, subscription tiers, organizations)
+- [ ] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
+- [ ] Set up app.js code structure for Hooks and interactive component
+
 ## To Do
 
 - [ ] Add proper descriptions to README files in gitlock_cli and gitlock_core apps
@@ -12,9 +24,6 @@
 - [ ] Implement terminal-based output formatting (currently outputs raw CSV/JSON)
 - [ ] Add example analyses and sample reports to documentation
 - [ ] Create comprehensive API documentation for library usage
-- [ ] Use the term "Repository Intelligence"
-- [ ] Use case: recommend code reviewers using knowledge silos
-- [ ] Use case: knowledge silos could be use to maintains expertise map
 
 ## In Progress
 
@@ -25,7 +34,7 @@
 
 - [x] Core analysis engine (hotspot detection, knowledge silos, coupling analysis, blast radius)
 - [x] CLI implementation with multiple investigation types
-- [x] CSV/JSON/STDOUT output reporters
+- [x] CSV and JSON output reporters
 - [x] Basic complexity analyzers for Elixir, JavaScript, and Python
 - [x] Git integration for repository history analysis
 - [x] Hexagonal architecture implementation
@@ -42,6 +51,9 @@
 
 ### High Priority
 
+- [ ] Publish CLI tool to package managers (Homebrew for macOS, Hex.pm for Elixir ecosystem)
+- [ ] Design and implement database schema for SaaS features (users, projects, analysis history, subscription tiers)
+- [ ] Build interactive web UI for triggering analyses and persisting results to database
 - [ ] Add code coverage reporting to CI pipeline (ExCoveralls integration)
 - [ ] Implement web dashboard for analysis results visualization
 - [ ] Add real-time analysis progress tracking in web UI
@@ -53,6 +65,8 @@
 
 ### Medium Priority
 
+- [ ] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
+- [ ] Design and implement LLM integration for intelligent code insights and natural language analysis summaries
 - [ ] Create interactive visualizations for analysis results (d3.js/Chart.js integration)
 - [ ] Add filtering by file patterns/extensions in CLI
 - [ ] Implement analysis comparison between different time periods
@@ -65,6 +79,9 @@
 - [ ] Add support for monorepo analysis with project boundaries
 - [ ] Implement incremental analysis (only analyze changes since last run)
 - [ ] Add natural language summaries of analysis results
+- [ ] Recommend code reviewers using knowledge silos
+- [ ] Maintains expertise map using knowledge silos
+- [ ] Set up app.js code structure for Hooks and interactive component
 
 ### Low Priority
 
@@ -101,6 +118,9 @@
 - Fly.io deployment is fully configured with CI/CD
 - Consider creating video tutorials for common use cases
 - Focus on improving visualization and reporting features next
+- Planning to add Code Age methodology from "Your Code as a Crime Scene" to identify stable vs volatile code patterns
+- LLM integration will provide intelligent insights and natural language explanations of analysis results
+- Database schema needed to support multi-tenant SaaS features with project management and analysis history
 
 ---
 

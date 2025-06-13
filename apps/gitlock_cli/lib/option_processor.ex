@@ -143,7 +143,7 @@ defmodule GitlockCLI.OptionProcessor do
   # Applies default values for options that weren't specified
   defp apply_defaults(options) do
     options
-    |> Map.put_new(:format, "text")
+    |> Map.put_new(:format, "csv")
     |> Map.put_new(:limit, 10)
     # Ensure rows always exists
     |> Map.put_new(:rows, Map.get(options, :limit, 10))
