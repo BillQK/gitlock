@@ -57,7 +57,7 @@ defmodule GitlockCLI.OptionProcessorTest do
     test "applies default values" do
       options = OptionProcessor.prepare_options(%{}, [])
 
-      assert options.format == "text"
+      assert options.format == "csv"
       assert options.limit == 10
       assert options.min_revs == 5
       assert options.min_coupling == 0.5
