@@ -20,7 +20,8 @@ defmodule GitlockPhxWeb.Router do
   scope "/", GitlockPhxWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/", LandingController, :index
+    get "/app", PageController, :home
   end
 
   # Other scopes may use custom stacks.

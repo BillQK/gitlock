@@ -12,12 +12,7 @@ defmodule GitlockCore.Adapters.Complexity.Lang.ElixirAnalyzerTest do
   describe "analyze_file/1" do
     setup do
       # Create a temporary directory for test files
-      test_dir = Path.join(System.tmp_dir!(), "elixir_analyzer_test_#{:rand.uniform(10000)}")
-      File.mkdir_p!(test_dir)
-
-      on_exit(fn ->
-        File.rm_rf!(test_dir)
-      end)
+      {:ok, test_dir} = Briefly.create(directory: true)
 
       {:ok, test_dir: test_dir}
     end
@@ -210,19 +205,16 @@ defmodule GitlockCore.Adapters.Complexity.Lang.ElixirAnalyzerTest do
 
   describe "analyze_directory/2" do
     setup do
-      # Create a temporary directory for test files
-      test_dir = Path.join(System.tmp_dir!(), "elixir_analyzer_dir_test_#{:rand.uniform(10000)}")
-      File.mkdir_p!(test_dir)
+      # Create a temporary directory using Briefly
+      {:ok, tmp_dir} = Briefly.create(directory: true)
 
-      # Create subdirectories
-      subdir = Path.join(test_dir, "subdir")
+      # Create subdirectory
+      subdir = Path.join(tmp_dir, "subdir")
       File.mkdir_p!(subdir)
 
-      on_exit(fn ->
-        File.rm_rf!(test_dir)
-      end)
+      # Briefly automatically cleans up when tests finish
 
-      {:ok, test_dir: test_dir, subdir: subdir}
+      {:ok, test_dir: tmp_dir, subdir: subdir}
     end
 
     test "analyzes all Elixir files in a directory", %{test_dir: test_dir, subdir: subdir} do

@@ -22,7 +22,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
     test "detects local repository correctly" do
       # Mock Git repository path
       # We'll check for the .git directory to identify repositories
-      repo_path = Path.join(System.tmp_dir!(), "mock_repo_#{:rand.uniform(10000)}")
+      {:ok, repo_path} = Briefly.create(directory: true)
       git_dir = Path.join(repo_path, ".git")
 
       try do
@@ -49,7 +49,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
 
     test "handles local Git repository by calling git command" do
       # Setup a mock repo
-      repo_path = Path.join(System.tmp_dir!(), "mock_repo_#{:rand.uniform(10000)}")
+      {:ok, repo_path} = Briefly.create(directory: true)
       git_dir = Path.join(repo_path, ".git")
 
       try do

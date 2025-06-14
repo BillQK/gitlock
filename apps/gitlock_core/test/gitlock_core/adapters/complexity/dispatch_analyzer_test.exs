@@ -21,12 +21,7 @@ defmodule GitlockCore.Adapters.Complexity.DispatchAnalyzerTest do
   describe "analyze_file/1" do
     setup do
       # Create a test directory with files of different types
-      test_dir = Path.join(System.tmp_dir!(), "dispatch_test_#{:rand.uniform(10000)}")
-      File.mkdir_p!(test_dir)
-
-      on_exit(fn ->
-        File.rm_rf!(test_dir)
-      end)
+      {:ok, test_dir} = Briefly.create(directory: true)
 
       # Create sample files of different types
       js_file = Path.join(test_dir, "test.js")
