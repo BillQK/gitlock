@@ -89,6 +89,6 @@ defmodule GitlockCore.Domain.Services.CodeAgeAnalysis do
   end
 
   defp sort_code_age_struct(code_ages) do
-    Enum.sort_by(code_ages, &(&1.age_months), :asc)
+    Enum.sort_by(code_ages, & &1.age_months, :asc)
   end
 end
