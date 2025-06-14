@@ -18,6 +18,7 @@ defmodule GitlockCLI.Main do
   """
   def main(args) do
     start_time = :os.timestamp()
+
     case ArgumentParser.parse(args) do
       {:help, remaining} ->
         HelpDisplay.display_help(remaining)
