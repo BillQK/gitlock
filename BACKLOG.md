@@ -3,13 +3,13 @@
 ## Sprint 6/11/2025 - 6/18/2025
 
 - [ ] Landing page - adding interactive demos and examples
-- [ ] Publish CLI tool to package managers (Homebrew for macOS, Hex.pm for Elixir ecosystem)
-- [ ] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
+- [x] Publish CLI tool to package managers (Homebrew for macOS)
+- [x] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
+- [x] Add proper descriptions to README files in gitlock_cli and gitlock_core apps
 
 ## Sprint 6/18/2025 - 6/25/2025
 
 - [ ] Design and implement database schema for SaaS features (users, projects, analysis history, subscription tiers, organizations)
-- [ ] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
 - [ ] Set up app.js code structure for Hooks and interactive component
 
 ## To Do
@@ -62,6 +62,7 @@
 - [ ] Implement analysis result storage and history tracking
 - [ ] Add export functionality for reports (PDF, HTML formats)
 - [ ] Create onboarding flow for new users in web app
+- [ ] Implement Burrito standalone binaries to eliminate Erlang dependency for end users
 
 ### Medium Priority
 
@@ -82,6 +83,7 @@
 - [ ] Recommend code reviewers using knowledge silos
 - [ ] Maintains expertise map using knowledge silos
 - [ ] Set up app.js code structure for Hooks and interactive component
+- [ ] Add inbound port `GitlockCore.Ports.AnalysisPort` behavior for `investigate/3` and `available_investigations/0` to enable proper Mox testing across CLI/Web apps
 
 ### Low Priority
 
