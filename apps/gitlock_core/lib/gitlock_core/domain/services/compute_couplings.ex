@@ -11,7 +11,7 @@ defmodule GitlockCore.Domain.Services.ComputeCouplings do
   The core algorithms for change impact analysis reside here.
   """
   alias GitlockCore.Domain.Values.FileGraph
-  alias GitlockCore.Domain.Values.CouplingMetrics
+  alias GitlockCore.Domain.Values.CouplingsMetrics
 
   @doc """
   Calculates the coupling strength, trend, and filters results based on thresholds.
@@ -34,7 +34,7 @@ defmodule GitlockCore.Domain.Services.ComputeCouplings do
           %{String.t() => integer()},
           float(),
           integer()
-        ) :: [CouplingMetrics.t()]
+        ) :: [CouplingsMetrics.t()]
   def calculate_coupling_strength(all, early, recent, file_counts, min_coupling, min_windows) do
     # Handle empty coupling data
     if map_size(all) == 0 do
@@ -58,7 +58,7 @@ defmodule GitlockCore.Domain.Services.ComputeCouplings do
             map_size(early) > 0 && map_size(recent) > 0
           )
 
-        %CouplingMetrics{
+        %CouplingsMetrics{
           entity: file1,
           coupled: file2,
           degree: Float.round(degree, 1),

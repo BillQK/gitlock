@@ -1,12 +1,12 @@
-defmodule GitlockCore.Domain.Values.CouplingMetricsTest do
+defmodule GitlockCore.Domain.Values.CouplingsMetricsTest do
   use ExUnit.Case, async: true
 
-  alias GitlockCore.Domain.Values.CouplingMetrics
+  alias GitlockCore.Domain.Values.CouplingsMetrics
 
   describe "new/5" do
     test "creates a new coupling metrics value object" do
       coupling =
-        CouplingMetrics.new(
+        CouplingsMetrics.new(
           "lib/auth/session.ex",
           "lib/auth/token.ex",
           85.7,
@@ -23,12 +23,12 @@ defmodule GitlockCore.Domain.Values.CouplingMetricsTest do
 
     test "handles zero and negative values" do
       # Zero coupling degree
-      zero_degree = CouplingMetrics.new("file1.ex", "file2.ex", 0.0, 1, 0.0)
+      zero_degree = CouplingsMetrics.new("file1.ex", "file2.ex", 0.0, 1, 0.0)
       assert zero_degree.degree == 0.0
       assert zero_degree.trend == 0.0
 
       # Negative trend (declining coupling)
-      negative_trend = CouplingMetrics.new("file1.ex", "file2.ex", 50.0, 10, -15.5)
+      negative_trend = CouplingsMetrics.new("file1.ex", "file2.ex", 50.0, 10, -15.5)
       assert negative_trend.trend == -15.5
     end
 
@@ -42,7 +42,7 @@ defmodule GitlockCore.Domain.Values.CouplingMetricsTest do
       ]
 
       for {path1, path2} <- paths do
-        coupling = CouplingMetrics.new(path1, path2, 75.0, 3, 5.0)
+        coupling = CouplingsMetrics.new(path1, path2, 75.0, 3, 5.0)
         assert coupling.entity == path1
         assert coupling.coupled == path2
       end
@@ -50,14 +50,11 @@ defmodule GitlockCore.Domain.Values.CouplingMetricsTest do
 
     test "accepts float precision for degree and trend" do
       # Test with various levels of precision
-      coupling = CouplingMetrics.new("file1.ex", "file2.ex", 75.123456, 3, 5.987654)
+      coupling = CouplingsMetrics.new("file1.ex", "file2.ex", 75.123456, 3, 5.987654)
 
       # The struct should store the values exactly as provided
       assert coupling.degree == 75.123456
       assert coupling.trend == 5.987654
     end
   end
-
-  # If there are any other methods in the module beyond new/5, 
-  # add corresponding tests for them here
 end

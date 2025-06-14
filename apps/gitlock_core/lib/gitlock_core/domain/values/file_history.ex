@@ -101,24 +101,21 @@ defmodule GitlockCore.Domain.Values.FileHistory do
   @spec find_canonical_for_any_name(t(), String.t()) :: String.t() | nil
   def find_canonical_for_any_name(%__MODULE__{rename_map: rename_map} = history, search_name) do
     cond do
-      # Direct lookup - search_name is already canonical
       Map.has_key?(history.canonical_changes, search_name) ->
         search_name
 
-      # search_name is an old name that was renamed
       Map.has_key?(rename_map, search_name) ->
         Map.get(rename_map, search_name)
 
-      # search_name might be a middle name in a rename chain
-      # Find if any rename maps to a canonical that then maps to something else
       true ->
-        rename_map
-        |> Enum.find_value(fn {_old, canonical} ->
-          if get_canonical_name(history, canonical) == search_name do
-            canonical
-          end
-        end)
+        find_in_rename_chain(rename_map, history, search_name)
     end
+  end
+
+  def find_in_rename_chain(rename_map, history, search_name) do
+    Enum.find_value(rename_map, fn {_old, canonical} ->
+      if get_canonical_name(history, canonical) == search_name, do: canonical
+    end)
   end
 
   @doc """

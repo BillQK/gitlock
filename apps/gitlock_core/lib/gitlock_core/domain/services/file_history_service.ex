@@ -36,8 +36,8 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
 
   Git represents renames as "{old => new}" in the file path.
   """
-  @spec is_rename_pattern?(String.t()) :: boolean()
-  def is_rename_pattern?(path) do
+  @spec rename_pattern?(String.t()) :: boolean()
+  def rename_pattern?(path) do
     String.contains?(path, " => ")
   end
 
@@ -48,10 +48,10 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
 
       iex> FileHistoryService.parse_rename("{old.ex => new.ex}")
       {"old.ex", "new.ex"}
-      
-      iex> FileHistoryService.parse_rename("lib/{auth.ex => authentication.ex}")  
+
+      iex> FileHistoryService.parse_rename("lib/{auth.ex => authentication.ex}")
       {"lib/auth.ex", "lib/authentication.ex"}
-      
+
       iex> FileHistoryService.parse_rename("normal_file.ex")
       nil
   """
@@ -84,10 +84,10 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
   ## Parameters
     - commits: List of commits to normalize
     - history: FileHistory value object containing rename mappings
-    
+
   ## Returns
     List of commits with normalized file paths
-    
+
   ## Example
 
       iex> history = FileHistoryService.build_history(commits)
@@ -117,26 +117,27 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
     commits
     |> Enum.flat_map(& &1.file_changes)
     |> Enum.map(& &1.entity)
-    |> Enum.filter(&is_rename_pattern?/1)
+    |> Enum.filter(&rename_pattern?/1)
     |> Enum.map(&parse_rename/1)
     |> Enum.reject(&is_nil/1)
   end
 
   defp follow_rename_chains(renames) do
-    # Build a map that follows transitive renames
-    # e.g., if a->b and b->c, then a->c and b->c
     Enum.reduce(renames, %{}, fn {old, new}, map ->
-      # If 'new' was already renamed, follow the chain
       final_name = Map.get(map, new, new)
 
-      # Update all files that point to 'old' to point to final_name
       map
-      |> Enum.map(fn {k, v} ->
-        if v == old, do: {k, final_name}, else: {k, v}
-      end)
-      |> Enum.into(%{})
+      |> update_existing_mappings(old, final_name)
       |> Map.put(old, final_name)
     end)
+  end
+
+  defp update_existing_mappings(map, old_target, new_target) do
+    map
+    |> Enum.map(fn {k, v} ->
+      {k, if(v == old_target, do: new_target, else: v)}
+    end)
+    |> Enum.into(%{})
   end
 
   defp build_canonical_changes(commits, rename_map) do
@@ -156,11 +157,11 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
   defp normalize_single_change(change, rename_map) do
     cond do
       # Skip pure renames (0 additions, 0 deletions)
-      is_pure_rename?(change) ->
+      pure_rename?(change) ->
         nil
 
       # Handle rename patterns in the entity path
-      is_rename_pattern?(change.entity) ->
+      rename_pattern?(change.entity) ->
         case parse_rename(change.entity) do
           {_old, new} ->
             canonical = Map.get(rename_map, new, new)
@@ -180,11 +181,11 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
   defp normalize_file_change(change, history) do
     cond do
       # Skip pure renames (0 additions, 0 deletions)
-      is_pure_rename?(change) ->
+      pure_rename?(change) ->
         nil
 
       # Handle rename patterns in the entity path
-      is_rename_pattern?(change.entity) ->
+      rename_pattern?(change.entity) ->
         case parse_rename(change.entity) do
           {_old, new} ->
             canonical = FileHistory.get_canonical_name(history, new)
@@ -201,8 +202,8 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
     end
   end
 
-  defp is_pure_rename?(change) do
-    is_rename_pattern?(change.entity) and
+  defp pure_rename?(change) do
+    rename_pattern?(change.entity) and
       change.loc_added in ["0", 0] and
       change.loc_deleted in ["0", 0]
   end

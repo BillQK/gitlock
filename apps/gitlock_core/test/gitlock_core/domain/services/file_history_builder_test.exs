@@ -38,14 +38,14 @@ defmodule GitlockCore.Domain.Services.FileHistoryServiceTest do
     end
   end
 
-  describe "is_rename_pattern?/1" do
+  describe "rename_pattern?/1" do
     test "detects various rename patterns" do
-      assert FileHistoryService.is_rename_pattern?("{old => new}")
-      assert FileHistoryService.is_rename_pattern?("lib/{old.ex => new.ex}")
-      assert FileHistoryService.is_rename_pattern?("path/{a => b}/rest")
+      assert FileHistoryService.rename_pattern?("{old => new}")
+      assert FileHistoryService.rename_pattern?("lib/{old.ex => new.ex}")
+      assert FileHistoryService.rename_pattern?("path/{a => b}/rest")
 
-      refute FileHistoryService.is_rename_pattern?("lib/normal.ex")
-      refute FileHistoryService.is_rename_pattern?("=> not a rename")
+      refute FileHistoryService.rename_pattern?("lib/normal.ex")
+      refute FileHistoryService.rename_pattern?("=> not a rename")
     end
   end
 

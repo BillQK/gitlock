@@ -29,7 +29,8 @@ defmodule GitlockCore.Infrastructure.AdapterRegistry do
       },
       reporter: %{
         "csv" => GitlockCore.Adapters.Reporters.CsvReporter,
-        "json" => GitlockCore.Adapters.Reporters.JsonReporter
+        "json" => GitlockCore.Adapters.Reporters.JsonReporter,
+        "stdout" => GitlockCore.Adapters.Reporters.StdoutReporter
       },
       complexity_analyzer: %{
         "dispatch" => GitlockCore.Adapters.Complexity.DispatchAnalyzer
