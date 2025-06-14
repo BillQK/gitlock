@@ -9,6 +9,7 @@ defmodule GitlockCore.Application.UseCaseFactory do
     AnalyzeCoupledHotspots,
     AnalyzeKnowledgeSilos,
     AnalyzeBlastRadius,
+    AnalyzeCodeAge,
     GetSummary
   }
 
@@ -18,6 +19,7 @@ defmodule GitlockCore.Application.UseCaseFactory do
     coupled_hotspots: AnalyzeCoupledHotspots,
     knowledge_silos: AnalyzeKnowledgeSilos,
     blast_radius: AnalyzeBlastRadius,
+    code_age: AnalyzeCodeAge,
     summary: GetSummary
   }
 

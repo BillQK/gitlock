@@ -32,6 +32,9 @@ defmodule GitlockCLI.HelpDisplay do
       "summary" ->
         IO.puts(summary_help())
 
+      "code_age" ->
+        IO.puts(code_age_help())
+
       _ ->
         IO.puts("No help available for unknown investigation: #{investigation}")
         display_help([])
@@ -319,6 +322,54 @@ defmodule GitlockCLI.HelpDisplay do
     Output Columns:
       statistic - Name of the statistic (e.g., number-of-commits)
       value     - Value of the statistic
+    """
+  end
+
+  # Code Age help content
+  defp code_age_help do
+    """
+    Gitlock - Code Age Analysis
+    Analyzes the age of code files based on when they were last modified.
+
+    Code age analysis is based on the "software half-life" principle - code should
+    be either fresh (in memory) or stable (proven), avoiding the dangerous middle
+    ground of being old enough to forget but young enough to still need changes.
+
+    Risk Categories:
+      • Low Risk (0-3 months): Fresh in memory  
+      • High Risk (3-18 months): Danger zone - forgotten but actively changing
+      • Medium Risk (18-36 months): Forgotten but may still need changes
+      • Low Risk (36+ months): Stable commodity code
+
+    Usage: 
+      gitlock code_age [options]
+
+    Options:
+      --repo, -r PATH     Repository or log file path (default: .)
+      --url, -u URL       URL to remote repository
+      --format, -f FORMAT Output format: csv, json, stdout (default: csv)
+      --output, -o FILE   Write output to file (default: timestamped file)
+      --age-time-now DATE Reference date for age calculation (YYYY-MM-DD, default: today)
+
+    Legacy Options:
+      --log, -l PATH      Git log file path (equivalent to --repo)
+      --vcs TYPE          Version control system type
+
+    Examples:
+      gitlock code_age --repo ./my_project
+      gitlock code_age --repo ./my_project --age-time-now 2024-01-01
+      gitlock code_age --repo ./my_project --format json --output code_age_report.json
+      
+    Output Columns:
+      entity      - File path (e.g., lib/auth/session.ex)
+      age_months  - Age in months since last modification
+      risk        - Risk level based on age (low, medium, high)
+
+    Notes:
+      • Uses precise 30.44 days per month calculation (Code Maat standard)
+      • Tracks files through renames and moves
+      • Age is calculated from the last meaningful change (ignoring pure renames)
+      • Based on Adam Tornhill's Code Maat methodology
     """
   end
 end

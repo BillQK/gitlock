@@ -19,7 +19,9 @@ defmodule GitlockCLI.InvestigationTypes do
     "summary" => "summary",
     "blast-radius" => "blast_radius",
     "blast" => "blast_radius",
-    "impact" => "blast_radius"
+    "impact" => "blast_radius",
+    "code_age" => "code_age",
+    "code-age" => "code_age"
   }
 
   @doc """
