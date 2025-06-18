@@ -3,9 +3,11 @@
 ## Sprint 6/11/2025 - 6/18/2025
 
 - [ ] Landing page - adding interactive demos and examples
+- [ ] BREAKING CHANGES - refactor cli pattern removing :dir options -> Needs to implement a new infrastructure for managing temp directories
 - [x] Publish CLI tool to package managers (Homebrew for macOS)
 - [x] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
 - [x] Add proper descriptions to README files in gitlock_cli and gitlock_core apps
+- [x] Add `stdout-reporter` for printing to the terminal (Terminal Friendly)
 
 ## Sprint 6/18/2025 - 6/25/2025
 
@@ -84,6 +86,7 @@
 - [ ] Maintains expertise map using knowledge silos
 - [ ] Set up app.js code structure for Hooks and interactive component
 - [ ] Add inbound port `GitlockCore.Ports.AnalysisPort` behavior for `investigate/3` and `available_investigations/0` to enable proper Mox testing across CLI/Web apps
+- [ ] Add `stdout-reporter` for printing to the terminal (Terminal Friendly)
 
 ### Low Priority
 
@@ -130,3 +133,6 @@
 
 - [ ] Smart Reviewer Matching - Score reviewers based on familiarity, activity, quality, and workload
 - [ ] Developer Contribution Summary: Automatically generate comprehensive narratives of each developer's impact, expertise, and growth by using LLMs to analyze their commits, PRs, reviews, and code changes—transforming git history into actionable intelligence for performance reviews, expertise discovery, and team planning.
+- [ ] Automated PR Creation - Generate pull requests with refactored code and detailed explanations of improvements
+- [ ] GitHub API Integration - Automatically create branches, commit changes, and submit PRs to target repositories
+- [ ] LLM Refactoring Suggestions - Send hotspot code to GPT-4 with specialized prompts to generate refactoring recommendations

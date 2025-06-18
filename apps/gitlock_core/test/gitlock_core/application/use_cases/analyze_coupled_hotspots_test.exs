@@ -143,17 +143,6 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCoupledHotspotsTest do
 
       assert result == {:ok, "Report generated"}
     end
-
-    test "fails when directory not provided", %{adapter_keys: keys} do
-      # When missing the dir option, should return an error
-      result =
-        AnalyzeCoupledHotspots.execute("repo_path", %{
-          vcs: keys.vcs,
-          format: keys.csv_reporter
-        })
-
-      assert {:error, "Directory path required for coupled hotspot analysis"} = result
-    end
   end
 
   describe "resolve_dependencies/1" do
@@ -184,7 +173,7 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCoupledHotspotsTest do
       end)
 
       ComplexityAnalyzerMock
-      |> expect(:analyze_directory, fn "/test/dir", _opts ->
+      |> expect(:analyze_directory, fn "repo_path", _opts ->
         complexity_map
       end)
 
@@ -194,9 +183,7 @@ defmodule GitlockCore.Application.UseCases.AnalyzeCoupledHotspotsTest do
         analyzer: ComplexityAnalyzerMock
       }
 
-      options = %{dir: "/test/dir"}
-
-      {:ok, results} = AnalyzeCoupledHotspots.run_domain_logic("repo_path", deps, options)
+      {:ok, results} = AnalyzeCoupledHotspots.run_domain_logic("repo_path", deps, %{})
 
       # FIXED: Accept empty results
       # Just log a warning and test basic properties

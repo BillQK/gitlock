@@ -29,8 +29,8 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadius do
       {:error, "No target_files specified. Use --target-files option"}
     else
       with {:ok, commits} <- deps.vcs.get_commit_history(repo_path, options),
-           complexity_map <- get_complexity_map(deps.analyzer, options),
-           active_files <- get_active_files(deps.file_system, options) do
+           complexity_map <- get_complexity_map(deps.analyzer, repo_path),
+           active_files <- get_active_files(deps.file_system, repo_path) do
         history = FileHistoryService.build_history(commits)
         normalizes = FileHistoryService.normalize_commits(commits, history)
 
@@ -58,26 +58,18 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadius do
   end
 
   defp resolve_complexity_analyzer(options) do
-    if Map.has_key?(options, :dir) do
-      AdapterRegistry.get_adapter(
-        :complexity_analyzer,
-        options[:complexity_analyzer] || "dispatch"
-      )
-    else
-      {:error, "Directory path required for blast radius analysis"}
-    end
+    AdapterRegistry.get_adapter(
+      :complexity_analyzer,
+      options[:complexity_analyzer] || "dispatch"
+    )
   end
 
-  defp get_complexity_map(analyzer, options) do
-    case Map.get(options, :dir) do
-      nil -> %{}
-      dir -> ComplexityCollector.collect_complexity(analyzer, dir)
-    end
+  defp get_complexity_map(analyzer, repo_path) do
+    ComplexityCollector.collect_complexity(analyzer, repo_path)
   end
 
-  defp get_active_files(file_system, options) do
-    base_path = options[:dir] || "."
-    files = file_system.list_all_files(base_path)
+  defp get_active_files(file_system, repo_path) do
+    files = file_system.list_all_files(repo_path)
     MapSet.new(files)
   end
 

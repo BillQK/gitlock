@@ -10,13 +10,18 @@ defmodule GitlockCore.Application.UseCase do
     quote do
       @behaviour GitlockCore.Application.UseCase
       alias GitlockCore.Infrastructure.AdapterRegistry
+      alias GitlockCore.Infrastructure.Workspace
 
       @spec execute(String.t(), map()) :: {:ok, String.t()} | {:error, String.t()}
       def execute(repo_path, options) do
-        with {:ok, dependencies} <- resolve_dependencies(options),
-             {:ok, domain_result} <- run_domain_logic(repo_path, dependencies, options) do
-          {:ok, format_result} = format_result(domain_result, dependencies, options)
-        end
+        workspace_opts = Map.to_list(options) |> Keyword.take([:depth, :branch, :timeout])
+
+        Workspace.with(repo_path, workspace_opts, fn workspace ->
+          with {:ok, dependencies} <- resolve_dependencies(options),
+               {:ok, domain_result} <- run_domain_logic(workspace.path, dependencies, options) do
+            {:ok, format_result} = format_result(domain_result, dependencies, options)
+          end
+        end)
       end
 
       defoverridable execute: 2
