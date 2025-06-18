@@ -152,18 +152,6 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadiusTest do
 
       assert {:error, "No target_files specified. Use --target-files option"} = result
     end
-
-    test "fails when directory not provided", %{adapter_keys: keys} do
-      # When missing the dir option, should return an error
-      result =
-        AnalyzeBlastRadius.execute("repo_path", %{
-          vcs: keys.vcs,
-          format: keys.csv_reporter,
-          target_files: ["lib/file.ex"]
-        })
-
-      assert {:error, "Directory path required for blast radius analysis"} = result
-    end
   end
 
   describe "resolve_dependencies/1" do
@@ -197,12 +185,12 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadiusTest do
       end)
 
       ComplexityAnalyzerMock
-      |> expect(:analyze_directory, fn "/test/dir", _opts ->
+      |> expect(:analyze_directory, fn "repo_path", _opts ->
         complexity_map
       end)
 
       FileSystemMock
-      |> expect(:list_all_files, fn "/test/dir" ->
+      |> expect(:list_all_files, fn "repo_path" ->
         Map.keys(complexity_map)
       end)
 
@@ -214,7 +202,6 @@ defmodule GitlockCore.Application.UseCases.AnalyzeBlastRadiusTest do
       }
 
       options = %{
-        dir: "/test/dir",
         target_files: target_files
       }
 

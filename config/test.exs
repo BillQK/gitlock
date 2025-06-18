@@ -30,7 +30,7 @@ config :gitlock_phx, GitlockPhx.Mailer, adapter: Swoosh.Adapters.Test
 config :swoosh, :api_client, false
 
 # Print only warnings and errors during test
-config :logger, level: :warning
+config :logger, level: :debug
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
@@ -40,3 +40,7 @@ config :phoenix_live_view,
   enable_expensive_runtime_checks: true
 
 config :gitlock_cli, :gitlock_core_module, MockGitlockCore
+
+config :gitlock_core,
+  workspace_cleanup_interval: :timer.seconds(1),
+  workspace_cleanup_enabled: true

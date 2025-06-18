@@ -62,16 +62,6 @@ defmodule GitlockCore.Application.UseCases.AnalyzeHotspotsTest do
 
       assert result == {:ok, "Hotspot analysis report"}
     end
-
-    test "fails when directory not provided", %{adapter_keys: keys} do
-      result =
-        AnalyzeHotspots.execute("/repo/path", %{
-          vcs: keys.vcs,
-          format: keys.csv_reporter
-        })
-
-      assert {:error, "Directory path required for hotspot analysis"} = result
-    end
   end
 
   describe "resolve_dependencies/1" do

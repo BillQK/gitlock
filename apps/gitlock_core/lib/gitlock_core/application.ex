@@ -10,12 +10,15 @@ defmodule GitlockCore.Application do
     children = [
       # Starts a worker by calling: Gitlock.Worker.start_link(arg)
       # {Gitlock.Worker, arg}
-      GitlockCore.Infrastructure.AdapterRegistry
+      GitlockCore.Infrastructure.AdapterRegistry,
+      GitlockCore.Infrastructure.Workspace.Store,
+      GitlockCore.Infrastructure.Workspace.Manager,
+      GitlockCore.Infrastructure.Workspace.Cleaner
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Gitlock.Supervisor]
+    opts = [strategy: :rest_for_one, name: Gitlock.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end
