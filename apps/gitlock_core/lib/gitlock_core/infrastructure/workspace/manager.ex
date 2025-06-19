@@ -320,7 +320,8 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
       type: detect_type(source),
       path: path,
       created_at: DateTime.utc_now(),
-      opts: opts
+      opts: opts,
+      git_log_cache: %{}
     }
   end
 

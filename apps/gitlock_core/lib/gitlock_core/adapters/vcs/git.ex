@@ -35,11 +35,6 @@ defmodule GitlockCore.Adapters.VCS.Git do
     end
   end
 
-  # Delegate to GitRepository for backward compatibility with tests
-  def determine_source_type(source) do
-    GitRepository.determine_source_type(source)
-  end
-
   # Make public for testing
   def parse_git_log(log_content) when is_binary(log_content) do
     cond do
