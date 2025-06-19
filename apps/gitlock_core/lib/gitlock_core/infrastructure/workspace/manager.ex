@@ -358,7 +358,6 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
     ["clone"] ++
       Enum.flat_map(opts, fn
         {:depth, n} when is_integer(n) -> ["--depth", to_string(n)]
-        {:branch, b} when is_binary(b) -> ["--branch", b]
         {:single_branch, true} -> ["--single-branch"]
         _ -> []
       end)

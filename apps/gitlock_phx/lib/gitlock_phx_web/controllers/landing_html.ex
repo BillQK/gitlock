@@ -222,7 +222,7 @@ defmodule GitlockPhxWeb.LandingHTML do
             <span class="indicator-item badge badge-sm bg-red-500/90 border border-red-400/50 text-white font-medium text-xs tracking-wider backdrop-blur-sm animate-pulse">
               BETA
             </span>
-            <div class="badge badge-lg bg-base-200/10 border border-base-300/20 text-base-content backdrop-blur-lg mb-12 animate-fade-in-up rounded-2xl px-8 py-3 tracking-wide hover:bg-base-200/20 hover:border-base-300/30 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
+            <div class="badge badge-lg bg-base-200/10 border border-base-300/20 text-base-content backdrop-blur-lg mb-2 animate-fade-in-up rounded-2xl px-8 py-3 tracking-wide hover:bg-base-200/20 hover:border-base-300/30 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
               <span class="gradient-text animate-gradient-text">Terminal Friendly</span>
             </div>
           </div>
@@ -1030,6 +1030,52 @@ defmodule GitlockPhxWeb.LandingHTML do
         <p>© 2025 Gitlock. Made with ❤️ by the Gitlock team. MIT Licensed.</p>
       </aside>
     </footer>
+    """
+  end
+
+  # Add this function to your LandingHTML module
+  def hotspots_demo_section(assigns) do
+    ~H"""
+    <section id="demo" class="py-24 px-4 relative z-10">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+          <div class="indicator">
+            <span class="indicator-item badge badge-sm bg-red-500/90 border border-red-400/50 text-white font-medium text-xs tracking-wider backdrop-blur-sm animate-pulse">
+              Live
+            </span>
+            <div class="badge badge-lg bg-base-200/10 border border-base-300/20 text-base-content backdrop-blur-lg animate-fade-in-up rounded-2xl px-8 py-3 tracking-wide hover:bg-base-200/20 hover:border-base-300/30 hover:-translate-y-1 hover:shadow-2xl transition-all duration-500">
+              <span class="text-sm font-semibold text-base-content/70 my-2 animate-fade-in">
+                See It In Action
+              </span>
+            </div>
+          </div>
+          <h2 class="text-4xl md:text-5xl font-bold mb-4 animate-fade-in animation-delay-200">
+            Try <span class="gradient-text animate-gradient-text">Hotspots Analysis</span> Now
+          </h2>
+          <p class="text-xl text-base-content/70 animate-fade-in animation-delay-400">
+            Analyze any GitHub repository and see instant insights
+          </p>
+        </div>
+        
+    <!-- LiveView Component Container -->
+        <div class="animate-fade-in animation-delay-600">
+          <%= if @conn do %>
+            {live_render(@conn, GitlockPhxWeb.HotspotsPreviewLive,
+              id: "hotspots-preview",
+              container: {:div, class: "w-full"},
+              sticky: true
+            )}
+          <% else %>
+            <!-- Fallback for non-conn renders -->
+            <div class="text-center py-8">
+              <a href="/demo" class="btn btn-primary">
+                View Live Demo
+              </a>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
     """
   end
 end
