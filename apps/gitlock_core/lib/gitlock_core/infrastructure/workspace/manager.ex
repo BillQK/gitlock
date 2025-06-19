@@ -120,6 +120,10 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
   def init(_opts) do
     Process.flag(:trap_exit, true)
 
+    # Ensure base directories exist
+    base_path = Path.join([System.tmp_dir!(), "gitlock", "workspaces"])
+    File.mkdir_p!(base_path)
+
     {:ok, %{monitors: %{}, pending_acquisitions: %{}}}
   end
 
