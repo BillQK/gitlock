@@ -336,11 +336,6 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
       Logger.info("Cloning #{workspace.source} to #{path}")
       Logger.debug("Git command: git #{Enum.join(args, " ")}")
 
-      case System.cmd("which", ["git"]) do
-        {output, 0} -> Logger.debug("Git found at: #{String.trim(output)}")
-        _ -> Logger.error("Git not found in PATH!")
-      end
-
       case System.cmd("git", args,
              stderr_to_stdout: true,
              env: [{"GIT_TERMINAL_PROMPT", "0"}]

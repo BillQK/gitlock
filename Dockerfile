@@ -65,7 +65,7 @@ RUN mix release gitlock_phx
 FROM erlang:27-slim
 
 RUN apt-get update -y && apt-get install -y \
-    libstdc++6 openssl libncurses5 locales curl build-essential \
+    libstdc++6 openssl libncurses5 locales curl build-essential git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
