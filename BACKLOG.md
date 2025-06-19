@@ -2,8 +2,8 @@
 
 ## Sprint 6/11/2025 - 6/18/2025
 
-- [ ] Landing page - adding interactive demos and examples
-- [ ] BREAKING CHANGES - refactor cli pattern removing :dir options -> Needs to implement a new infrastructure for managing temp directories
+- [x] Landing page - adding interactive demos and examples
+- [x] BREAKING CHANGES - refactor cli pattern removing :dir options -> Needs to implement a new infrastructure for managing temp directories
 - [x] Publish CLI tool to package managers (Homebrew for macOS)
 - [x] Implement Code Age analysis methodology (identify stable vs volatile code based on age)
 - [x] Add proper descriptions to README files in gitlock_cli and gitlock_core apps
@@ -13,6 +13,7 @@
 
 - [ ] Design and implement database schema for SaaS features (users, projects, analysis history, subscription tiers, organizations)
 - [ ] Set up app.js code structure for Hooks and interactive component
+- [ ] Implement a git log cache system - improving performance on large repositories
 
 ## To Do
 

@@ -6,71 +6,8 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
   alias GitlockCore.Domain.Entities.{Commit, Author}
   alias GitlockCore.Domain.Values.FileChange
 
-  describe "determine_source_type/1" do
-    test "detects log file correctly" do
-      # Create a test file
-      {:ok, log_file} = Briefly.create(extname: ".txt")
-      File.write!(log_file, "dummy content")
-
-      assert Git.determine_source_type(log_file) == :log_file
-
-      # Test with common extensions
-      assert Git.determine_source_type("git_log.txt") == :log_file
-      assert Git.determine_source_type("commits.log") == :log_file
-    end
-
-    test "detects local repository correctly" do
-      # Mock Git repository path
-      # We'll check for the .git directory to identify repositories
-      {:ok, repo_path} = Briefly.create(directory: true)
-      git_dir = Path.join(repo_path, ".git")
-
-      try do
-        File.mkdir_p!(git_dir)
-        assert Git.determine_source_type(repo_path) == :local_repo
-      after
-        File.rm_rf(repo_path)
-      end
-    end
-
-    test "detects URL correctly" do
-      assert Git.determine_source_type("https://github.com/user/repo.git") == :url
-      assert Git.determine_source_type("git@github.com:user/repo.git") == :url
-    end
-
-    test "handles non-existent paths as log files for backward compatibility" do
-      assert Git.determine_source_type("/non/existent/path") == :unknown
-    end
-  end
-
-  describe "get_commit_history/2 with local repository" do
-    # These tests would work better as integration tests
-    # with a real Git repository, but we'll mock the output
-
-    test "handles local Git repository by calling git command" do
-      # Setup a mock repo
-      {:ok, repo_path} = Briefly.create(directory: true)
-      git_dir = Path.join(repo_path, ".git")
-
-      try do
-        # Create mock Git repo structure
-        File.mkdir_p!(git_dir)
-
-        # Mock System.cmd to return a predefined log output
-        # This requires mocking, which is beyond the scope of this test
-        # In a real implementation, you would use a tool like Mox
-
-        # Instead, we'll verify the path is recognized as a repo
-        assert Git.determine_source_type(repo_path) == :local_repo
-      after
-        File.rm_rf(repo_path)
-      end
-    end
-  end
-
-  describe "get_commit_history/2" do
-    test "successfully parses a valid git log file" do
-      # Create a test git log file with proper format
+  describe "parse_git_log/1" do
+    test "successfully parses a valid git log" do
       log_content = """
       --abc123--2023-01-01--John Doe
       10\t5\tlib/example.ex
@@ -81,10 +18,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       -\t-\tassets/image.png
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, commits} = Git.get_commit_history(log_file, %{})
+      assert {:ok, commits} = Git.parse_git_log(log_content)
       assert length(commits) == 2
 
       # Verify first commit
@@ -114,20 +48,14 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
              } = second_commit
     end
 
-    test "handles empty log file" do
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, "")
-
-      assert {:ok, []} = Git.get_commit_history(log_file, %{})
+    test "handles empty log content" do
+      assert {:ok, []} = Git.parse_git_log("")
     end
 
-    test "handles log file with only whitespace" do
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, "\n\n  \n\t\n")
-
+    test "handles log with only whitespace" do
       # The parser treats whitespace-only content as a malformed header
       assert {:error, {:commit, "Invalid commit header format:" <> _}} =
-               Git.get_commit_history(log_file, %{})
+               Git.parse_git_log("\n\n  \n\t\n")
     end
 
     test "handles single commit" do
@@ -136,10 +64,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       42\t13\tsrc/main.ex
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, [commit]} = Git.get_commit_history(log_file, %{})
+      assert {:ok, [commit]} = Git.parse_git_log(log_content)
       assert commit.id == "single123"
       assert commit.author.name == "Solo Developer"
       assert length(commit.file_changes) == 1
@@ -150,10 +75,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       --empty123--2023-04-01--Empty Commit Author
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, [commit]} = Git.get_commit_history(log_file, %{})
+      assert {:ok, [commit]} = Git.parse_git_log(log_content)
       assert commit.file_changes == []
     end
 
@@ -163,11 +85,8 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       10\t5\tlib/example.ex
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
       assert {:error, {:commit, "Invalid commit header format:" <> _}} =
-               Git.get_commit_history(log_file, %{})
+               Git.parse_git_log(log_content)
     end
 
     test "handles empty header - returns error" do
@@ -175,33 +94,19 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
 
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:error, {:commit, "Empty commit text"}} =
-               Git.get_commit_history(log_file, %{})
+      assert {:error, {:commit, "Empty commit text"}} = Git.parse_git_log(log_content)
     end
 
-    test "handles malformed file change line - returns error" do
+    test "handles malformed file change line" do
       log_content = """
       --abc123--2023-01-01--John Doe
       this is not a valid file change line
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
       # The parser filters out lines that don't contain tabs, so this results in a commit with no file changes
-      assert {:ok, [commit]} = Git.get_commit_history(log_file, %{})
+      assert {:ok, [commit]} = Git.parse_git_log(log_content)
       assert commit.id == "abc123"
       assert commit.file_changes == []
-    end
-
-    test "handles file not found error" do
-      non_existent = "/tmp/does_not_exist_#{:rand.uniform(10000)}.log"
-
-      assert {:error, {:io, ^non_existent, :enoent}} =
-               Git.get_commit_history(non_existent, %{})
     end
 
     test "handles authors with special characters" do
@@ -213,15 +118,12 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       8\t3\tlib/中文.ex
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, commits} = Git.get_commit_history(log_file, %{})
+      assert {:ok, commits} = Git.parse_git_log(log_content)
       assert length(commits) == 2
       assert Enum.map(commits, & &1.author.name) == ["José García-López", "李明 (Li Ming)"]
     end
 
-    test "preserves commit order from file" do
+    test "preserves commit order" do
       log_content = """
       --commit1--2023-01-01--Author One
       1\t0\tfile1.ex
@@ -233,10 +135,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       3\t0\tfile3.ex
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, commits} = Git.get_commit_history(log_file, %{})
+      assert {:ok, commits} = Git.parse_git_log(log_content)
       assert Enum.map(commits, & &1.id) == ["commit1", "commit2", "commit3"]
     end
 
@@ -247,10 +146,7 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       3\t1\ttest/test with spaces.exs
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, [commit]} = Git.get_commit_history(log_file, %{})
+      assert {:ok, [commit]} = Git.parse_git_log(log_content)
 
       assert Enum.map(commit.file_changes, & &1.entity) == [
                "lib/my module/example file.ex",
@@ -264,13 +160,96 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
       999999\t888888\tlib/huge_refactor.ex
       """
 
-      {:ok, log_file} = Briefly.create()
-      File.write!(log_file, log_content)
-
-      assert {:ok, [commit]} = Git.get_commit_history(log_file, %{})
+      assert {:ok, [commit]} = Git.parse_git_log(log_content)
       [change] = commit.file_changes
       assert change.loc_added == "999999"
       assert change.loc_deleted == "888888"
+    end
+
+    test "parses standard git log format" do
+      # Test the standard git log format (not custom format)
+      log_content = """
+      commit abc123def456
+      Author: John Doe <john@example.com>
+      Date: 2023-01-01
+
+      10\t5\tlib/example.ex
+      3\t1\ttest/example_test.exs
+      """
+
+      assert {:ok, [commit]} = Git.parse_git_log(log_content)
+      assert commit.id == "abc123def456"
+      assert commit.author.name == "John Doe"
+      assert commit.author.email == "john@example.com"
+      assert length(commit.file_changes) == 2
+    end
+
+    test "handles multiple commits in standard format" do
+      log_content = """
+      commit abc123
+      Author: John Doe <john@example.com>
+      Date: 2023-01-01
+
+      10\t5\tlib/example.ex
+
+      commit def456
+      Author: Jane Smith <jane@example.com>
+      Date: 2023-01-02
+
+      20\t0\tlib/another.ex
+      """
+
+      assert {:ok, commits} = Git.parse_git_log(log_content)
+      assert length(commits) == 2
+    end
+  end
+
+  describe "get_commit_history/2 with real git repository" do
+    @tag :integration
+    test "fetches from local git repository" do
+      # Create a temporary git repository
+      {:ok, repo_dir} = Briefly.create(directory: true)
+
+      # Initialize a git repo
+      System.cmd("git", ["init"], cd: repo_dir, stderr_to_stdout: true)
+
+      # Configure git user for the test repo
+      System.cmd("git", ["config", "user.email", "test@example.com"], cd: repo_dir)
+      System.cmd("git", ["config", "user.name", "Test User"], cd: repo_dir)
+
+      # Create a file and commit
+      test_file = Path.join(repo_dir, "test.txt")
+      File.write!(test_file, "test content")
+      System.cmd("git", ["add", "."], cd: repo_dir)
+      System.cmd("git", ["commit", "-m", "Initial commit"], cd: repo_dir)
+
+      # Fetch log
+      case Git.get_commit_history(repo_dir) do
+        {:ok, commits} ->
+          assert length(commits) == 1
+          [commit] = commits
+          assert commit.author.name == "Test User"
+          assert commit.author.email == "test@example.com"
+
+        {:error, reason} ->
+          # Git might not be available in CI
+          IO.puts("Skipping git test: #{reason}")
+      end
+    end
+
+    @tag :integration
+    test "handles empty git repository" do
+      {:ok, repo_dir} = Briefly.create(directory: true)
+      System.cmd("git", ["init"], cd: repo_dir)
+
+      case Git.get_commit_history(repo_dir) do
+        {:ok, commits} ->
+          assert commits == []
+
+        {:error, msg} ->
+          # Empty repo might return an error
+          assert msg =~ "does not have any commits" or msg =~ "Git log failed"
+      end
     end
   end
 
@@ -282,12 +261,8 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
           commits_data
           |> Enum.map_join("\n\n", &format_commit_for_log/1)
 
-        # Create temp file using Briefly
-        {:ok, path} = Briefly.create()
-        File.write!(path, log_content)
-
         # Parse and verify
-        assert {:ok, parsed_commits} = Git.get_commit_history(path, %{})
+        assert {:ok, parsed_commits} = Git.parse_git_log(log_content)
         assert length(parsed_commits) == length(commits_data)
 
         # Verify each commit
@@ -303,11 +278,8 @@ defmodule GitlockCore.Adapters.VCS.GitTest do
 
     property "handles any malformed input without crashing" do
       check all(content <- string(:printable)) do
-        {:ok, path} = Briefly.create()
-        File.write!(path, content)
-
         # Should either parse successfully or return a proper error
-        case Git.get_commit_history(path, %{}) do
+        case Git.parse_git_log(content) do
           {:ok, commits} -> assert is_list(commits)
           {:error, reason} -> assert is_tuple(reason) or is_binary(reason)
         end

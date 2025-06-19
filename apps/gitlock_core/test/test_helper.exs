@@ -5,3 +5,4 @@ ExUnit.after_suite(fn _ ->
 end)
 
 Logger.configure(level: :none)
+System.cmd("git", ["config", "--global", "init.defaultBranch", "main"])
