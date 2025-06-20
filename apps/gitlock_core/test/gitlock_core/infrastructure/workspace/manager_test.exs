@@ -80,7 +80,6 @@ defmodule GitlockCore.Infrastructure.Workspace.ManagerTest do
   end
 
   describe "acquire/2 - remote repositories" do
-    @tag :integration
     test "clones remote repository" do
       # Use a small test repository
       repo_url = "https://github.com/octocat/Hello-World.git"

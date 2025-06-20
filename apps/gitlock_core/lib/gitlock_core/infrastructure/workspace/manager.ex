@@ -28,6 +28,12 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
 
   alias GitlockCore.Infrastructure.Workspace.Store
 
+  # Default configuration values
+  # 10 minutes default timeout
+  @default_timeout :timer.minutes(10)
+  # Clone all branches by default
+  @default_single_branch true
+
   @typedoc "Manager state"
   @type state :: %{
           monitors: %{pid() => reference()},
@@ -41,8 +47,6 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
           | {:single_branch, boolean()}
           | {:timeout, timeout()}
         ]
-
-  @timeout :timer.minutes(5)
 
   # Client API
 
@@ -74,8 +78,8 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
 
   - `:depth` - Git clone depth (default: full clone)
   - `:branch` - Specific branch to clone
-  - `:single_branch` - Clone only the specified branch
-  - `:timeout` - Maximum time to wait for clone
+  - `:single_branch` - Clone only the specified branch (default: #{@default_single_branch})
+  - `:timeout` - Maximum time to wait for clone (default: #{@default_timeout}ms)
 
   ## Returns
 
@@ -94,7 +98,9 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
   """
   @spec acquire(String.t(), acquire_opts()) :: {:ok, map()} | {:error, term()}
   def acquire(source, opts \\ []) do
-    GenServer.call(__MODULE__, {:acquire, source, self(), opts}, @timeout)
+    # Extract timeout from opts or use default
+    timeout = Keyword.get(opts, :timeout, @default_timeout)
+    GenServer.call(__MODULE__, {:acquire, source, self(), opts}, timeout)
   end
 
   @doc """
@@ -360,12 +366,23 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
   end
 
   defp build_clone_args(opts) do
-    ["clone"] ++
-      Enum.flat_map(opts, fn
-        {:depth, n} when is_integer(n) -> ["--depth", to_string(n)]
-        {:single_branch, true} -> ["--single-branch"]
-        _ -> []
-      end)
+    # Apply defaults
+    depth = Keyword.get(opts, :depth)
+    single_branch = Keyword.get(opts, :single_branch, @default_single_branch)
+    branch = Keyword.get(opts, :branch)
+
+    args = ["clone"]
+
+    args =
+      if depth && depth > 0,
+        do: args ++ ["--depth", to_string(depth)],
+        else: args
+
+    # Add single-branch if true
+    args = if single_branch, do: args ++ ["--single-branch"], else: args
+    args = if branch, do: args ++ ["--branch", branch], else: args
+
+    args
   end
 
   defp resolve_workspace(id_or_source) do

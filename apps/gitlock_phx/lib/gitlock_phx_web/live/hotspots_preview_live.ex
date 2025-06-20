@@ -8,7 +8,8 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       description: "The library for web and native user interfaces",
       stars: 228_000,
       language: "JavaScript",
-      platform: "github"
+      platform: "github",
+      depth: 300
     },
     %{
       name: "microsoft/vscode",
@@ -16,7 +17,8 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       description: "Visual Studio Code",
       stars: 163_000,
       language: "TypeScript",
-      platform: "github"
+      platform: "github",
+      depth: 300
     },
     %{
       name: "vercel/next.js",
@@ -24,7 +26,8 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       description: "The React Framework",
       stars: 125_000,
       language: "JavaScript",
-      platform: "github"
+      platform: "github",
+      depth: 300
     },
     %{
       name: "nodejs/node",
@@ -32,7 +35,17 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       description: "Node.js JavaScript runtime",
       stars: 107_000,
       language: "JavaScript",
-      platform: "github"
+      platform: "github",
+      depth: 300
+    },
+    %{
+      name: "phoenixframework/phoenix",
+      url: "https://github.com/phoenixframework/phoenix",
+      description: "Phoenix Framework",
+      stars: 22_000,
+      language: "Elixir",
+      platform: "github",
+      depth: 0
     }
   ]
 
@@ -96,12 +109,21 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
   defp analyze_repository(url) do
     limit = 100_000
 
+    repo = Enum.find(@filtered_repos, fn repo -> repo.url == url end)
+
+    depth =
+      if repo do
+        repo.depth
+      else
+        0
+      end
+
     options = %{
       url: url,
       format: "csv",
       limit: limit,
       min_revs: 1,
-      branch: "main"
+      depth: depth
     }
 
     case GitlockCore.investigate(:hotspots, url, options) do
@@ -287,7 +309,6 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       _ ->
         # Weight different risk levels
         risk_weights = %{
-          "critical" => 10,
           "high" => 5,
           "medium" => 2,
           "low" => 0.5
@@ -376,6 +397,7 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
   defp get_language_color("TypeScript"), do: "bg-blue-500"
   defp get_language_color("Python"), do: "bg-green-500"
   defp get_language_color("Java"), do: "bg-orange-500"
+  defp get_language_color("Elixir"), do: "bg-purple-500"
   defp get_language_color(_), do: "bg-gray-500"
 
   defp format_stars(stars) when stars >= 1000 do
@@ -476,7 +498,7 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
                       </div>
                     </div>
                     <div class="max-h-48 overflow-y-auto">
-                      <%= for repo <- Enum.take(@filtered_repos, 4) do %>
+                      <%= for repo <- @filtered_repos do %>
                         <button
                           type="button"
                           phx-click="select_repo"
@@ -617,7 +639,7 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
                       <div class="flex items-center gap-4">
                         <span class="text-sm text-base-content/50">{hotspot.changes} changes</span>
                         <div class={"badge badge-sm #{risk_badge_class(hotspot.risk)}"}>
-                          {hotspot.score}
+                          {hotspot.risk}
                         </div>
                       </div>
                     </div>
