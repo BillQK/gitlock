@@ -303,7 +303,7 @@ defmodule GitlockCore.Domain.Services.ComputeCouplings do
 
   @spec calculate_impact(
           [{String.t(), float()}],
-          %{String.t() => float()},
+          [{String.t(), float(), non_neg_integer()}],
           [{String.t(), non_neg_integer()}],
           MapSet.t(),
           float(),
