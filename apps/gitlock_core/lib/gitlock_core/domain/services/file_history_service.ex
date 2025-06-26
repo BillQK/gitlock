@@ -64,6 +64,7 @@ defmodule GitlockCore.Domain.Services.FileHistoryService do
         {old, new}
 
       # Handle pattern: prefix/{old => new}/suffix
+      # Git dependencies 
       match = Regex.run(~r/(.*){\s*(.*?)\s*=>\s*(.*?)\s*}(.*)/, path) ->
         [_, prefix, old, new, suffix] = match
         {prefix <> old <> suffix, prefix <> new <> suffix}

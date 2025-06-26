@@ -20,8 +20,7 @@ defmodule GitlockCore.Infrastructure.Workspace.Manager do
 
   On startup, the Manager:
   1. Re-establishes monitors for existing workspaces
-  2. Cleans up workspaces with dead owners
-  3. Resumes normal operation
+  2. Resumes normal operation
   """
   use GenServer
   require Logger

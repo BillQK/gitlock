@@ -13,7 +13,9 @@
 
 - [ ] Design and implement database schema for SaaS features (users, projects, analysis history, subscription tiers, organizations)
 - [ ] Set up app.js code structure for Hooks and interactive component
-- [ ] Implement a git log cache system - improving performance on large repositories
+- [x] Implement a git log cache system - improving performance on large repositories
+- [ ] Session Analysis Engine - a actor model pipeline system that create flexible, reusable, and interactive analyses
+- [x] BUG: Search bar background issues - Chrome
 
 ## To Do
 

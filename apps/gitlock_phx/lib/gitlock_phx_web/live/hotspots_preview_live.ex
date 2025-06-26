@@ -18,7 +18,7 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       stars: 163_000,
       language: "TypeScript",
       platform: "github",
-      depth: 300
+      depth: 200
     },
     %{
       name: "vercel/next.js",
@@ -36,7 +36,7 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
       stars: 107_000,
       language: "JavaScript",
       platform: "github",
-      depth: 300
+      depth: 200
     },
     %{
       name: "phoenixframework/phoenix",
@@ -483,6 +483,13 @@ defmodule GitlockPhxWeb.HotspotsPreviewLive do
     <!-- Dropdown Suggestions -->
                 <%= if @show_suggestions do %>
                   <div class="absolute top-full left-0 right-0 mt-2 glass-card backdrop-blur-md rounded-xl border border-base-content/10 overflow-hidden z-50 dropdown-content shadow-lg">
+                    <%!-- Bug: Chrome backdrop blur temporary fix, it is chrome problem --%>
+                    <div
+                      class="absolute inset-0 bg-base-100/80 backdrop-blur-3xl -z-10"
+                      aria-hidden="true"
+                    >
+                    </div>
+
                     <div class="p-2 border-b border-base-content/10">
                       <div class="text-xs text-base-content/60 flex items-center gap-2">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
