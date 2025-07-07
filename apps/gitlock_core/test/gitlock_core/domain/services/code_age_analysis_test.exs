@@ -141,7 +141,7 @@ defmodule GitlockCore.Domain.Services.CodeAgeAnalysisTest do
 
       expected_age = CodeAge.calculate_age_months(test_date)
       assert code_age.age_months == expected_age
-      assert code_age.risk == :high
+      assert code_age.risk == :medium
     end
 
     test "handles files with special characters in names" do

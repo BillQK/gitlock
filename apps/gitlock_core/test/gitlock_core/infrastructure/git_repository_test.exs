@@ -17,7 +17,6 @@ defmodule GitlockCore.Infrastructure.GitRepositoryTest do
   end
 
   describe "fetch_log/2" do
-    @tag :integration
     test "fetches from local git repository" do
       # This test requires git to be installed
       # Create a temporary git repository

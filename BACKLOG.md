@@ -16,6 +16,7 @@
 - [x] Implement a git log cache system - improving performance on large repositories
 - [ ] Session Analysis Engine - a actor model pipeline system that create flexible, reusable, and interactive analyses
 - [x] BUG: Search bar background issues - Chrome
+- [ ] Develop a strategy to use Phoenix
 
 ## To Do
 
