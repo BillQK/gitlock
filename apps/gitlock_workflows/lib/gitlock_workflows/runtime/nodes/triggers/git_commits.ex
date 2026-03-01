@@ -131,7 +131,9 @@ defmodule GitlockWorkflows.Runtime.Nodes.Triggers.GitCommits do
       []
       |> then(fn acc -> if opts[:since], do: ["since #{opts[:since]}" | acc], else: acc end)
       |> then(fn acc -> if opts[:until], do: ["until #{opts[:until]}" | acc], else: acc end)
-      |> then(fn acc -> if opts[:max_count], do: ["last #{opts[:max_count]} commits" | acc], else: acc end)
+      |> then(fn acc ->
+        if opts[:max_count], do: ["last #{opts[:max_count]} commits" | acc], else: acc
+      end)
       |> then(fn acc -> if opts[:path], do: ["path: #{opts[:path]}" | acc], else: acc end)
       |> Enum.reverse()
 

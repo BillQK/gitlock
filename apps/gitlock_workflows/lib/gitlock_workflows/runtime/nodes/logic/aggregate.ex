@@ -25,9 +25,15 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Aggregate do
       inputs: [%{name: "items", type: :any, required: true}],
       outputs: [%{name: "result", type: :any}],
       parameters: [
-        %{name: "operations", displayName: "Operations", type: "string", required: true,
-          default: "count", placeholder: "count,sum:revisions,avg:risk_score,max:complexity",
-          description: "Comma-separated: count, sum:field, avg:field, min:field, max:field"}
+        %{
+          name: "operations",
+          displayName: "Operations",
+          type: "string",
+          required: true,
+          default: "count",
+          placeholder: "count,sum:revisions,avg:risk_score,max:complexity",
+          description: "Comma-separated: count, sum:field, avg:field, min:field, max:field"
+        }
       ]
     }
   end
@@ -96,12 +102,14 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Aggregate do
   defp get_number(_, _), do: 0
 
   defp to_number(v) when is_number(v), do: v
+
   defp to_number(v) when is_binary(v) do
     case Float.parse(v) do
       {n, _} -> n
       :error -> 0
     end
   end
+
   defp to_number(_), do: 0
 
   defp resolve_items(input_data) do

@@ -121,7 +121,9 @@ defmodule GitlockPhxWeb.AnalyzeLive do
                       <%= for row <- Enum.take(rows, 30) do %>
                         <tr>
                           <%= for col <- cols do %>
-                            <td title={to_string(Map.get(row, col, ""))}>{format_cell(Map.get(row, col))}</td>
+                            <td title={to_string(Map.get(row, col, ""))}>
+                              {format_cell(Map.get(row, col))}
+                            </td>
                           <% end %>
                         </tr>
                       <% end %>
@@ -287,12 +289,16 @@ defmodule GitlockPhxWeb.AnalyzeLive do
 
       [single] when is_map(single) ->
         # Single port output with a map — display as key-value
-        rows = Enum.map(single, fn {k, v} -> %{"field" => to_string(k), "value" => format_cell(v)} end)
+        rows =
+          Enum.map(single, fn {k, v} -> %{"field" => to_string(k), "value" => format_cell(v)} end)
+
         %{label: label, status: :ok, rows: rows, columns: ["field", "value"]}
 
       _ ->
         # Multi-port or other map — show as key-value pairs
-        rows = Enum.map(data, fn {k, v} -> %{"field" => to_string(k), "value" => format_cell(v)} end)
+        rows =
+          Enum.map(data, fn {k, v} -> %{"field" => to_string(k), "value" => format_cell(v)} end)
+
         %{label: label, status: :ok, rows: rows, columns: ["field", "value"]}
     end
   end
@@ -307,14 +313,19 @@ defmodule GitlockPhxWeb.AnalyzeLive do
 
   # Put the most important columns first
   defp prioritize_columns(cols) do
-    priority = ~w(file path name entity label author changes revisions complexity score risk normalized_score percentile)
+    priority =
+      ~w(file path name entity label author changes revisions complexity score risk normalized_score percentile)
 
     {front, rest} =
       Enum.split_with(cols, fn c ->
         String.downcase(c) in priority
       end)
 
-    sorted_front = Enum.sort_by(front, fn c -> Enum.find_index(priority, &(&1 == String.downcase(c))) || 999 end)
+    sorted_front =
+      Enum.sort_by(front, fn c ->
+        Enum.find_index(priority, &(&1 == String.downcase(c))) || 999
+      end)
+
     sorted_front ++ Enum.sort(rest)
   end
 
@@ -340,7 +351,14 @@ defmodule GitlockPhxWeb.AnalyzeLive do
 
   defp persist_run_results(%PipelineRun{} = run, results) do
     storable = ResultSerializer.serialize_for_storage(results)
-    failures = results |> Map.values() |> Enum.filter(fn {:error, _} -> true; _ -> false end)
+
+    failures =
+      results
+      |> Map.values()
+      |> Enum.filter(fn
+        {:error, _} -> true
+        _ -> false
+      end)
 
     {status, error} =
       case failures do
@@ -371,10 +389,30 @@ defmodule GitlockPhxWeb.AnalyzeLive do
   defp status_text(_), do: nil
 
   defp status_icon({:running, _}), do: status_icon(:running)
-  defp status_icon(:running), do: raw(~s[<svg class="status-spin" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8"/></svg>])
-  defp status_icon(:done), do: raw(~s[<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>])
-  defp status_icon(:error), do: raw(~s[<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>])
-  defp status_icon(_), do: raw(~s[<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg>])
+
+  defp status_icon(:running),
+    do:
+      raw(
+        ~s[<svg class="status-spin" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8"/></svg>]
+      )
+
+  defp status_icon(:done),
+    do:
+      raw(
+        ~s[<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.5 12L13 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>]
+      )
+
+  defp status_icon(:error),
+    do:
+      raw(
+        ~s[<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>]
+      )
+
+  defp status_icon(_),
+    do:
+      raw(
+        ~s[<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg>]
+      )
 
   defp node_label(node_id, %Pipeline{nodes: nodes}) do
     case Map.get(nodes, node_id) do

@@ -61,7 +61,14 @@ defmodule GitlockCore.Domain.Services.HotspotDetection do
   def normalize_scores([]), do: []
 
   def normalize_scores([single] = _hotspots) do
-    [%{single | normalized_score: 100.0, percentile: 100.0, risk_factor: risk_level_from_normalized(100.0)}]
+    [
+      %{
+        single
+        | normalized_score: 100.0,
+          percentile: 100.0,
+          risk_factor: risk_level_from_normalized(100.0)
+      }
+    ]
   end
 
   def normalize_scores(hotspots) do
@@ -89,10 +96,11 @@ defmodule GitlockCore.Domain.Services.HotspotDetection do
       # rank 0 = highest score = highest percentile
       percentile = (total - rank - 1) / max(total - 1, 1) * 100.0
 
-      %{hotspot |
-        normalized_score: Float.round(normalized, 1),
-        percentile: Float.round(percentile, 1),
-        risk_factor: risk_level_from_normalized(normalized)
+      %{
+        hotspot
+        | normalized_score: Float.round(normalized, 1),
+          percentile: Float.round(percentile, 1),
+          risk_factor: risk_level_from_normalized(normalized)
       }
     end)
   end

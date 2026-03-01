@@ -69,7 +69,9 @@ defmodule GitlockPhxWeb.RunDetailLive do
                       <%= for row <- Enum.take(rows, 50) do %>
                         <tr>
                           <%= for col <- cols do %>
-                            <td title={to_string(Map.get(row, col, ""))}>{format_cell(Map.get(row, col))}</td>
+                            <td title={to_string(Map.get(row, col, ""))}>
+                              {format_cell(Map.get(row, col))}
+                            </td>
                           <% end %>
                         </tr>
                       <% end %>
@@ -137,7 +139,9 @@ defmodule GitlockPhxWeb.RunDetailLive do
         parse_data(label, list)
 
       _ ->
-        rows = Enum.map(data, fn {k, v} -> %{"field" => to_string(k), "value" => format_cell(v)} end)
+        rows =
+          Enum.map(data, fn {k, v} -> %{"field" => to_string(k), "value" => format_cell(v)} end)
+
         %{label: label, status: :ok, rows: rows, columns: ["field", "value"]}
     end
   end
@@ -165,7 +169,8 @@ defmodule GitlockPhxWeb.RunDetailLive do
   defp pipeline_name(_), do: "Unknown Pipeline"
 
   defp prioritize_columns(cols) do
-    priority = ~w(file path name entity label author changes revisions complexity score risk normalized_score percentile)
+    priority =
+      ~w(file path name entity label author changes revisions complexity score risk normalized_score percentile)
 
     {front, rest} =
       Enum.split_with(cols, fn c -> String.downcase(c) in priority end)

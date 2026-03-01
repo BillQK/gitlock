@@ -17,8 +17,13 @@ defmodule GitlockWorkflows.Runtime.Nodes.Analysis.CoupledHotspot do
       description: "Finds hotspots that are temporally coupled",
       inputs: [
         %{name: "commits", type: {:list, :map}, required: true},
-        %{name: "repo_path", type: :string, required: false,
-          description: "Repository path (used to auto-compute complexity if complexity_map is not provided)"},
+        %{
+          name: "repo_path",
+          type: :string,
+          required: false,
+          description:
+            "Repository path (used to auto-compute complexity if complexity_map is not provided)"
+        },
         %{name: "complexity_map", type: {:list, :map}, required: false}
       ],
       outputs: [%{name: "coupled_hotspots", type: {:list, :map}}],
@@ -97,15 +102,16 @@ defmodule GitlockWorkflows.Runtime.Nodes.Analysis.CoupledHotspot do
 
   defp list_tracked_files(repo_path) do
     case System.cmd("git", ["ls-tree", "-r", "--name-only", "HEAD"],
-           cd: repo_path, stderr_to_stdout: true) do
+           cd: repo_path,
+           stderr_to_stdout: true
+         ) do
       {output, 0} -> {:ok, String.split(output, "\n", trim: true)}
       {error, code} -> {:error, "git ls-tree failed (#{code}): #{String.trim(error)}"}
     end
   end
 
   defp read_file_from_git(repo_path, file_path) do
-    case System.cmd("git", ["show", "HEAD:#{file_path}"],
-           cd: repo_path, stderr_to_stdout: true) do
+    case System.cmd("git", ["show", "HEAD:#{file_path}"], cd: repo_path, stderr_to_stdout: true) do
       {content, 0} -> {:ok, content}
       {error, _code} -> {:error, String.trim(error)}
     end

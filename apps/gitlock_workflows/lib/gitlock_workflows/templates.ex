@@ -66,7 +66,9 @@ defmodule GitlockWorkflows.Templates do
     coupled = Node.new(:coupled_hotspot_analysis, position: {380, 680})
     summary_node = Node.new(:summary, position: {700, 300})
 
-    Pipeline.new("Full Analysis", description: "Complete codebase health analysis with all analyzers")
+    Pipeline.new("Full Analysis",
+      description: "Complete codebase health analysis with all analyzers"
+    )
     |> add_nodes([git, hotspots, couplings, silos, age, blast, coupled, summary_node])
     |> connect(git, hotspots)
     |> connect(git, couplings)

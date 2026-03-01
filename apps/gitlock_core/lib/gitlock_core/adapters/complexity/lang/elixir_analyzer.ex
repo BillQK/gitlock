@@ -141,13 +141,17 @@ defmodule GitlockCore.Adapters.Complexity.Lang.ElixirAnalyzer do
 
     after_complexity =
       case after_clauses do
-        nil -> 0
+        nil ->
+          0
+
         c when is_list(c) ->
           Enum.reduce(c, 0, fn
             {:->, _, [_pattern, body]}, acc -> acc + 1 + count_complexity(body)
             _, acc -> acc
           end)
-        other -> count_complexity(other)
+
+        other ->
+          count_complexity(other)
       end
 
     clauses_complexity + after_complexity

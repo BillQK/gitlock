@@ -34,13 +34,29 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Filter do
         %{name: "rejected", type: :any, description: "Items not matching"}
       ],
       parameters: [
-        %{name: "field", displayName: "Field", type: "string", required: true,
-          description: "Field name to check (e.g., 'risk_factor', 'revisions')"},
-        %{name: "operator", displayName: "Operator", type: "select", required: true,
-          default: "eq", options: Enum.map(@operators, &%{value: &1, label: format_op(&1)}),
-          description: "Comparison operator"},
-        %{name: "value", displayName: "Value", type: "string", required: true,
-          description: "Value to compare against"}
+        %{
+          name: "field",
+          displayName: "Field",
+          type: "string",
+          required: true,
+          description: "Field name to check (e.g., 'risk_factor', 'revisions')"
+        },
+        %{
+          name: "operator",
+          displayName: "Operator",
+          type: "select",
+          required: true,
+          default: "eq",
+          options: Enum.map(@operators, &%{value: &1, label: format_op(&1)}),
+          description: "Comparison operator"
+        },
+        %{
+          name: "value",
+          displayName: "Value",
+          type: "string",
+          required: true,
+          description: "Value to compare against"
+        }
       ]
     }
   end
@@ -84,7 +100,10 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Filter do
   defp compare(a, "gte", b) when is_number(a) and is_number(b), do: a >= b
   defp compare(a, "lte", b) when is_number(a) and is_number(b), do: a <= b
   defp compare(a, "contains", b) when is_binary(a) and is_binary(b), do: String.contains?(a, b)
-  defp compare(a, "not_contains", b) when is_binary(a) and is_binary(b), do: not String.contains?(a, b)
+
+  defp compare(a, "not_contains", b) when is_binary(a) and is_binary(b),
+    do: not String.contains?(a, b)
+
   defp compare(_, _, _), do: false
 
   defp coerce(value, reference) when is_number(reference) do
@@ -110,7 +129,9 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Filter do
 
   defp resolve_items(input_data) do
     case Map.get(input_data, :items) do
-      list when is_list(list) -> list
+      list when is_list(list) ->
+        list
+
       _ ->
         # Try to find the first list value in input data
         input_data |> Map.values() |> Enum.find([], &is_list/1)

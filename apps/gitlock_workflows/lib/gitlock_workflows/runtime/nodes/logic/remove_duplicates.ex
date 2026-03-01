@@ -24,8 +24,13 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.RemoveDuplicates do
       inputs: [%{name: "items", type: :any, required: true}],
       outputs: [%{name: "items", type: :any}],
       parameters: [
-        %{name: "field", displayName: "Deduplicate By", type: "string", required: true,
-          description: "Field to check for duplicates"}
+        %{
+          name: "field",
+          displayName: "Deduplicate By",
+          type: "string",
+          required: true,
+          description: "Field to check for duplicates"
+        }
       ]
     }
   end

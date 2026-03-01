@@ -42,13 +42,26 @@ defmodule GitlockWorkflows.NodeCatalogTest do
 
   describe "runtime_module/1" do
     test "returns module for nodes with runtime implementations" do
-      assert GitlockWorkflows.Runtime.Nodes.Triggers.GitCommits = NodeCatalog.runtime_module(:git_log)
-      assert GitlockWorkflows.Runtime.Nodes.Analysis.Hotspot = NodeCatalog.runtime_module(:hotspot_detection)
-      assert GitlockWorkflows.Runtime.Nodes.Analysis.Coupling = NodeCatalog.runtime_module(:coupling_detection)
-      assert GitlockWorkflows.Runtime.Nodes.Analysis.KnowledgeSilo = NodeCatalog.runtime_module(:knowledge_silo_detection)
-      assert GitlockWorkflows.Runtime.Nodes.Analysis.CodeAge = NodeCatalog.runtime_module(:code_age_analysis)
-      assert GitlockWorkflows.Runtime.Nodes.Analysis.CoupledHotspot = NodeCatalog.runtime_module(:coupled_hotspot_analysis)
-      assert GitlockWorkflows.Runtime.Nodes.Analysis.Summary = NodeCatalog.runtime_module(:summary)
+      assert GitlockWorkflows.Runtime.Nodes.Triggers.GitCommits =
+               NodeCatalog.runtime_module(:git_log)
+
+      assert GitlockWorkflows.Runtime.Nodes.Analysis.Hotspot =
+               NodeCatalog.runtime_module(:hotspot_detection)
+
+      assert GitlockWorkflows.Runtime.Nodes.Analysis.Coupling =
+               NodeCatalog.runtime_module(:coupling_detection)
+
+      assert GitlockWorkflows.Runtime.Nodes.Analysis.KnowledgeSilo =
+               NodeCatalog.runtime_module(:knowledge_silo_detection)
+
+      assert GitlockWorkflows.Runtime.Nodes.Analysis.CodeAge =
+               NodeCatalog.runtime_module(:code_age_analysis)
+
+      assert GitlockWorkflows.Runtime.Nodes.Analysis.CoupledHotspot =
+               NodeCatalog.runtime_module(:coupled_hotspot_analysis)
+
+      assert GitlockWorkflows.Runtime.Nodes.Analysis.Summary =
+               NodeCatalog.runtime_module(:summary)
     end
 
     test "returns nil for output nodes" do

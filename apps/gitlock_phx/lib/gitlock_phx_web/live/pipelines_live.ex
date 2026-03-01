@@ -76,8 +76,7 @@ defmodule GitlockPhxWeb.PipelinesLive do
         <% else %>
           <section class="pipelines-empty">
             <p>
-              <.link navigate={~p"/users/log-in"}>Log in</.link>
-              to save and manage your pipelines.
+              <.link navigate={~p"/users/log-in"}>Log in</.link> to save and manage your pipelines.
             </p>
           </section>
         <% end %>
@@ -131,12 +130,14 @@ defmodule GitlockPhxWeb.PipelinesLive do
   defp current_user(_), do: nil
 
   defp node_count(%{config: %{"nodes" => nodes}}) when is_map(nodes), do: map_size(nodes)
+
   defp node_count(%{config: config}) when is_map(config) do
     case Map.get(config, :nodes) || Map.get(config, "nodes") do
       nodes when is_map(nodes) -> map_size(nodes)
       _ -> 0
     end
   end
+
   defp node_count(_), do: 0
 
   defp format_time(dt) do

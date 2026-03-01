@@ -22,11 +22,22 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Sort do
       inputs: [%{name: "items", type: :any, required: true}],
       outputs: [%{name: "items", type: :any}],
       parameters: [
-        %{name: "field", displayName: "Sort By", type: "string", required: true,
-          description: "Field name to sort by"},
-        %{name: "direction", displayName: "Direction", type: "select", required: false,
-          default: "asc", options: [%{value: "asc", label: "Ascending"}, %{value: "desc", label: "Descending"}],
-          description: "Sort direction"}
+        %{
+          name: "field",
+          displayName: "Sort By",
+          type: "string",
+          required: true,
+          description: "Field name to sort by"
+        },
+        %{
+          name: "direction",
+          displayName: "Direction",
+          type: "select",
+          required: false,
+          default: "asc",
+          options: [%{value: "asc", label: "Ascending"}, %{value: "desc", label: "Descending"}],
+          description: "Sort direction"
+        }
       ]
     }
   end

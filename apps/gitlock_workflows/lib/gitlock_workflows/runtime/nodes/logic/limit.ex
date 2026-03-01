@@ -26,11 +26,23 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Limit do
       inputs: [%{name: "items", type: :any, required: true}],
       outputs: [%{name: "items", type: :any}],
       parameters: [
-        %{name: "count", displayName: "Count", type: "number", required: true, default: 10,
-          description: "Number of items to keep"},
-        %{name: "from", displayName: "From", type: "select", required: false, default: "start",
+        %{
+          name: "count",
+          displayName: "Count",
+          type: "number",
+          required: true,
+          default: 10,
+          description: "Number of items to keep"
+        },
+        %{
+          name: "from",
+          displayName: "From",
+          type: "select",
+          required: false,
+          default: "start",
           options: [%{value: "start", label: "First N"}, %{value: "end", label: "Last N"}],
-          description: "Take from start or end of list"}
+          description: "Take from start or end of list"
+        }
       ]
     }
   end
@@ -56,12 +68,14 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Limit do
 
   defp to_int(v) when is_integer(v), do: v
   defp to_int(v) when is_float(v), do: round(v)
+
   defp to_int(v) when is_binary(v) do
     case Integer.parse(v) do
       {n, _} -> n
       :error -> 10
     end
   end
+
   defp to_int(_), do: 10
 
   defp resolve_items(input_data) do

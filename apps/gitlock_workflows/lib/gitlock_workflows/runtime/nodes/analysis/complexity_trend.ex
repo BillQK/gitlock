@@ -117,14 +117,20 @@ defmodule GitlockWorkflows.Runtime.Nodes.Analysis.ComplexityTrend do
     val = Map.get(params, key) || Map.get(params, String.to_atom(key))
 
     case val do
-      nil -> default
-      v when is_integer(v) -> v
+      nil ->
+        default
+
+      v when is_integer(v) ->
+        v
+
       v when is_binary(v) ->
         case Integer.parse(v) do
           {n, _} -> n
           :error -> default
         end
-      _ -> default
+
+      _ ->
+        default
     end
   end
 end

@@ -38,13 +38,15 @@ defmodule GitlockWorkflows.Runtime.Nodes.Analysis.Hotspot do
           name: "repo_path",
           type: :string,
           required: false,
-          description: "Repository path (used to auto-compute complexity if complexity_map is not provided)"
+          description:
+            "Repository path (used to auto-compute complexity if complexity_map is not provided)"
         },
         %{
           name: "complexity_map",
           type: :map,
           required: false,
-          description: "Pre-computed complexity map (if not provided, will be computed automatically from repo_path)"
+          description:
+            "Pre-computed complexity map (if not provided, will be computed automatically from repo_path)"
         }
       ],
       outputs: [

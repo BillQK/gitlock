@@ -169,7 +169,10 @@ defmodule GitlockCore.Domain.Services.ComplexityTrendAnalysis do
     end
   rescue
     e ->
-      Logger.debug("Complexity analysis failed for #{file_path}@#{String.slice(sha, 0..7)}: #{Exception.message(e)}")
+      Logger.debug(
+        "Complexity analysis failed for #{file_path}@#{String.slice(sha, 0..7)}: #{Exception.message(e)}"
+      )
+
       {:error, :analysis_failed}
   end
 end

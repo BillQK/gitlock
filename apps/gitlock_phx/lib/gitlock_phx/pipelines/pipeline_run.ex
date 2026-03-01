@@ -18,7 +18,16 @@ defmodule GitlockPhx.Pipelines.PipelineRun do
 
   def changeset(run, attrs) do
     run
-    |> cast(attrs, [:repo_url, :status, :results, :error, :started_at, :completed_at, :pipeline_id, :user_id])
+    |> cast(attrs, [
+      :repo_url,
+      :status,
+      :results,
+      :error,
+      :started_at,
+      :completed_at,
+      :pipeline_id,
+      :user_id
+    ])
     |> validate_required([:repo_url, :status, :pipeline_id, :user_id])
     |> validate_inclusion(:status, ~w(running completed failed))
     |> foreign_key_constraint(:pipeline_id)

@@ -59,19 +59,21 @@ defmodule GitlockPhxWeb.ResultSerializer do
   def serialize_for_storage(results) when is_map(results) do
     Map.new(results, fn
       {node_id, {:ok, %{data: data} = meta}} ->
-        {node_id, %{
-          "status" => "ok",
-          "node_id" => to_string(Map.get(meta, :node_id, node_id)),
-          "type" => to_string(Map.get(meta, :type, "unknown")),
-          "label" => to_string(Map.get(meta, :label, node_id)),
-          "data" => serialize(data)
-        }}
+        {node_id,
+         %{
+           "status" => "ok",
+           "node_id" => to_string(Map.get(meta, :node_id, node_id)),
+           "type" => to_string(Map.get(meta, :type, "unknown")),
+           "label" => to_string(Map.get(meta, :label, node_id)),
+           "data" => serialize(data)
+         }}
 
       {node_id, {:error, reason}} ->
-        {node_id, %{
-          "status" => "error",
-          "error" => to_string(reason)
-        }}
+        {node_id,
+         %{
+           "status" => "error",
+           "error" => to_string(reason)
+         }}
 
       {node_id, _other} ->
         {node_id, %{"status" => "unknown"}}

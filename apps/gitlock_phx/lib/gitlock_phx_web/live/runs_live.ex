@@ -50,8 +50,9 @@ defmodule GitlockPhxWeb.RunsLive do
             <div class="runs-empty">
               <p>No runs yet.</p>
               <p>
-                <.link navigate={~p"/analyze"}>Run an analysis</.link> or
-                <.link navigate={~p"/workflows"}>execute a pipeline</.link> to see results here.
+                <.link navigate={~p"/analyze"}>Run an analysis</.link>
+                or <.link navigate={~p"/workflows"}>execute a pipeline</.link>
+                to see results here.
               </p>
             </div>
           <% end %>

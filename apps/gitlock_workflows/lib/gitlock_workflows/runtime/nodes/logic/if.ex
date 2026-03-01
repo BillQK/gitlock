@@ -37,14 +37,30 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.If do
         %{name: "false", type: :any, description: "Items not matching"}
       ],
       parameters: [
-        %{name: "field", displayName: "Field", type: "string", required: true,
-          description: "Field name to evaluate"},
-        %{name: "operator", displayName: "Operator", type: "select", required: true,
+        %{
+          name: "field",
+          displayName: "Field",
+          type: "string",
+          required: true,
+          description: "Field name to evaluate"
+        },
+        %{
+          name: "operator",
+          displayName: "Operator",
+          type: "select",
+          required: true,
           default: "eq",
           options: Enum.map(@operators, &%{value: &1, label: format_op(&1)}),
-          description: "Comparison operator"},
-        %{name: "value", displayName: "Value", type: "string", required: false,
-          default: "", description: "Value to compare against (not needed for is_empty/is_not_empty)"}
+          description: "Comparison operator"
+        },
+        %{
+          name: "value",
+          displayName: "Value",
+          type: "string",
+          required: false,
+          default: "",
+          description: "Value to compare against (not needed for is_empty/is_not_empty)"
+        }
       ]
     }
   end
@@ -88,7 +104,10 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.If do
   defp compare(a, "gte", b) when is_number(a) and is_number(b), do: a >= b
   defp compare(a, "lte", b) when is_number(a) and is_number(b), do: a <= b
   defp compare(a, "contains", b) when is_binary(a) and is_binary(b), do: String.contains?(a, b)
-  defp compare(a, "not_contains", b) when is_binary(a) and is_binary(b), do: not String.contains?(a, b)
+
+  defp compare(a, "not_contains", b) when is_binary(a) and is_binary(b),
+    do: not String.contains?(a, b)
+
   defp compare(nil, "is_empty", _), do: true
   defp compare("", "is_empty", _), do: true
   defp compare([], "is_empty", _), do: true

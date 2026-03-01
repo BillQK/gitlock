@@ -113,7 +113,7 @@ defmodule GitlockPhxWeb.WorkflowLive do
 
           <%= if current_user(assigns) do %>
             <button phx-click="save" class="btn btn-secondary">
-              <%= if @saved_pipeline_id, do: "Save", else: "Save As" %>
+              {if @saved_pipeline_id, do: "Save", else: "Save As"}
             </button>
           <% end %>
 
@@ -145,7 +145,9 @@ defmodule GitlockPhxWeb.WorkflowLive do
                 />
               </div>
               <div class="save-actions">
-                <button type="button" phx-click="cancel_save" class="btn btn-secondary">Cancel</button>
+                <button type="button" phx-click="cancel_save" class="btn btn-secondary">
+                  Cancel
+                </button>
                 <button type="submit" class="btn btn-execute">Save</button>
               </div>
             </form>
@@ -325,7 +327,8 @@ defmodule GitlockPhxWeb.WorkflowLive do
 
       true ->
         # Show save-as dialog
-        {:noreply, assign(socket, show_save_dialog: true, save_name: socket.assigns.pipeline.name)}
+        {:noreply,
+         assign(socket, show_save_dialog: true, save_name: socket.assigns.pipeline.name)}
     end
   end
 
@@ -416,7 +419,11 @@ defmodule GitlockPhxWeb.WorkflowLive do
 
   def handle_info({:pipeline_progress, node_id, {:status, message}}, socket) do
     {:noreply,
-     push_event(socket, "node_progress", %{node_id: node_id, status: "running", status_text: message})}
+     push_event(socket, "node_progress", %{
+       node_id: node_id,
+       status: "running",
+       status_text: message
+     })}
   end
 
   def handle_info({:pipeline_progress, node_id, {:done, result}}, socket) do
@@ -445,7 +452,12 @@ defmodule GitlockPhxWeb.WorkflowLive do
 
   def handle_info({:pipeline_complete, results}, socket) do
     {successes, failures} =
-      results |> Map.values() |> Enum.split_with(fn {:ok, _} -> true; _ -> false end)
+      results
+      |> Map.values()
+      |> Enum.split_with(fn
+        {:ok, _} -> true
+        _ -> false
+      end)
 
     {level, message} =
       case {length(successes), length(failures)} do

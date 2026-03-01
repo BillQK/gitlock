@@ -25,13 +25,19 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Merge do
       ],
       outputs: [%{name: "items", type: :any}],
       parameters: [
-        %{name: "mode", displayName: "Mode", type: "select", required: false, default: "append",
+        %{
+          name: "mode",
+          displayName: "Mode",
+          type: "select",
+          required: false,
+          default: "append",
           options: [
             %{value: "append", label: "Append (A then B)"},
             %{value: "interleave", label: "Interleave (alternate)"},
             %{value: "keep_a", label: "Keep A only"}
           ],
-          description: "How to combine the two inputs"}
+          description: "How to combine the two inputs"
+        }
       ]
     }
   end

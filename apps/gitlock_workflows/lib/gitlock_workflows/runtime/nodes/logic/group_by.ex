@@ -29,8 +29,13 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.GroupBy do
         %{name: "items", type: :any, description: "Flat list of group summaries"}
       ],
       parameters: [
-        %{name: "field", displayName: "Group By", type: "string", required: true,
-          description: "Field name to group by"}
+        %{
+          name: "field",
+          displayName: "Group By",
+          type: "string",
+          required: true,
+          description: "Field name to group by"
+        }
       ]
     }
   end

@@ -25,9 +25,7 @@ config :gitlock_phx, GitlockPhxWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "K966iHPm7n+pF66q4rDM/m6R284ZJ3k3WxX5lHqOjk45AGU23pwvMkZvgC1w6UL4",
   watchers: [
-    node: ["build.mjs", "--watch",
-      cd: Path.expand("../apps/gitlock_phx/assets", __DIR__)
-    ],
+    node: ["build.mjs", "--watch", cd: Path.expand("../apps/gitlock_phx/assets", __DIR__)],
     tailwind: {Tailwind, :install_and_run, [:gitlock_phx, ~w(--watch)]}
   ]
 

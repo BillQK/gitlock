@@ -36,11 +36,21 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Switch do
         %{name: "default", type: :any, description: "Items not matching any case"}
       ],
       parameters: [
-        %{name: "field", displayName: "Field", type: "string", required: true,
-          description: "Field name to switch on"},
-        %{name: "cases", displayName: "Cases", type: "string", required: true,
+        %{
+          name: "field",
+          displayName: "Field",
+          type: "string",
+          required: true,
+          description: "Field name to switch on"
+        },
+        %{
+          name: "cases",
+          displayName: "Cases",
+          type: "string",
+          required: true,
           placeholder: "high,medium,low",
-          description: "Comma-separated values to match (maps to case_0, case_1, ...)"}
+          description: "Comma-separated values to match (maps to case_0, case_1, ...)"
+        }
       ]
     }
   end
@@ -60,10 +70,11 @@ defmodule GitlockWorkflows.Runtime.Nodes.Logic.Switch do
         |> Enum.map(&String.trim/1)
 
       # Group items by which case they match
-      grouped = Enum.group_by(items, fn item ->
-        item_val = get_field(item, field) |> to_string()
-        Enum.find_index(case_values, &(&1 == item_val))
-      end)
+      grouped =
+        Enum.group_by(items, fn item ->
+          item_val = get_field(item, field) |> to_string()
+          Enum.find_index(case_values, &(&1 == item_val))
+        end)
 
       # Build output map with case_0, case_1, ... and default
       output =

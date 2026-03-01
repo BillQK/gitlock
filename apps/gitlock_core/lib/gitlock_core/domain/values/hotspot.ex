@@ -31,8 +31,16 @@ defmodule GitlockCore.Domain.Values.Hotspot do
           percentile: float()
         }
 
-  defstruct [:entity, :revisions, :complexity, :loc, :risk_factor, :risk_score,
-             normalized_score: 0.0, percentile: 0.0]
+  defstruct [
+    :entity,
+    :revisions,
+    :complexity,
+    :loc,
+    :risk_factor,
+    :risk_score,
+    normalized_score: 0.0,
+    percentile: 0.0
+  ]
 
   @doc """
   Creates a new hotspot value object.

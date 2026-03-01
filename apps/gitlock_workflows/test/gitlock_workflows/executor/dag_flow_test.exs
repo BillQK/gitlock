@@ -13,9 +13,16 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     use GitlockWorkflows.Runtime.Node
 
     def metadata do
-      %{id: "test.dag.source", displayName: "DAG Source", group: "trigger", version: 1,
-        description: "Emits test data", inputs: [],
-        outputs: [%{name: "items", type: {:list, :map}}], parameters: []}
+      %{
+        id: "test.dag.source",
+        displayName: "DAG Source",
+        group: "trigger",
+        version: 1,
+        description: "Emits test data",
+        inputs: [],
+        outputs: [%{name: "items", type: {:list, :map}}],
+        parameters: []
+      }
     end
 
     def execute(_input, _params, _ctx) do
@@ -29,9 +36,16 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     use GitlockWorkflows.Runtime.Node
 
     def metadata do
-      %{id: "test.dag.transform", displayName: "DAG Transform", group: "analysis", version: 1,
-        description: "Doubles scores", inputs: [%{name: "items", type: {:list, :map}, required: true}],
-        outputs: [%{name: "results", type: {:list, :map}}], parameters: []}
+      %{
+        id: "test.dag.transform",
+        displayName: "DAG Transform",
+        group: "analysis",
+        version: 1,
+        description: "Doubles scores",
+        inputs: [%{name: "items", type: {:list, :map}, required: true}],
+        outputs: [%{name: "results", type: {:list, :map}}],
+        parameters: []
+      }
     end
 
     def execute(input_data, _params, _ctx) do
@@ -46,9 +60,16 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     use GitlockWorkflows.Runtime.Node
 
     def metadata do
-      %{id: "test.dag.sink", displayName: "DAG Sink", group: "analysis", version: 1,
-        description: "Sums scores", inputs: [%{name: "results", type: {:list, :map}, required: true}],
-        outputs: [%{name: "summary", type: :map}], parameters: []}
+      %{
+        id: "test.dag.sink",
+        displayName: "DAG Sink",
+        group: "analysis",
+        version: 1,
+        description: "Sums scores",
+        inputs: [%{name: "results", type: {:list, :map}, required: true}],
+        outputs: [%{name: "summary", type: :map}],
+        parameters: []
+      }
     end
 
     def execute(input_data, _params, _ctx) do
@@ -64,9 +85,16 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     use GitlockWorkflows.Runtime.Node
 
     def metadata do
-      %{id: "test.dag.counting_source", displayName: "Counting Source", group: "trigger",
-        version: 1, description: "Counts executions", inputs: [],
-        outputs: [%{name: "items", type: {:list, :map}}], parameters: []}
+      %{
+        id: "test.dag.counting_source",
+        displayName: "Counting Source",
+        group: "trigger",
+        version: 1,
+        description: "Counts executions",
+        inputs: [],
+        outputs: [%{name: "items", type: {:list, :map}}],
+        parameters: []
+      }
     end
 
     def execute(_input, _params, _ctx) do
@@ -90,14 +118,18 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
 
   describe "DAG data flow" do
     test "linear chain: source → transform → sink" do
-      workflow = build_workflow([
-        node("src", "test.dag.source"),
-        node("xform", "test.dag.transform"),
-        node("sink", "test.dag.sink")
-      ], [
-        conn("src", "items", "xform", "items"),
-        conn("xform", "results", "sink", "results")
-      ])
+      workflow =
+        build_workflow(
+          [
+            node("src", "test.dag.source"),
+            node("xform", "test.dag.transform"),
+            node("sink", "test.dag.sink")
+          ],
+          [
+            conn("src", "items", "xform", "items"),
+            conn("xform", "results", "sink", "results")
+          ]
+        )
 
       results = run_dag(workflow)
 
@@ -112,14 +144,18 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     end
 
     test "fan-out: source feeds two transforms independently" do
-      workflow = build_workflow([
-        node("src", "test.dag.source"),
-        node("a", "test.dag.transform"),
-        node("b", "test.dag.transform")
-      ], [
-        conn("src", "items", "a", "items"),
-        conn("src", "items", "b", "items")
-      ])
+      workflow =
+        build_workflow(
+          [
+            node("src", "test.dag.source"),
+            node("a", "test.dag.transform"),
+            node("b", "test.dag.transform")
+          ],
+          [
+            conn("src", "items", "a", "items"),
+            conn("src", "items", "b", "items")
+          ]
+        )
 
       results = run_dag(workflow)
 
@@ -133,16 +169,20 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
       Registry.register_node(CountingSource)
       Agent.start_link(fn -> 0 end, name: :source_exec_count)
 
-      workflow = build_workflow([
-        node("src", "test.dag.counting_source"),
-        node("a", "test.dag.transform"),
-        node("b", "test.dag.transform"),
-        node("c", "test.dag.transform")
-      ], [
-        conn("src", "items", "a", "items"),
-        conn("src", "items", "b", "items"),
-        conn("src", "items", "c", "items")
-      ])
+      workflow =
+        build_workflow(
+          [
+            node("src", "test.dag.counting_source"),
+            node("a", "test.dag.transform"),
+            node("b", "test.dag.transform"),
+            node("c", "test.dag.transform")
+          ],
+          [
+            conn("src", "items", "a", "items"),
+            conn("src", "items", "b", "items"),
+            conn("src", "items", "c", "items")
+          ]
+        )
 
       results = run_dag(workflow)
 
@@ -153,12 +193,16 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     end
 
     test "progress messages sent in topological order" do
-      workflow = build_workflow([
-        node("src", "test.dag.source"),
-        node("xform", "test.dag.transform")
-      ], [
-        conn("src", "items", "xform", "items")
-      ])
+      workflow =
+        build_workflow(
+          [
+            node("src", "test.dag.source"),
+            node("xform", "test.dag.transform")
+          ],
+          [
+            conn("src", "items", "xform", "items")
+          ]
+        )
 
       me = self()
 
@@ -169,11 +213,12 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
 
       messages = collect_messages(10)
 
-      events = Enum.map(messages, fn
-        {:pipeline_progress, id, :running} -> {:running, id}
-        {:pipeline_progress, id, {:done, _}} -> {:done, id}
-        {:pipeline_complete, _} -> :complete
-      end)
+      events =
+        Enum.map(messages, fn
+          {:pipeline_progress, id, :running} -> {:running, id}
+          {:pipeline_progress, id, {:done, _}} -> {:done, id}
+          {:pipeline_complete, _} -> :complete
+        end)
 
       # src finishes before xform starts
       src_done = Enum.find_index(events, &(&1 == {:done, "src"}))
@@ -184,7 +229,8 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
 
   # ── Workflow builder helpers ─────────────────────────────────
 
-  defp node(id, type), do: %{id: id, type: type, position: [0, 0], parameters: %{}, disabled: false}
+  defp node(id, type),
+    do: %{id: id, type: type, position: [0, 0], parameters: %{}, disabled: false}
 
   defp conn(from_node, from_port, to_node, to_port) do
     %{from: %{node: from_node, port: from_port}, to: %{node: to_node, port: to_port}}
@@ -217,7 +263,11 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
       case run_node(node_def, input_data) do
         {:ok, output_data} ->
           notify(caller, {:pipeline_progress, node_id, {:done, output_data}})
-          result = {:ok, %{node_id: node_id, type: node_def.type, label: node_def.type, data: output_data}}
+
+          result =
+            {:ok,
+             %{node_id: node_id, type: node_def.type, label: node_def.type, data: output_data}}
+
           {Map.put(outputs, node_id, output_data), Map.put(results, node_id, result)}
 
         {:error, _} = err ->
@@ -240,11 +290,14 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
       case Map.get(outputs, conn.from.node) do
         upstream when is_map(upstream) ->
           key = String.to_atom(conn.from.port)
+
           case Map.get(upstream, key) do
             nil -> acc
             val -> Map.put(acc, String.to_atom(conn.to.port), val)
           end
-        _ -> acc
+
+        _ ->
+          acc
       end
     end)
   end
@@ -253,21 +306,25 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
     ids = MapSet.new(workflow.nodes, & &1.id)
     deg = Map.new(ids, &{&1, 0})
 
-    {adj, deg} = Enum.reduce(workflow.connections, {%{}, deg}, fn c, {a, d} ->
-      {Map.update(a, c.from.node, [c.to.node], &[c.to.node | &1]),
-       Map.update(d, c.to.node, 1, &(&1 + 1))}
-    end)
+    {adj, deg} =
+      Enum.reduce(workflow.connections, {%{}, deg}, fn c, {a, d} ->
+        {Map.update(a, c.from.node, [c.to.node], &[c.to.node | &1]),
+         Map.update(d, c.to.node, 1, &(&1 + 1))}
+      end)
 
     queue = for {id, 0} <- deg, do: id
     do_topo(queue, adj, deg, [])
   end
 
   defp do_topo([], _, _, r), do: Enum.reverse(r)
+
   defp do_topo([h | t], adj, deg, r) do
-    {q, d} = Enum.reduce(Map.get(adj, h, []), {[], deg}, fn n, {q, d} ->
-      d = Map.update!(d, n, &(&1 - 1))
-      if d[n] == 0, do: {[n | q], d}, else: {q, d}
-    end)
+    {q, d} =
+      Enum.reduce(Map.get(adj, h, []), {[], deg}, fn n, {q, d} ->
+        d = Map.update!(d, n, &(&1 - 1))
+        if d[n] == 0, do: {[n | q], d}, else: {q, d}
+      end)
+
     do_topo(t ++ Enum.reverse(q), adj, d, [h | r])
   end
 
@@ -276,6 +333,7 @@ defmodule GitlockWorkflows.Executor.DagFlowTest do
 
   defp collect_messages(max, acc \\ [])
   defp collect_messages(0, acc), do: Enum.reverse(acc)
+
   defp collect_messages(n, acc) do
     receive do
       msg -> collect_messages(n - 1, [msg | acc])

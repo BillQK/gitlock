@@ -17,8 +17,20 @@ defmodule GitlockWorkflows.Runtime.Nodes.Analysis.Coupling do
       inputs: [%{name: "commits", type: {:list, :map}, required: true}],
       outputs: [%{name: "couplings", type: {:list, :map}}],
       parameters: [
-        %{name: "min_coupling", displayName: "Min coupling score", type: "number", default: 1.0, required: false},
-        %{name: "min_windows", displayName: "Min time windows", type: "number", default: 5, required: false}
+        %{
+          name: "min_coupling",
+          displayName: "Min coupling score",
+          type: "number",
+          default: 1.0,
+          required: false
+        },
+        %{
+          name: "min_windows",
+          displayName: "Min time windows",
+          type: "number",
+          default: 5,
+          required: false
+        }
       ]
     }
   end
