@@ -114,7 +114,7 @@ defmodule GitlockWorkflows.NodeCatalog do
       description: "Identifies high-change, high-complexity files",
       input_ports: [
         %{name: "commits", data_type: :commits},
-        %{name: "complexity_map", data_type: :map}
+        %{name: "complexity_map", data_type: :map, optional: true}
       ],
       output_ports: [%{name: "hotspots", data_type: :hotspots}],
       runtime_module: Nodes.Analysis.Hotspot,

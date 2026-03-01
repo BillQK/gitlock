@@ -156,7 +156,7 @@ defmodule GitlockWorkflows.Pipeline do
     |> Map.values()
     |> Enum.flat_map(fn node ->
       node.input_ports
-      |> Enum.reject(&MapSet.member?(connected_input_ports, &1.id))
+      |> Enum.reject(&(&1.optional || MapSet.member?(connected_input_ports, &1.id)))
       |> Enum.map(fn port ->
         {:unconnected_inputs, "#{node.label} port '#{port.name}' has no incoming connection"}
       end)

@@ -90,8 +90,8 @@ defmodule GitlockWorkflows.CompilerTest do
       hotspots = Node.new(:hotspot_detection)
       csv = Node.new(:csv_report)
 
-      [git_out] = git.output_ports
-      [hs_in] = hotspots.input_ports
+      git_out = Enum.find(git.output_ports, &(&1.name == "commits"))
+      hs_in = Enum.find(hotspots.input_ports, &(&1.name == "commits"))
       [hs_out] = hotspots.output_ports
       [csv_in] = csv.input_ports
 
@@ -142,8 +142,8 @@ defmodule GitlockWorkflows.CompilerTest do
     test "falls back to repo_url from config when no repo_path option" do
       git = Node.new(:git_log, config: %{"repo_url" => "https://github.com/test/repo"})
       hs = Node.new(:hotspot_detection)
-      [git_out] = git.output_ports
-      [hs_in] = hs.input_ports
+      git_out = Enum.find(git.output_ports, &(&1.name == "commits"))
+      hs_in = Enum.find(hs.input_ports, &(&1.name == "commits"))
 
       pipeline =
         Pipeline.new("Test")

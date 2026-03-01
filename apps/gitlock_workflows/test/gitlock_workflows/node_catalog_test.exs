@@ -32,7 +32,7 @@ defmodule GitlockWorkflows.NodeCatalogTest do
       assert type_def.category == :source
       assert type_def.label == "Git Log"
       assert type_def.input_ports == []
-      assert length(type_def.output_ports) == 1
+      assert length(type_def.output_ports) == 2
     end
 
     test "returns error for unknown type" do

@@ -37,11 +37,12 @@ defmodule GitlockWorkflows.Port do
   @type t :: %__MODULE__{
           id: String.t(),
           name: String.t(),
-          data_type: data_type()
+          data_type: data_type(),
+          optional: boolean()
         }
 
   @enforce_keys [:id, :name, :data_type]
-  defstruct [:id, :name, :data_type]
+  defstruct [:id, :name, :data_type, optional: false]
 
   @analysis_subtypes [
     :hotspots,
@@ -55,12 +56,13 @@ defmodule GitlockWorkflows.Port do
   ]
 
   @doc "Creates a new port with a generated id."
-  @spec new(String.t(), data_type()) :: t()
-  def new(name, data_type) do
+  @spec new(String.t(), data_type(), keyword()) :: t()
+  def new(name, data_type, opts \\ []) do
     %__MODULE__{
       id: gen_id(),
       name: name,
-      data_type: data_type
+      data_type: data_type,
+      optional: Keyword.get(opts, :optional, false)
     }
   end
 

@@ -3,6 +3,9 @@ defmodule GitlockWorkflows.PipelineTest do
 
   alias GitlockWorkflows.{Pipeline, Node, Edge}
 
+  # Helper to find a port by name in a list of ports
+  defp find_port(ports, name), do: Enum.find(ports, &(&1.name == name))
+
   # ─── Node Creation ──────────────────────────────────────────────
 
   describe "Node.new/2 from catalog type" do
@@ -12,23 +15,28 @@ defmodule GitlockWorkflows.PipelineTest do
       assert node.type == :git_log
       assert node.label == "Git Log"
       assert node.input_ports == []
-      assert length(node.output_ports) == 1
+      assert length(node.output_ports) == 2
 
-      [port] = node.output_ports
-      assert port.data_type == :commits
-      assert port.name == "commits"
+      commits_port = find_port(node.output_ports, "commits")
+      assert commits_port.data_type == :commits
+
+      repo_path_port = find_port(node.output_ports, "repo_path")
+      assert repo_path_port.data_type == :string
     end
 
     test "creates an analysis node with input and output ports" do
       node = Node.new(:hotspot_detection)
 
       assert node.type == :hotspot_detection
-      assert length(node.input_ports) == 1
+      assert length(node.input_ports) == 2
       assert length(node.output_ports) == 1
 
-      [input] = node.input_ports
-      assert input.data_type == :commits
-      assert input.name == "commits"
+      commits_input = find_port(node.input_ports, "commits")
+      assert commits_input.data_type == :commits
+
+      complexity_input = find_port(node.input_ports, "complexity_map")
+      assert complexity_input.data_type == :map
+      assert complexity_input.optional == true
 
       [output] = node.output_ports
       assert output.data_type == :hotspots
@@ -82,8 +90,8 @@ defmodule GitlockWorkflows.PipelineTest do
       source = Node.new(:git_log)
       target = Node.new(:hotspot_detection)
 
-      [source_port] = source.output_ports
-      [target_port] = target.input_ports
+      source_port = find_port(source.output_ports, "commits")
+      target_port = find_port(target.input_ports, "commits")
 
       edge = Edge.new(source.id, source_port.id, target.id, target_port.id)
 
@@ -151,8 +159,8 @@ defmodule GitlockWorkflows.PipelineTest do
     end
 
     test "connects compatible ports", %{pipeline: pipeline, source: source, target: target} do
-      [source_port] = source.output_ports
-      [target_port] = target.input_ports
+      source_port = find_port(source.output_ports, "commits")
+      target_port = find_port(target.input_ports, "commits")
 
       edge = Edge.new(source.id, source_port.id, target.id, target_port.id)
       pipeline = Pipeline.add_edge(pipeline, edge)
@@ -161,14 +169,14 @@ defmodule GitlockWorkflows.PipelineTest do
     end
 
     test "rejects edge to non-existent source node", %{pipeline: pipeline, target: target} do
-      [target_port] = target.input_ports
+      target_port = find_port(target.input_ports, "commits")
       edge = Edge.new("ghost", "p1", target.id, target_port.id)
 
       assert {:error, :source_node_not_found} = Pipeline.add_edge(pipeline, edge)
     end
 
     test "rejects edge to non-existent target node", %{pipeline: pipeline, source: source} do
-      [source_port] = source.output_ports
+      source_port = find_port(source.output_ports, "commits")
       edge = Edge.new(source.id, source_port.id, "ghost", "p1")
 
       assert {:error, :target_node_not_found} = Pipeline.add_edge(pipeline, edge)
@@ -179,7 +187,7 @@ defmodule GitlockWorkflows.PipelineTest do
       source: source,
       target: target
     } do
-      [target_port] = target.input_ports
+      target_port = find_port(target.input_ports, "commits")
       edge = Edge.new(source.id, "bad_port", target.id, target_port.id)
 
       assert {:error, :source_port_not_found} = Pipeline.add_edge(pipeline, edge)
@@ -190,7 +198,7 @@ defmodule GitlockWorkflows.PipelineTest do
       source: source,
       target: target
     } do
-      [source_port] = source.output_ports
+      source_port = find_port(source.output_ports, "commits")
       edge = Edge.new(source.id, source_port.id, target.id, "bad_port")
 
       assert {:error, :target_port_not_found} = Pipeline.add_edge(pipeline, edge)
@@ -207,7 +215,7 @@ defmodule GitlockWorkflows.PipelineTest do
         |> Pipeline.add_node(coupling_node)
 
       [source_port] = hotspot_node.output_ports
-      [target_port] = coupling_node.input_ports
+      target_port = find_port(coupling_node.input_ports, "commits")
 
       edge = Edge.new(hotspot_node.id, source_port.id, coupling_node.id, target_port.id)
 
@@ -221,8 +229,8 @@ defmodule GitlockWorkflows.PipelineTest do
       middle = Node.new(:hotspot_detection)
       output = Node.new(:csv_report)
 
-      [src_port] = source.output_ports
-      [mid_in] = middle.input_ports
+      src_port = find_port(source.output_ports, "commits")
+      mid_in = find_port(middle.input_ports, "commits")
       [mid_out] = middle.output_ports
       [out_port] = output.input_ports
 
@@ -260,8 +268,8 @@ defmodule GitlockWorkflows.PipelineTest do
     test "removes an edge by id" do
       source = Node.new(:git_log)
       target = Node.new(:hotspot_detection)
-      [src_port] = source.output_ports
-      [tgt_port] = target.input_ports
+      src_port = find_port(source.output_ports, "commits")
+      tgt_port = find_port(target.input_ports, "commits")
       edge = Edge.new(source.id, src_port.id, target.id, tgt_port.id)
 
       pipeline =
@@ -284,8 +292,8 @@ defmodule GitlockWorkflows.PipelineTest do
       analysis = Node.new(:hotspot_detection)
       output = Node.new(:csv_report)
 
-      [src_port] = source.output_ports
-      [ana_in] = analysis.input_ports
+      src_port = find_port(source.output_ports, "commits")
+      ana_in = find_port(analysis.input_ports, "commits")
       [ana_out] = analysis.output_ports
       [out_port] = output.input_ports
 
@@ -337,8 +345,8 @@ defmodule GitlockWorkflows.PipelineTest do
       hotspots = Node.new(:hotspot_detection, position: {300, 100})
       report = Node.new(:csv_report, position: {600, 100})
 
-      [git_out] = git_log.output_ports
-      [hs_in] = hotspots.input_ports
+      git_out = find_port(git_log.output_ports, "commits")
+      hs_in = find_port(hotspots.input_ports, "commits")
       [hs_out] = hotspots.output_ports
       [rpt_in] = report.input_ports
 
