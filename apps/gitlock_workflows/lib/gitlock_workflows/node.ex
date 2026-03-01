@@ -55,8 +55,16 @@ defmodule GitlockWorkflows.Node do
       label: type_def.label,
       config: Keyword.get(opts, :config, %{}),
       position: Keyword.get(opts, :position, {0, 0}),
-      input_ports: Enum.map(type_def.input_ports, &Port.new(&1.name, &1.data_type, optional: Map.get(&1, :optional, false))),
-      output_ports: Enum.map(type_def.output_ports, &Port.new(&1.name, &1.data_type, optional: Map.get(&1, :optional, false)))
+      input_ports:
+        Enum.map(
+          type_def.input_ports,
+          &Port.new(&1.name, &1.data_type, optional: Map.get(&1, :optional, false))
+        ),
+      output_ports:
+        Enum.map(
+          type_def.output_ports,
+          &Port.new(&1.name, &1.data_type, optional: Map.get(&1, :optional, false))
+        )
     }
   end
 
