@@ -499,10 +499,9 @@ defmodule GitlockWorkflows.Runtime.Registry do
 
     nodes =
       node_ids
-      |> Enum.map(fn node_id ->
-        {_module, metadata} = Map.get(state.nodes, node_id)
-        metadata
-      end)
+      |> Enum.map(&Map.get(state.nodes, &1))
+      |> Enum.reject(&is_nil/1)
+      |> Enum.map(fn {_module, metadata} -> metadata end)
       |> Enum.sort_by(& &1.displayName)
 
     {:reply, nodes, state}
