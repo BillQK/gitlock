@@ -11,6 +11,17 @@ defmodule GitlockPhx.Release do
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
+
+    seed()
+  end
+
+  def seed do
+    load_app()
+
+    {:ok, _, _} =
+      Ecto.Migrator.with_repo(GitlockPhx.Repo, fn _repo ->
+        GitlockPhx.Pipelines.seed_templates!()
+      end)
   end
 
   def rollback(repo, version) do
