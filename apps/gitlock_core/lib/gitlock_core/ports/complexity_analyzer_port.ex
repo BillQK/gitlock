@@ -32,6 +32,18 @@ defmodule GitlockCore.Ports.ComplexityAnalyzerPort do
               opts :: map()
             ) :: {:ok, %{String.t() => ComplexityMetrics.t()}} | {:error, String.t()}
 
+  @doc """
+  Analyze complexity from a content string (no disk read).
+
+  Used for historical analysis where file content is retrieved from
+  version control at a specific commit.
+
+  ## Returns
+    * `{:ok, %ComplexityMetrics{}}` on success
+  """
+  @callback analyze_content(content :: String.t(), file_path :: String.t()) ::
+              {:ok, ComplexityMetrics.t()}
+
   @doc "List of file extensions this analyzer will process (e.g. [\".ex\", \".exs\"])."
   @callback supported_extensions() :: [String.t()]
 end

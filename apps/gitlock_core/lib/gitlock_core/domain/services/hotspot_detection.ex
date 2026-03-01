@@ -25,27 +25,76 @@ defmodule GitlockCore.Domain.Services.HotspotDetection do
       |> Enum.flat_map(fn %Commit{file_changes: changes} -> changes end)
 
     # Group by entity (file path) and count revisions
-    file_changes
-    |> Enum.group_by(fn %FileChange{entity: entity} -> entity end)
-    |> Enum.map(fn {entity, changes} ->
-      # Get complexity metrics if available
-      metrics = Map.get(complexity_metrics, entity)
-      complexity = if metrics, do: metrics.cyclomatic_complexity, else: 1
-      loc = if metrics, do: metrics.loc, else: 0
+    hotspots =
+      file_changes
+      |> Enum.group_by(fn %FileChange{entity: entity} -> entity end)
+      |> Enum.map(fn {entity, changes} ->
+        # Get complexity metrics if available
+        metrics = Map.get(complexity_metrics, entity)
+        complexity = if metrics, do: metrics.cyclomatic_complexity, else: 1
+        loc = if metrics, do: metrics.loc, else: 0
 
-      # Calculate risk based on both change frequency and complexity
-      risk_score = calculate_risk_score(changes, complexity, loc)
+        # Calculate risk based on both change frequency and complexity
+        risk_score = calculate_risk_score(changes, complexity, loc)
 
-      %Hotspot{
-        entity: entity,
-        revisions: length(changes),
-        complexity: complexity,
-        loc: loc,
-        risk_score: risk_score,
-        risk_factor: risk_level_from_score(risk_score)
+        %Hotspot{
+          entity: entity,
+          revisions: length(changes),
+          complexity: complexity,
+          loc: loc,
+          risk_score: risk_score,
+          risk_factor: :low
+        }
+      end)
+      |> Enum.sort_by(fn %{risk_score: score} -> score end, :desc)
+
+    normalize_scores(hotspots)
+  end
+
+  @doc """
+  Normalizes raw risk scores to 0-100 scale and calculates percentiles.
+
+  Uses min-max normalization on log-scaled scores to prevent extreme outliers
+  from compressing the rest of the distribution.
+  """
+  @spec normalize_scores([Hotspot.t()]) :: [Hotspot.t()]
+  def normalize_scores([]), do: []
+
+  def normalize_scores([single] = _hotspots) do
+    [%{single | normalized_score: 100.0, percentile: 100.0, risk_factor: risk_level_from_normalized(100.0)}]
+  end
+
+  def normalize_scores(hotspots) do
+    total = length(hotspots)
+
+    # Use log scale to prevent outliers from compressing the distribution
+    log_scores = Enum.map(hotspots, fn h -> :math.log(h.risk_score + 1) end)
+    min_log = Enum.min(log_scores)
+    max_log = Enum.max(log_scores)
+    range = max_log - min_log
+
+    hotspots
+    |> Enum.with_index()
+    |> Enum.map(fn {hotspot, rank} ->
+      # Normalized score: 0-100 via min-max on log scale
+      normalized =
+        if range == 0 do
+          50.0
+        else
+          log_score = :math.log(hotspot.risk_score + 1)
+          (log_score - min_log) / range * 100.0
+        end
+
+      # Percentile: what percentage of files score lower than this one
+      # rank 0 = highest score = highest percentile
+      percentile = (total - rank - 1) / max(total - 1, 1) * 100.0
+
+      %{hotspot |
+        normalized_score: Float.round(normalized, 1),
+        percentile: Float.round(percentile, 1),
+        risk_factor: risk_level_from_normalized(normalized)
       }
     end)
-    |> Enum.sort_by(fn %{risk_score: score} -> score end, :desc)
   end
 
   @doc """
@@ -72,8 +121,18 @@ defmodule GitlockCore.Domain.Services.HotspotDetection do
   end
 
   @doc """
-  Determines risk level based on calculated score.
+  Determines risk level based on normalized 0-100 score.
+
+  - High: top 20% (score > 70)
+  - Medium: middle tier (score > 40)
+  - Low: bottom tier
   """
+  @spec risk_level_from_normalized(float()) :: Hotspot.risk_factor()
+  def risk_level_from_normalized(score) when score > 70.0, do: :high
+  def risk_level_from_normalized(score) when score > 40.0, do: :medium
+  def risk_level_from_normalized(_), do: :low
+
+  # Keep for backward compatibility
   @spec risk_level_from_score(float()) :: Hotspot.risk_factor()
   def risk_level_from_score(score) when score > 2.0, do: :high
   def risk_level_from_score(score) when score > 1.0, do: :medium

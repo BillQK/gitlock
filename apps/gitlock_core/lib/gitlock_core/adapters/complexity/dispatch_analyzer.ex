@@ -1,6 +1,6 @@
 defmodule GitlockCore.Adapters.Complexity.DispatchAnalyzer do
   @moduledoc """
-  A dispatch  analyzer that delegates to specific language analyzers based on file extensions.
+  A dispatch analyzer that delegates to specific language analyzers based on file extensions.
 
   This analyzer implements the ComplexityAnalyzerPort behavior but internally routes
   analysis requests to the appropriate language-specific analyzer based on file extension.
@@ -15,16 +15,25 @@ defmodule GitlockCore.Adapters.Complexity.DispatchAnalyzer do
   alias GitlockCore.Adapters.Complexity.Lang.{
     ElixirAnalyzer,
     JavaScriptAnalyzer,
+    TypeScriptAnalyzer,
     PythonAnalyzer,
     MockAnalyzer
   }
 
-  # Define all available analyzers
   @available_analyzers [
     ElixirAnalyzer,
     JavaScriptAnalyzer,
+    TypeScriptAnalyzer,
     PythonAnalyzer,
     MockAnalyzer
+  ]
+
+  # Real analyzers (excludes MockAnalyzer which is a fallback)
+  @real_analyzers [
+    ElixirAnalyzer,
+    JavaScriptAnalyzer,
+    TypeScriptAnalyzer,
+    PythonAnalyzer
   ]
 
   @impl true
@@ -42,9 +51,30 @@ defmodule GitlockCore.Adapters.Complexity.DispatchAnalyzer do
     analyzer.analyze_file(file_path)
   end
 
+  @doc """
+  Analyze complexity from file content directly, without reading from disk.
+
+  Used for historical analysis where file content comes from `git show`.
+  """
+  @impl true
+  def analyze_content(content, file_path) do
+    extension = Path.extname(file_path)
+
+    case find_real_analyzer(extension) do
+      nil -> {:error, :unsupported_language}
+      analyzer -> analyzer.analyze_content(content, file_path)
+    end
+  end
+
   defp select_analyzer(extension) do
     @available_analyzers
     |> Enum.find(MockAnalyzer, fn analyzer ->
+      extension in analyzer.supported_extensions()
+    end)
+  end
+
+  defp find_real_analyzer(extension) do
+    Enum.find(@real_analyzers, fn analyzer ->
       extension in analyzer.supported_extensions()
     end)
   end

@@ -1,0 +1,418 @@
+/* ── Workflow Page Layout ─────────────── */
+.workflow-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0e0e1a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+.workflow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 52px;
+  background: #16162a;
+  border-bottom: 1px solid #252540;
+  flex-shrink: 0;
+}
+
+.workflow-header h1 {
+  color: #e0e0ee;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.workflow-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── Badges ──────────────────────────── */
+.validation-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.validation-badge.valid {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+
+.validation-badge.invalid {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+/* ── Buttons ─────────────────────────── */
+.btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.12s, opacity 0.12s;
+  font-family: inherit;
+}
+
+.btn-secondary {
+  background: #252540;
+  color: #b0b0c0;
+  border: 1px solid #2e2e48;
+}
+
+.btn-secondary:hover {
+  background: #2e2e48;
+  color: #d0d0e0;
+}
+
+/* ── Template Select ─────────────────── */
+.template-dropdown {
+  display: contents;
+}
+
+.template-select {
+  background: #1e1e2e;
+  border: 1px solid #2e2e48;
+  color: #b0b0c0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.12s;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236e6e88' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.template-select:hover { border-color: #3e3e58; }
+.template-select:focus { border-color: #6366f1; }
+
+/* ── Execute Button ──────────────────── */
+.btn-execute {
+  background: #6366f1;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn-execute:hover:not(:disabled) {
+  background: #5558e6;
+}
+
+.btn-execute:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-execute.running {
+  background: #f59e0b;
+}
+
+.btn-execute.done {
+  background: #10b981;
+}
+
+/* ── Title Group ──────────────────────── */
+.workflow-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.workflow-header h1[contenteditable] {
+  outline: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: -2px -6px;
+  transition: background 0.12s;
+  cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.workflow-header h1[contenteditable]:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.workflow-header h1[contenteditable]:focus {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px #6366f1;
+}
+
+.dirty-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+.saved-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+/* ── Save Dialog ─────────────────────── */
+.save-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.save-dialog {
+  background: #1e1e2e;
+  border: 1px solid #2e2e48;
+  border-radius: 12px;
+  padding: 24px;
+  min-width: 360px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.save-dialog h3 {
+  color: #e0e0ee;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.save-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.save-field label {
+  color: #8e8ea8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.save-input {
+  background: #16162a;
+  border: 1px solid #2e2e48;
+  color: #e0e0ee;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.save-input:focus {
+  border-color: #6366f1;
+}
+
+.save-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ── Pipelines Page ──────────────────── */
+.pipelines-page {
+  min-height: 100vh;
+  background: #0e0e1a;
+  padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+.pipelines-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.pipelines-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.pipelines-header h1 {
+  color: #e0e0ee;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.pipelines-section {
+  margin-bottom: 40px;
+}
+
+.pipelines-section h2 {
+  color: #8e8ea8;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 16px;
+}
+
+.pipelines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.pipeline-card {
+  background: #16162a;
+  border: 1px solid #252540;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.12s;
+}
+
+.pipeline-card:hover {
+  border-color: #3e3e58;
+}
+
+.pipeline-card.template {
+  border-left: 3px solid #6366f1;
+}
+
+.pipeline-card-body h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pipeline-card-body h3 a {
+  color: #e0e0ee;
+  text-decoration: none;
+}
+
+.pipeline-card-body h3 a:hover {
+  color: #6366f1;
+}
+
+.pipeline-desc {
+  color: #6e6e88;
+  font-size: 12px;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.pipeline-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #5e5e78;
+}
+
+.template-badge {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.pipeline-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.18);
+}
+
+.pipelines-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #5e5e78;
+  font-size: 14px;
+}
+
+.pipelines-empty a {
+  color: #818cf8;
+  text-decoration: underline;
+}
+
+/* ── Canvas Mount Point ──────────────── */
+.workflow-canvas {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── SvelteFlow Overrides ────────────── */
+.workflow-canvas :global(.svelte-flow__minimap) {
+  background: #16162a;
+  border: 1px solid #252540;
+  border-radius: 8px;
+}
+
+.workflow-canvas :global(.svelte-flow__controls) {
+  border: 1px solid #252540;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.workflow-canvas :global(.svelte-flow__controls button) {
+  background: #1e1e2e;
+  color: #b0b0c0;
+  border-bottom: 1px solid #252540;
+  width: 28px;
+  height: 28px;
+}
+
+.workflow-canvas :global(.svelte-flow__controls button:hover) {
+  background: #252540;
+  color: #e0e0ee;
+}
+
+.workflow-canvas :global(.svelte-flow__edge-path) {
+  stroke: #4e4e68;
+  stroke-width: 1.5;
+}
+
+.workflow-canvas :global(.svelte-flow__edge.animated path) {
+  stroke: #6366f1;
+}
+
+.workflow-canvas :global(.svelte-flow__connection-path) {
+  stroke: #6366f1;
+  stroke-width: 2;
+}

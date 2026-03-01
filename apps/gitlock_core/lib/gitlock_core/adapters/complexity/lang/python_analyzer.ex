@@ -74,8 +74,8 @@ defmodule GitlockCore.Adapters.Complexity.Lang.PythonAnalyzer do
 
       # Comprehensions with conditions
       list_comp_if: ~r/\[\s*[^]]+\s+if\s+[^]]+\]/,
-      dict_comp_if: ~r/\{\s*[^}]+\s+if\s+[^}]+\}/,
-      set_comp_if: ~r/\{\s*[^}]+\s+if\s+[^}]+\}/,
+      dict_comp_if: ~r/\{\s*\w+\s*:\s*[^}]+\s+if\s+[^}]+\}/,
+      set_comp_if: ~r/\{\s*[^:}]+\s+for\s+[^}]+\s+if\s+[^}]+\}/,
       gen_exp_if: ~r/\(\s*[^)]+\s+if\s+[^)]+\)/,
 
       # Lambda with conditions (rough approximation)

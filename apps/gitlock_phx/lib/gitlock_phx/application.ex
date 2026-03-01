@@ -12,8 +12,8 @@ defmodule GitlockPhx.Application do
       GitlockPhx.Repo,
       {DNSCluster, query: Application.get_env(:gitlock_phx, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: GitlockPhx.PubSub},
-      # Start a worker by calling: GitlockPhx.Worker.start_link(arg)
-      # {GitlockPhx.Worker, arg},
+      # Task supervisor for async pipeline execution
+      {Task.Supervisor, name: GitlockPhx.TaskSupervisor},
       # Start to serve requests, typically the last entry
       GitlockPhxWeb.Endpoint
     ]

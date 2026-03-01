@@ -14,6 +14,7 @@ defmodule GitlockCore.Adapters.VCS.Git do
   def get_commit_history(source, options \\ %{}) do
     Logger.debug("Getting commit history from #{source}")
 
+    # Pass through progress_fn if provided
     case GitRepository.fetch_log(source, options) do
       {:ok, log_content} ->
         parse_git_log(log_content)
@@ -277,5 +278,37 @@ defmodule GitlockCore.Adapters.VCS.Git do
       _ ->
         nil
     end
+  end
+
+  # ── File-at-commit operations ────────────────────────────────
+
+  @impl true
+  def get_file_at_commit(repo_path, commit_id, file_path) do
+    case System.cmd("git", ["show", "#{commit_id}:#{file_path}"],
+           cd: repo_path,
+           stderr_to_stdout: true
+         ) do
+      {content, 0} -> {:ok, content}
+      {output, _} -> {:error, {:file_not_found, file_path, String.trim(output)}}
+    end
+  rescue
+    e -> {:error, {:git_error, Exception.message(e)}}
+  end
+
+  @impl true
+  def list_files_at_commit(repo_path, commit_id) do
+    case System.cmd("git", ["ls-tree", "-r", "--name-only", commit_id],
+           cd: repo_path,
+           stderr_to_stdout: true
+         ) do
+      {output, 0} ->
+        files = output |> String.split("\n", trim: true)
+        {:ok, files}
+
+      {output, _} ->
+        {:error, {:git_error, String.trim(output)}}
+    end
+  rescue
+    e -> {:error, {:git_error, Exception.message(e)}}
   end
 end
