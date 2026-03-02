@@ -114,7 +114,10 @@ defmodule GitlockMCP.Cache do
           summary: data.summary
         }
 
-        Logger.info("Gitlock indexed #{repo} — #{length(data.hotspots)} hotspots, #{length(data.couplings)} coupling pairs, #{length(data.knowledge_silos)} silos")
+        Logger.info(
+          "Gitlock indexed #{repo} — #{length(data.hotspots)} hotspots, #{length(data.couplings)} coupling pairs, #{length(data.knowledge_silos)} silos"
+        )
+
         {:reply, :ok, new_state}
 
       {:error, reason} ->
@@ -129,12 +132,14 @@ defmodule GitlockMCP.Cache do
     coupled = Map.get(state.coupling_index, file_path, [])
 
     risk_score = if hotspot, do: hotspot.normalized_score, else: 0
-    risk_level = cond do
-      risk_score > 70 -> "critical"
-      risk_score > 40 -> "high"
-      risk_score > 20 -> "medium"
-      true -> "low"
-    end
+
+    risk_level =
+      cond do
+        risk_score > 70 -> "critical"
+        risk_score > 40 -> "high"
+        risk_score > 20 -> "medium"
+        true -> "low"
+      end
 
     assessment = %{
       file: file_path,
@@ -161,11 +166,12 @@ defmodule GitlockMCP.Cache do
       |> Enum.take(limit)
       |> Enum.map(&format_hotspot/1)
 
-    summary_text = if dir do
-      "#{dir} contains #{length(results)} hotspots"
-    else
-      "Repository has #{length(state.hotspots)} total hotspots, showing top #{length(results)}"
-    end
+    summary_text =
+      if dir do
+        "#{dir} contains #{length(results)} hotspots"
+      else
+        "Repository has #{length(state.hotspots)} total hotspots, showing top #{length(results)}"
+      end
 
     {:reply, {:ok, %{hotspots: results, summary: summary_text}}, state}
   end
@@ -176,7 +182,13 @@ defmodule GitlockMCP.Cache do
     if silo do
       {:reply, {:ok, format_ownership_detail(silo)}, state}
     else
-      {:reply, {:ok, %{file: file_path, status: "no_data", message: "No ownership data — file may have very few commits"}}, state}
+      {:reply,
+       {:ok,
+        %{
+          file: file_path,
+          status: "no_data",
+          message: "No ownership data — file may have very few commits"
+        }}, state}
     end
   end
 
@@ -185,14 +197,17 @@ defmodule GitlockMCP.Cache do
       Map.get(state.coupling_index, file_path, [])
       |> Enum.filter(&(&1.coupling_pct >= min_coupling))
 
-    recommendation = if coupled == [] do
-      "No strong temporal coupling found for #{file_path}"
-    else
-      top = hd(coupled)
-      "#{file_path} is strongly coupled with #{top.file} (#{top.coupling_pct}% co-change rate). If you changed #{Path.basename(file_path)}, verify #{Path.basename(top.file)} still works correctly."
-    end
+    recommendation =
+      if coupled == [] do
+        "No strong temporal coupling found for #{file_path}"
+      else
+        top = hd(coupled)
 
-    {:reply, {:ok, %{file: file_path, coupled_files: coupled, recommendation: recommendation}}, state}
+        "#{file_path} is strongly coupled with #{top.file} (#{top.coupling_pct}% co-change rate). If you changed #{Path.basename(file_path)}, verify #{Path.basename(top.file)} still works correctly."
+      end
+
+    {:reply, {:ok, %{file: file_path, coupled_files: coupled, recommendation: recommendation}},
+     state}
   end
 
   def handle_call({:review_pr, changed_files}, _from, state) do
@@ -277,7 +292,8 @@ defmodule GitlockMCP.Cache do
       knowledge_silos: silo_count,
       high_coupling_pairs: high_coupling,
       riskiest_areas: dir_risks,
-      summary: "Codebase with #{length(state.hotspots)} tracked files, #{length(state.commits)} commits. #{Map.get(hotspot_counts, "high", 0)} critical hotspots, #{silo_count} knowledge silos, #{high_coupling} high-coupling pairs."
+      summary:
+        "Codebase with #{length(state.hotspots)} tracked files, #{length(state.commits)} commits. #{Map.get(hotspot_counts, "high", 0)} critical hotspots, #{silo_count} knowledge silos, #{high_coupling} high-coupling pairs."
     }
 
     {:reply, {:ok, result}, state}
@@ -356,8 +372,12 @@ defmodule GitlockMCP.Cache do
       total_authors: silo.num_authors,
       total_commits: silo.num_commits,
       risk_level: to_string(silo.risk_level),
-      recommendation: "#{silo.main_author} owns #{silo.ownership_ratio}% of this file. " <>
-        if(silo.risk_level == :high, do: "Knowledge silo — ensure this person reviews any changes.", else: "Moderate ownership concentration.")
+      recommendation:
+        "#{silo.main_author} owns #{silo.ownership_ratio}% of this file. " <>
+          if(silo.risk_level == :high,
+            do: "Knowledge silo — ensure this person reviews any changes.",
+            else: "Moderate ownership concentration."
+          )
     }
   end
 
@@ -368,24 +388,30 @@ defmodule GitlockMCP.Cache do
   defp build_recommendation(file_path, hotspot, silo, coupled) do
     parts = []
 
-    parts = if hotspot && hotspot.normalized_score > 70 do
-      ["High-risk file — #{hotspot.revisions} revisions, complexity #{hotspot.complexity}." | parts]
-    else
-      parts
-    end
+    parts =
+      if hotspot && hotspot.normalized_score > 70 do
+        [
+          "High-risk file — #{hotspot.revisions} revisions, complexity #{hotspot.complexity}."
+          | parts
+        ]
+      else
+        parts
+      end
 
-    parts = if silo && silo.risk_level in [:high, :medium] do
-      ["#{silo.main_author} owns #{silo.ownership_ratio}% — consider them as reviewer." | parts]
-    else
-      parts
-    end
+    parts =
+      if silo && silo.risk_level in [:high, :medium] do
+        ["#{silo.main_author} owns #{silo.ownership_ratio}% — consider them as reviewer." | parts]
+      else
+        parts
+      end
 
-    parts = if length(coupled) > 0 do
-      top = hd(coupled)
-      ["Temporally coupled with #{top.file} (#{top.coupling_pct}% co-change rate)." | parts]
-    else
-      parts
-    end
+    parts =
+      if length(coupled) > 0 do
+        top = hd(coupled)
+        ["Temporally coupled with #{top.file} (#{top.coupling_pct}% co-change rate)." | parts]
+      else
+        parts
+      end
 
     case parts do
       [] -> "#{Path.basename(file_path)} appears stable and well-distributed."
@@ -397,24 +423,27 @@ defmodule GitlockMCP.Cache do
     high_risk = Enum.count(assessments, &(&1.risk_score > 70))
     parts = []
 
-    parts = if high_risk > 0 do
-      ["This PR touches #{high_risk} high-risk file(s)." | parts]
-    else
-      parts
-    end
+    parts =
+      if high_risk > 0 do
+        ["This PR touches #{high_risk} high-risk file(s)." | parts]
+      else
+        parts
+      end
 
-    parts = if length(missing_coupled) > 0 do
-      files = Enum.map_join(missing_coupled, ", ", & &1.file)
-      ["Potentially missing coupled files: #{files}." | parts]
-    else
-      parts
-    end
+    parts =
+      if length(missing_coupled) > 0 do
+        files = Enum.map_join(missing_coupled, ", ", & &1.file)
+        ["Potentially missing coupled files: #{files}." | parts]
+      else
+        parts
+      end
 
-    parts = if length(reviewers) > 0 do
-      ["Suggested reviewers: #{Enum.join(reviewers, ", ")}." | parts]
-    else
-      parts
-    end
+    parts =
+      if length(reviewers) > 0 do
+        ["Suggested reviewers: #{Enum.join(reviewers, ", ")}." | parts]
+      else
+        parts
+      end
 
     case parts do
       [] -> "Low-risk PR. No concerns detected."

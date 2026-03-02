@@ -40,7 +40,6 @@ defmodule GitlockMCP.Indexer do
 
     with {:ok, workspace} <- resolve_workspace(repo_path),
          {:ok, commits} <- load_commits(workspace.path) do
-
       path = workspace.path
       Logger.info("Loaded #{length(commits)} commits from #{path}")
 
@@ -55,22 +54,24 @@ defmodule GitlockMCP.Indexer do
       }
 
       # Await all with generous timeout
-      results = Map.new(tasks, fn {key, task} ->
-        {key, Task.await(task, 120_000)}
-      end)
+      results =
+        Map.new(tasks, fn {key, task} ->
+          {key, Task.await(task, 120_000)}
+        end)
 
       elapsed = System.monotonic_time(:millisecond) - start
       Logger.info("Indexing complete in #{elapsed}ms")
 
-      {:ok, %{
-        commits: commits,
-        hotspots: results.hotspots,
-        couplings: results.couplings,
-        knowledge_silos: results.silos,
-        complexity_map: results.complexity,
-        code_age: results.code_age,
-        summary: results.summary
-      }}
+      {:ok,
+       %{
+         commits: commits,
+         hotspots: results.hotspots,
+         couplings: results.couplings,
+         knowledge_silos: results.silos,
+         complexity_map: results.complexity,
+         code_age: results.code_age,
+         summary: results.summary
+       }}
     end
   end
 

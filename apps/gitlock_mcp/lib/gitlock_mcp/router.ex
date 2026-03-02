@@ -7,11 +7,13 @@ defmodule GitlockMCP.Router do
   """
   use Plug.Router
 
-  plug :match
-  plug :dispatch
+  plug(:match)
+  plug(:dispatch)
 
-  forward "/mcp", to: Hermes.Server.Transport.StreamableHTTP.Plug,
+  forward("/mcp",
+    to: Hermes.Server.Transport.StreamableHTTP.Plug,
     init_opts: [server: GitlockMCP.Server]
+  )
 
   get "/health" do
     send_resp(conn, 200, Jason.encode!(%{status: "ok", server: "gitlock-mcp"}))
