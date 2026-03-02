@@ -50,8 +50,7 @@ defmodule GitlockWorkflows.NodeCatalog do
       description: "Fetches commit history from a git repository",
       input_ports: [],
       output_ports: [
-        %{name: "commits", data_type: :commits},
-        %{name: "repo_path", data_type: :string}
+        %{name: "commits", data_type: :commits}
       ],
       runtime_module: Nodes.Triggers.GitCommits,
       config_schema: [
@@ -191,7 +190,7 @@ defmodule GitlockWorkflows.NodeCatalog do
       category: :analyze,
       label: "Complexity Analysis",
       description: "Analyzes cyclomatic complexity of source files via git",
-      input_ports: [%{name: "repo_path", data_type: :string}],
+      input_ports: [%{name: "commits", data_type: :commits}],
       output_ports: [%{name: "complexity_map", data_type: :map}],
       runtime_module: Nodes.Analysis.Complexity,
       config_schema: []

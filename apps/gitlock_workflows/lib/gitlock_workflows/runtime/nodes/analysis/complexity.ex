@@ -44,10 +44,11 @@ defmodule GitlockWorkflows.Runtime.Nodes.Analysis.Complexity do
 
   @impl true
   def execute(input_data, _parameters, context) do
-    repo_path = input_data[:repo_path]
+    # Prefer input port, fall back to execution context
+    repo_path = input_data[:repo_path] || context[:repo_path]
 
     if is_nil(repo_path) or repo_path == "" do
-      {:error, "repo_path input is required — connect to a Git Commits node"}
+      {:error, "repo_path is required — configure a repository URL on the Git Log node"}
     else
       analyze_from_git(repo_path, context)
     end

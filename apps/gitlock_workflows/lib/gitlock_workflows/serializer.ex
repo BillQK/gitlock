@@ -68,7 +68,8 @@ defmodule GitlockWorkflows.Serializer do
   end
 
   defp port_to_map(%Port{} = port) do
-    %{id: port.id, name: port.name, data_type: port.data_type}
+    map = %{id: port.id, name: port.name, data_type: port.data_type}
+    if port.optional, do: Map.put(map, :optional, true), else: map
   end
 
   defp category_label(:source), do: "Sources"

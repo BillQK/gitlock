@@ -15,13 +15,11 @@ defmodule GitlockWorkflows.PipelineTest do
       assert node.type == :git_log
       assert node.label == "Git Log"
       assert node.input_ports == []
-      assert length(node.output_ports) == 2
+      assert length(node.output_ports) == 1
 
-      commits_port = find_port(node.output_ports, "commits")
-      assert commits_port.data_type == :commits
-
-      repo_path_port = find_port(node.output_ports, "repo_path")
-      assert repo_path_port.data_type == :string
+      [port] = node.output_ports
+      assert port.data_type == :commits
+      assert port.name == "commits"
     end
 
     test "creates an analysis node with input and output ports" do

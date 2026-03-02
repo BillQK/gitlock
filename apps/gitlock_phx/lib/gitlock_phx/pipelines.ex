@@ -139,22 +139,32 @@ defmodule GitlockPhx.Pipelines do
   @doc "Seeds built-in pipeline templates. Idempotent."
   def seed_templates! do
     for template_info <- Templates.list() do
-      unless Repo.exists?(
-               from p in SavedPipeline,
-                 where: p.name == ^template_info.name and p.is_template == true
-             ) do
-        pipeline = Templates.build(template_info.id)
-        now = DateTime.utc_now() |> DateTime.truncate(:second)
+      pipeline = Templates.build(template_info.id)
+      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      config = Serializer.to_map(pipeline)
 
-        Repo.insert!(%SavedPipeline{
-          name: template_info.name,
-          description: template_info.description,
-          config: Serializer.to_map(pipeline),
-          is_template: true,
-          user_id: nil,
-          inserted_at: now,
-          updated_at: now
-        })
+      case Repo.one(
+             from p in SavedPipeline,
+               where: p.name == ^template_info.name and p.is_template == true
+           ) do
+        nil ->
+          Repo.insert!(%SavedPipeline{
+            name: template_info.name,
+            description: template_info.description,
+            config: config,
+            is_template: true,
+            user_id: nil,
+            inserted_at: now,
+            updated_at: now
+          })
+
+        existing ->
+          existing
+          |> SavedPipeline.changeset(%{
+            description: template_info.description,
+            config: config
+          })
+          |> Repo.update!()
       end
     end
   end
@@ -203,8 +213,8 @@ defmodule GitlockPhx.Pipelines do
           label: data["label"] || type_def.label,
           config: data["config"] || %{},
           position: {x, y},
-          input_ports: hydrate_ports(data["input_ports"]),
-          output_ports: hydrate_ports(data["output_ports"])
+          input_ports: rebuild_ports(data["input_ports"], type_def.input_ports),
+          output_ports: rebuild_ports(data["output_ports"], type_def.output_ports)
         }
 
       {:error, _} ->
@@ -214,14 +224,26 @@ defmodule GitlockPhx.Pipelines do
     _ -> nil
   end
 
-  defp hydrate_ports(nil), do: []
+  # Rebuild ports from the catalog definition (source of truth),
+  # preserving stored port IDs where names match so edges stay valid.
+  defp rebuild_ports(stored_ports, catalog_ports) do
+    stored_by_name =
+      (stored_ports || [])
+      |> Map.new(fn p -> {p["name"], p["id"]} end)
 
-  defp hydrate_ports(ports) do
-    Enum.map(ports, fn p ->
+    Enum.map(catalog_ports, fn catalog_port ->
+      optional = Map.get(catalog_port, :optional, false)
+
+      # Reuse stored ID if this port existed before, otherwise generate new
+      id =
+        Map.get(stored_by_name, catalog_port.name) ||
+          :crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)
+
       %Port{
-        id: p["id"],
-        name: p["name"],
-        data_type: String.to_existing_atom(to_string(p["data_type"]))
+        id: id,
+        name: catalog_port.name,
+        data_type: catalog_port.data_type,
+        optional: optional
       }
     end)
   end

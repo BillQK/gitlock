@@ -381,10 +381,21 @@ defmodule GitlockPhxWeb.WorkflowLive do
       match?({:error, _}, Pipeline.validate(pipeline)) ->
         validation = Pipeline.validate(pipeline)
 
+        error_details =
+          case validation do
+            {:error, errors} ->
+              errors
+              |> Enum.map(fn {_key, msg} -> msg end)
+              |> Enum.join("; ")
+
+            _ ->
+              "Unknown validation error"
+          end
+
         {:noreply,
          socket
          |> assign(validation: validation)
-         |> put_flash(:error, "Fix validation errors before executing")}
+         |> put_flash(:error, "Validation failed: #{error_details}")}
 
       true ->
         user = current_user(socket)
