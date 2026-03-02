@@ -26,10 +26,21 @@ defmodule GitlockCore.Domain.Values.Hotspot do
           complexity: non_neg_integer(),
           loc: non_neg_integer(),
           risk_factor: risk_factor(),
-          risk_score: float()
+          risk_score: float(),
+          normalized_score: float(),
+          percentile: float()
         }
 
-  defstruct [:entity, :revisions, :complexity, :loc, :risk_factor, :risk_score]
+  defstruct [
+    :entity,
+    :revisions,
+    :complexity,
+    :loc,
+    :risk_factor,
+    :risk_score,
+    normalized_score: 0.0,
+    percentile: 0.0
+  ]
 
   @doc """
   Creates a new hotspot value object.
@@ -45,14 +56,16 @@ defmodule GitlockCore.Domain.Values.Hotspot do
   ## Returns
     A new immutable Hotspot struct
   """
-  def new(entity, revisions, complexity, loc, risk_factor, risk_score) do
+  def new(entity, revisions, complexity, loc, risk_factor, risk_score, opts \\ []) do
     %__MODULE__{
       entity: entity,
       revisions: revisions,
       complexity: complexity,
       loc: loc,
       risk_factor: risk_factor,
-      risk_score: risk_score
+      risk_score: risk_score,
+      normalized_score: Keyword.get(opts, :normalized_score, 0.0),
+      percentile: Keyword.get(opts, :percentile, 0.0)
     }
   end
 
@@ -90,6 +103,8 @@ defmodule GitlockCore.Domain.Values.Hotspot do
       end
 
     "#{Path.basename(hotspot.entity)}: #{hotspot.revisions} revisions, " <>
-      "complexity: #{hotspot.complexity}, risk score: #{Float.round(hotspot.risk_score, 2)} (#{risk_text})"
+      "complexity: #{hotspot.complexity}, " <>
+      "score: #{Float.round(hotspot.normalized_score, 1)}/100 " <>
+      "(top #{Float.round(100.0 - hotspot.percentile, 1)}%) (#{risk_text})"
   end
 end

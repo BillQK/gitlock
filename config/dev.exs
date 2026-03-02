@@ -25,7 +25,7 @@ config :gitlock_phx, GitlockPhxWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "K966iHPm7n+pF66q4rDM/m6R284ZJ3k3WxX5lHqOjk45AGU23pwvMkZvgC1w6UL4",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:gitlock_phx, ~w(--sourcemap=inline --watch)]},
+    node: ["build.mjs", "--watch", cd: Path.expand("../apps/gitlock_phx/assets", __DIR__)],
     tailwind: {Tailwind, :install_and_run, [:gitlock_phx, ~w(--watch)]}
   ]
 
@@ -59,7 +59,8 @@ config :gitlock_phx, GitlockPhxWeb.Endpoint,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/gitlock_phx_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
+      ~r"lib/gitlock_phx_web/(?:controllers|live|components|router)/?.*\.(ex|heex)$",
+      ~r"assets/svelte/.*\.svelte$"
     ]
   ]
 

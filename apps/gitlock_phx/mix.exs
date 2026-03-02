@@ -40,6 +40,7 @@ defmodule GitlockPhx.MixProject do
       {:tidewave, "~> 0.1", only: :dev},
       {:bcrypt_elixir, "~> 3.0"},
       {:gitlock_core, in_umbrella: true},
+      {:gitlock_workflows, in_umbrella: true},
       {:phoenix, "~> 1.8.0-rc.3", override: true},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
@@ -81,11 +82,11 @@ defmodule GitlockPhx.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind gitlock_phx", "esbuild gitlock_phx"],
+      "assets.setup": ["tailwind.install --if-missing", "cmd --cd assets npm install"],
+      "assets.build": ["tailwind gitlock_phx", "cmd --cd assets node build.mjs"],
       "assets.deploy": [
         "tailwind gitlock_phx --minify",
-        "esbuild gitlock_phx --minify",
+        "cmd --cd assets node build.mjs --deploy",
         "phx.digest"
       ]
     ]

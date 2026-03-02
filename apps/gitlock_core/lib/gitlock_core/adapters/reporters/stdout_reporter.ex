@@ -282,10 +282,14 @@ defmodule GitlockCore.Adapters.Reporters.StdoutReporter do
         _ -> "⚪ Unknown Risk"
       end
 
+    normalized = get_field(hotspot, :normalized_score, 0.0)
+    percentile = get_field(hotspot, :percentile, 0.0)
+    top_pct = Float.round(100.0 - percentile, 1)
+
     """
     #{risk_emoji}: #{get_field(hotspot, :entity)}
+    • Score: #{format_float(normalized)}/100 (top #{format_float(top_pct)}% riskiest)
     • #{get_field(hotspot, :revisions)} changes, complexity: #{get_field(hotspot, :complexity)}, #{format_number(get_field(hotspot, :loc))} lines
-    • Risk score: #{format_float(get_field(hotspot, :risk_score))}
     """
     |> String.trim()
   end

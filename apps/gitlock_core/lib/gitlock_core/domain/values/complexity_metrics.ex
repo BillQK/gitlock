@@ -6,7 +6,7 @@ defmodule GitlockCore.Domain.Values.ComplexityMetrics do
   measurements for a specific file.
   """
 
-  @type language :: :elixir | :javascript | :ruby | :python | :java | :unknown
+  @type language :: :elixir | :javascript | :typescript | :ruby | :python | :java | :unknown
 
   @type t :: %__MODULE__{
           file_path: String.t(),

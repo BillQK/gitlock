@@ -31,4 +31,37 @@ defmodule GitlockCore.Ports.VersionControlPort do
     * `{:error, reason}` on failure  
   """
   @callback get_commit_history(repo_path(), options()) :: success() | error()
+
+  @doc """
+  Retrieve the contents of a file at a specific commit.
+
+  ## Parameters
+
+    * `repo_path` — path to the repository
+    * `commit_id` — the commit SHA
+    * `file_path` — path to the file relative to repo root
+
+  ## Returns
+
+    * `{:ok, content}` on success
+    * `{:error, reason}` if the file doesn't exist at that commit
+  """
+  @callback get_file_at_commit(repo_path(), String.t(), String.t()) ::
+              {:ok, String.t()} | {:error, term()}
+
+  @doc """
+  List files that exist at a specific commit.
+
+  ## Parameters
+
+    * `repo_path` — path to the repository
+    * `commit_id` — the commit SHA
+
+  ## Returns
+
+    * `{:ok, [file_path]}` on success
+    * `{:error, reason}` on failure
+  """
+  @callback list_files_at_commit(repo_path(), String.t()) ::
+              {:ok, [String.t()]} | {:error, term()}
 end

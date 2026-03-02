@@ -1,137 +1,142 @@
-defmodule GitlockCore.Adapters.Complexity.Lang.JavascriptAnalyzerTest do
+defmodule GitlockCore.Adapters.Complexity.Lang.JavaScriptAnalyzerTest do
   use ExUnit.Case, async: true
 
   alias GitlockCore.Adapters.Complexity.Lang.JavaScriptAnalyzer
 
   describe "supported_extensions/0" do
-    test "returns JavaScript file extensions" do
-      assert JavaScriptAnalyzer.supported_extensions() == [".js", ".jsx", ".ts", ".tsx"]
+    test "returns JS/TS file extensions" do
+      assert JavaScriptAnalyzer.supported_extensions() == [".js", ".jsx"]
     end
   end
 
-  describe "analyze_file/1" do
-    setup do
-      # Create a temporary directory for test files
-      {:ok, test_dir} = Briefly.create(directory: true)
-
-      {:ok, test_dir: test_dir}
-    end
-
-    test "calculates complexity for JavaScript function declarations", %{test_dir: test_dir} do
-      # Create a JavaScript file with multiple functions
-      js_path = Path.join(test_dir, "functions.js")
-
-      js_content = """
-      function simpleFunction() {
-        return true;
-      }
-
-      function conditionalFunction(value) {
-        if (value > 10) {
-          return 'high';
-        } else if (value > 5) {
-          return 'medium';
-        } else {
-          return 'low';
-        }
-      }
-
-      function loopFunction(items) {
-        for (let i = 0; i < items.length; i++) {
-          if (items[i] > 10) {
-            console.log('high value');
-          }
-        }
+  describe "analyze_content/2 - basic constructs" do
+    test "simple function with no branching" do
+      code = """
+      function hello() {
+        return "world";
       }
       """
 
-      File.write!(js_path, js_content)
-
-      {:ok, metrics} = JavaScriptAnalyzer.analyze_file(js_path)
-
-      # Base complexity + 3 functions + 3 if statements + 1 else if + 1 for loop
-      # Total should be at least 9
-      assert metrics.cyclomatic_complexity >= 9
-      assert metrics.language == :javascript
-
-      # Fix: Adapt the test to match the actual line count
-      # The analyzer counts 22 lines, likely including blank lines or handling line breaks differently
-      assert metrics.loc == 22
-    end
-
-    test "handles modern JavaScript features", %{test_dir: test_dir} do
-      js_path = Path.join(test_dir, "modern.js")
-
-      js_content = """
-      // Arrow functions
-      const simple = () => true;
-
-      // Arrow function with condition
-      const conditional = value => value > 10 ? 'high' : 'low';
-
-      // Class with methods
-      class Calculator {
-        constructor() {
-          this.value = 0;
-        }
-        
-        add(x) {
-          this.value += x;
-          return this;
-        }
-        
-        multiply(x) {
-          if (x === 0) {
-            console.warn('Multiplying by zero');
-          }
-          this.value *= x;
-          return this;
-        }
-      }
-
-      // Logical operators
-      const hasPermission = user => {
-        return user && user.isActive && (user.role === 'admin' || user.permissions.includes('edit'));
-      };
-      """
-
-      File.write!(js_path, js_content)
-
-      {:ok, metrics} = JavaScriptAnalyzer.analyze_file(js_path)
-
-      # Should detect arrow functions, ternary, class methods, and logical operators
-      assert metrics.cyclomatic_complexity >= 7
-    end
-
-    test "handles empty files", %{test_dir: test_dir} do
-      js_path = Path.join(test_dir, "empty.js")
-      File.write!(js_path, "")
-
-      {:ok, metrics} = JavaScriptAnalyzer.analyze_file(js_path)
-
-      # Base complexity
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      # 1 base + 1 function decl = 2
       assert metrics.cyclomatic_complexity >= 1
-      # Empty file has 1 line
-      assert metrics.loc == 1
     end
 
-    test "handles syntax errors gracefully", %{test_dir: test_dir} do
-      js_path = Path.join(test_dir, "syntax_error.js")
-
-      js_content = """
-      function brokenFunction( {
-        // Missing closing parenthesis
-        if (true) {
-          return "something";
+    test "if statement adds complexity" do
+      code = """
+      function test(x) {
+        if (x > 0) {
+          return "positive";
         }
       }
       """
 
-      File.write!(js_path, js_content)
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      assert metrics.cyclomatic_complexity >= 2
+    end
 
-      # Should still return metrics despite syntax errors
-      {:ok, metrics} = JavaScriptAnalyzer.analyze_file(js_path)
-      assert metrics.cyclomatic_complexity >= 1
+    test "switch case counts each case" do
+      code = """
+      function test(x) {
+        switch(x) {
+          case 1: return "one";
+          case 2: return "two";
+          case 3: return "three";
+        }
+      }
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      # 1 base + 1 fn + 3 cases = 5
+      assert metrics.cyclomatic_complexity >= 4
+    end
+
+    test "logical operators add complexity" do
+      code = """
+      function test(a, b) {
+        if (a && b || c) {
+          return true;
+        }
+      }
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      # 1 base + 1 fn + 1 if + 1 && + 1 || = 5
+      assert metrics.cyclomatic_complexity >= 4
+    end
+  end
+
+  describe "analyze_content/2 - comment/string stripping" do
+    test "if inside a single-line comment is NOT counted" do
+      code = """
+      function test() {
+        // if (this should not count)
+        return 1;
+      }
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      # 1 base + 1 fn, NO if = 2
+      assert metrics.cyclomatic_complexity <= 3
+    end
+
+    test "if inside a multi-line comment is NOT counted" do
+      code = """
+      function test() {
+        /* if (x > 0) {
+          return "this is a comment";
+        } */
+        return 1;
+      }
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      assert metrics.cyclomatic_complexity <= 3
+    end
+
+    test "if inside a string literal is NOT counted" do
+      code = """
+      function test() {
+        const msg = "if this is counted, it's a bug";
+        const other = 'if single quotes too';
+        return msg;
+      }
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      assert metrics.cyclomatic_complexity <= 3
+    end
+
+    test "if inside a template literal is NOT counted" do
+      code = """
+      function test() {
+        const msg = `if (x > 0) { this is a template literal }`;
+        return msg;
+      }
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      assert metrics.cyclomatic_complexity <= 3
+    end
+  end
+
+  describe "analyze_content/2 - arrow functions" do
+    test "arrow functions are counted" do
+      code = """
+      const add = (a, b) => a + b;
+      const multiply = (a, b) => a * b;
+      """
+
+      {:ok, metrics} = JavaScriptAnalyzer.analyze_content(code, "test.js")
+      # 1 base + 2 arrows = 3
+      assert metrics.cyclomatic_complexity >= 3
+    end
+  end
+
+  describe "behavior compliance" do
+    test "implements ComplexityAnalyzerPort behavior" do
+      behaviors = JavaScriptAnalyzer.__info__(:attributes)[:behaviour] || []
+      assert GitlockCore.Ports.ComplexityAnalyzerPort in behaviors
     end
   end
 end

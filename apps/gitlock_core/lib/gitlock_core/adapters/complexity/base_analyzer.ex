@@ -165,8 +165,28 @@ defmodule GitlockCore.Adapters.Complexity.BaseAnalyzer do
                 non_neg_integer()
       end
 
+      @doc """
+      Analyzes complexity from a content string without reading from disk.
+
+      Used for historical analysis where file content comes from git.
+      """
+      @impl true
+      @spec analyze_content(String.t(), String.t()) :: {:ok, ComplexityMetrics.t()}
+      def analyze_content(content, file_path) do
+        metrics =
+          ComplexityMetrics.new(
+            file_path,
+            count_lines(content),
+            calculate_complexity(content, file_path),
+            detect_language(file_path)
+          )
+
+        {:ok, metrics}
+      end
+
       defoverridable analyze_file: 1
       defoverridable analyze_directory: 2
+      defoverridable analyze_content: 2
     end
   end
 end

@@ -109,7 +109,19 @@ defmodule GitlockCLI.ArgumentParser do
   defp build_parsed_args(parsed_options, remaining_args) do
     case extract_investigation_info(parsed_options, remaining_args) do
       {:ok, investigation_type, args_without_investigation} ->
-        {repo_source, source_type} = RepositorySource.determine(parsed_options)
+        # Explicit --repo/--url/--log takes priority over positional args
+        {repo_source, source_type} =
+          if has_explicit_repo?(parsed_options) do
+            RepositorySource.determine(parsed_options)
+          else
+            case args_without_investigation do
+              [path | _] when byte_size(path) > 0 ->
+                {path, RepositorySource.determine_source_type(path)}
+
+              _ ->
+                RepositorySource.determine(parsed_options)
+            end
+          end
 
         processed_options =
           OptionProcessor.prepare_options(parsed_options, args_without_investigation)
@@ -125,6 +137,10 @@ defmodule GitlockCLI.ArgumentParser do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  defp has_explicit_repo?(opts) do
+    opts[:repo] != nil || opts[:url] != nil || opts[:log] != nil
   end
 
   # Extracts investigation type from arguments (supports both new and legacy styles)

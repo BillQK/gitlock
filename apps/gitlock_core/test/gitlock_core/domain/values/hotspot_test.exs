@@ -70,7 +70,9 @@ defmodule GitlockCore.Domain.Values.HotspotTest do
         revisions: 10,
         complexity: 15,
         risk_factor: :high,
-        risk_score: 7.8
+        risk_score: 7.8,
+        normalized_score: 85.3,
+        percentile: 95.0
       }
 
       result = Hotspot.to_string(hotspot)
@@ -79,7 +81,8 @@ defmodule GitlockCore.Domain.Values.HotspotTest do
       assert String.contains?(result, "file.ex")
       assert String.contains?(result, "10 revisions")
       assert String.contains?(result, "complexity: 15")
-      assert String.contains?(result, "7.8")
+      assert String.contains?(result, "85.3/100")
+      assert String.contains?(result, "top 5.0%")
       assert String.contains?(result, "HIGH RISK")
     end
   end

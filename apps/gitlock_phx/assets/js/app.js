@@ -25,7 +25,24 @@ import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import "./theme.js";
 
-let Hooks = {};
+import WorkflowHook from "./hooks/workflow_hook";
+
+let Hooks = {
+  WorkflowCanvas: WorkflowHook,
+  ContentEditable: {
+    mounted() {
+      this.el.addEventListener("blur", () => {
+        this.pushEvent("rename", { value: this.el.innerText });
+      });
+      this.el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          this.el.blur();
+        }
+      });
+    },
+  },
+};
 
 const csrfToken = document
   .querySelector("meta[name='csrf-token']")

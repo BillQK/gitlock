@@ -24,6 +24,20 @@ defmodule GitlockPhxWeb.Router do
     get "/app", PageController, :home
   end
 
+  scope "/", GitlockPhxWeb do
+    pipe_through [:browser]
+
+    live_session :app,
+      on_mount: [{GitlockPhxWeb.UserAuth, :mount_current_scope}] do
+      live "/analyze", AnalyzeLive
+      live "/workflows", WorkflowLive
+      live "/workflows/:id", WorkflowLive
+      live "/pipelines", PipelinesLive
+      live "/runs", RunsLive
+      live "/runs/:id", RunDetailLive
+    end
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", GitlockPhxWeb do
   #   pipe_through :api

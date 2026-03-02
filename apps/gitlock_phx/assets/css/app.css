@@ -1,9 +1,13 @@
 /* See the Tailwind configuration guide for advanced usage
    https://tailwindcss.com/docs/configuration */
 @import "./landing.css";
+@import "./workflow.css";
+@import "./analyze.css";
+@import "./runs.css";
 @import "tailwindcss" source(none);
 @source "../css";
 @source "../js";
+@source "../svelte";
 @source "../../lib/gitlock_phx_web";
 
 /* A Tailwind plugin that makes "hero-#{ICON}" classes available.
