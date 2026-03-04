@@ -85,7 +85,5 @@ defmodule GitlockMCP.IndexerTest do
         assert String.contains?(path, "/") or String.ends_with?(path, ".ex")
       end
     end
-
-
   end
 end

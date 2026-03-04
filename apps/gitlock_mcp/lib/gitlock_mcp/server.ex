@@ -101,7 +101,9 @@ defmodule GitlockMCP.Server do
 
   def handle_tool_call("gitlock_find_coupling", params, frame) do
     file_path = params[:file_path] || params["file_path"]
-    min_coupling = to_integer(Map.get(params, :min_coupling) || Map.get(params, "min_coupling"), 30)
+
+    min_coupling =
+      to_integer(Map.get(params, :min_coupling) || Map.get(params, "min_coupling"), 30)
 
     case GitlockMCP.Cache.find_coupling(file_path, min_coupling) do
       {:ok, result} -> {:reply, text_response(format_coupling(result)), frame}
@@ -242,12 +244,14 @@ defmodule GitlockMCP.Server do
 
   defp to_integer(nil, default), do: default
   defp to_integer(val, _default) when is_integer(val), do: val
+
   defp to_integer(val, default) when is_binary(val) do
     case Integer.parse(val) do
       {n, _} -> n
       :error -> default
     end
   end
+
   defp to_integer(_, default), do: default
 
   defp text_response(text) do

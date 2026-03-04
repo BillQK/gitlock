@@ -153,8 +153,12 @@ defmodule GitlockMCP.Indexer do
               File.mkdir_p!(Path.dirname(tmp_path))
 
               case read_file_from_git(repo_path, file_path) do
-                {:ok, content} -> File.write!(tmp_path, content); file_path
-                _ -> nil
+                {:ok, content} ->
+                  File.write!(tmp_path, content)
+                  file_path
+
+                _ ->
+                  nil
               end
             end,
             max_concurrency: System.schedulers_online() * 2,
