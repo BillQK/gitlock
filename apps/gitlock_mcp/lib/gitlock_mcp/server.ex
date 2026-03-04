@@ -10,6 +10,7 @@ defmodule GitlockMCP.Server do
     version: "0.1.0",
     capabilities: [:tools]
 
+  alias Hermes.Server.Response
   require Logger
 
   @impl true
@@ -74,51 +75,54 @@ defmodule GitlockMCP.Server do
   @impl true
   def handle_tool_call("gitlock_assess_file", %{file_path: file_path}, frame) do
     case GitlockMCP.Cache.assess_file(file_path) do
-      {:ok, result} -> {:reply, format_assess_file(result), frame}
-      {:error, reason} -> {:error, inspect(reason), frame}
+      {:ok, result} -> {:reply, text_response(format_assess_file(result)), frame}
+      {:error, reason} -> {:reply, error_response(inspect(reason)), frame}
     end
   end
 
   def handle_tool_call("gitlock_hotspots", params, frame) do
     opts = %{
-      directory: Map.get(params, :directory),
-      limit: Map.get(params, :limit, 10)
+      directory: Map.get(params, :directory) || Map.get(params, "directory"),
+      limit: to_integer(Map.get(params, :limit) || Map.get(params, "limit"), 10)
     }
 
     case GitlockMCP.Cache.hotspots(opts) do
-      {:ok, result} -> {:reply, format_hotspots(result), frame}
-      {:error, reason} -> {:error, inspect(reason), frame}
+      {:ok, result} -> {:reply, text_response(format_hotspots(result)), frame}
+      {:error, reason} -> {:reply, error_response(inspect(reason)), frame}
     end
   end
 
   def handle_tool_call("gitlock_file_ownership", %{file_path: file_path}, frame) do
     case GitlockMCP.Cache.file_ownership(file_path) do
-      {:ok, result} -> {:reply, format_ownership(result), frame}
-      {:error, reason} -> {:error, inspect(reason), frame}
+      {:ok, result} -> {:reply, text_response(format_ownership(result)), frame}
+      {:error, reason} -> {:reply, error_response(inspect(reason)), frame}
     end
   end
 
   def handle_tool_call("gitlock_find_coupling", params, frame) do
-    file_path = params.file_path
-    min_coupling = Map.get(params, :min_coupling, 30)
+    file_path = params[:file_path] || params["file_path"]
+    min_coupling = to_integer(Map.get(params, :min_coupling) || Map.get(params, "min_coupling"), 30)
 
     case GitlockMCP.Cache.find_coupling(file_path, min_coupling) do
-      {:ok, result} -> {:reply, format_coupling(result), frame}
-      {:error, reason} -> {:error, inspect(reason), frame}
+      {:ok, result} -> {:reply, text_response(format_coupling(result)), frame}
+      {:error, reason} -> {:reply, error_response(inspect(reason)), frame}
     end
   end
 
-  def handle_tool_call("gitlock_review_pr", %{changed_files: files}, frame) do
+  def handle_tool_call("gitlock_review_pr", params, frame) do
+    files = params[:changed_files] || params["changed_files"]
+    files = if is_binary(files), do: Jason.decode!(files), else: files
+
     case GitlockMCP.Cache.review_pr(files) do
-      {:ok, result} -> {:reply, format_review(result), frame}
-      {:error, reason} -> {:error, inspect(reason), frame}
+      {:ok, result} -> {:reply, text_response(format_review(result)), frame}
+      {:error, reason} -> {:reply, error_response(inspect(reason)), frame}
     end
   end
 
   def handle_tool_call("gitlock_repo_summary", _params, frame) do
     case GitlockMCP.Cache.repo_summary() do
-      {:ok, result} -> {:reply, format_summary(result), frame}
-      {:error, reason} -> {:error, inspect(reason), frame}
+      {:ok, result} -> {:reply, text_response(format_summary(result)), frame}
+      {:error, reason} -> {:reply, error_response(inspect(reason)), frame}
     end
   end
 
@@ -234,6 +238,24 @@ defmodule GitlockMCP.Server do
     #{r.summary}
     """
     |> String.trim()
+  end
+
+  defp to_integer(nil, default), do: default
+  defp to_integer(val, _default) when is_integer(val), do: val
+  defp to_integer(val, default) when is_binary(val) do
+    case Integer.parse(val) do
+      {n, _} -> n
+      :error -> default
+    end
+  end
+  defp to_integer(_, default), do: default
+
+  defp text_response(text) do
+    Response.tool() |> Response.text(text)
+  end
+
+  defp error_response(message) do
+    Response.tool() |> Response.error(message)
   end
 
   defp format_hotspot_counts(counts) do

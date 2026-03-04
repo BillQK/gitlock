@@ -138,32 +138,61 @@ defmodule GitlockMCP.Indexer do
 
     case list_tracked_files(repo_path) do
       {:ok, files} ->
-        files
-        |> Enum.filter(fn path -> Path.extname(path) in supported_ext end)
-        |> Task.async_stream(
-          fn file_path ->
-            case read_file_from_git(repo_path, file_path) do
-              {:ok, content} ->
-                case DispatchAnalyzer.analyze_content(content, file_path) do
-                  {:ok, metrics} -> {file_path, metrics}
-                  _ -> nil
-                end
+        source_files = Enum.filter(files, fn path -> Path.extname(path) in supported_ext end)
 
-              _ ->
-                nil
-            end
-          end,
-          max_concurrency: System.schedulers_online() * 2,
-          on_timeout: :kill_task
-        )
-        |> Enum.reduce(%{}, fn
-          {:ok, {path, metrics}}, acc -> Map.put(acc, path, metrics)
-          _, acc -> acc
-        end)
+        # Write files to a temp dir so DispatchAnalyzer.analyze_file/1 can read them
+        tmp_dir = Path.join(System.tmp_dir!(), "gitlock_complexity_#{:rand.uniform(100_000)}")
+        File.mkdir_p!(tmp_dir)
+
+        try do
+          # Extract files from git into temp dir
+          source_files
+          |> Task.async_stream(
+            fn file_path ->
+              tmp_path = Path.join(tmp_dir, file_path)
+              File.mkdir_p!(Path.dirname(tmp_path))
+
+              case read_file_from_git(repo_path, file_path) do
+                {:ok, content} -> File.write!(tmp_path, content); file_path
+                _ -> nil
+              end
+            end,
+            max_concurrency: System.schedulers_online() * 2,
+            on_timeout: :kill_task
+          )
+          |> Enum.reduce([], fn
+            {:ok, nil}, acc -> acc
+            {:ok, path}, acc -> [path | acc]
+            _, acc -> acc
+          end)
+
+          # Now analyze from the temp dir
+          source_files
+          |> Task.async_stream(
+            fn file_path ->
+              tmp_path = Path.join(tmp_dir, file_path)
+
+              case DispatchAnalyzer.analyze_file(tmp_path) do
+                {:ok, metrics} -> {file_path, metrics}
+                _ -> nil
+              end
+            end,
+            max_concurrency: System.schedulers_online() * 2,
+            on_timeout: :kill_task
+          )
+          |> Enum.reduce(%{}, fn
+            {:ok, {path, metrics}}, acc -> Map.put(acc, path, metrics)
+            _, acc -> acc
+          end)
+        after
+          File.rm_rf(tmp_dir)
+        end
 
       {:error, _} ->
         %{}
     end
+  rescue
+    _ -> %{}
   end
 
   defp list_tracked_files(repo_path) do

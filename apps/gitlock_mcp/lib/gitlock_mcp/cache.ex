@@ -131,7 +131,7 @@ defmodule GitlockMCP.Cache do
     silo = Map.get(state.silo_index, file_path)
     coupled = Map.get(state.coupling_index, file_path, [])
 
-    risk_score = if hotspot, do: hotspot.normalized_score, else: 0
+    risk_score = if hotspot, do: hotspot.risk_score, else: 0
 
     risk_level =
       cond do
@@ -218,7 +218,7 @@ defmodule GitlockMCP.Cache do
 
         %{
           file: file,
-          risk_score: if(hotspot, do: round(hotspot.normalized_score), else: 0),
+          risk_score: if(hotspot, do: round(hotspot.risk_score), else: 0),
           risk_level: if(hotspot, do: to_string(hotspot.risk_factor), else: "low"),
           ownership: format_ownership(silo)
         }
@@ -276,7 +276,7 @@ defmodule GitlockMCP.Cache do
       state.hotspots
       |> Enum.group_by(fn h -> h.entity |> Path.dirname() end)
       |> Enum.map(fn {dir, hotspots} ->
-        avg_risk = Enum.map(hotspots, & &1.normalized_score) |> then(&(Enum.sum(&1) / length(&1)))
+        avg_risk = Enum.map(hotspots, & &1.risk_score) |> then(&(Enum.sum(&1) / length(&1)))
         %{directory: dir, avg_risk: round(avg_risk), hotspot_files: length(hotspots)}
       end)
       |> Enum.sort_by(& &1.avg_risk, :desc)
@@ -302,23 +302,10 @@ defmodule GitlockMCP.Cache do
   # ── Private Helpers ──────────────────────────────────────────
 
   defp detect_repo_path do
-    cwd = File.cwd!()
-
-    if File.dir?(Path.join(cwd, ".git")) do
-      cwd
-    else
-      # Walk up to find a .git directory
-      cwd
-      |> Path.split()
-      |> Enum.reduce_while(nil, fn _segment, _acc ->
-        path = Path.join(Path.split(cwd) |> Enum.take(length(Path.split(cwd))))
-
-        if File.dir?(Path.join(path, ".git")) do
-          {:halt, path}
-        else
-          {:cont, nil}
-        end
-      end) || cwd
+    # Use git to find the actual repo root
+    case System.cmd("git", ["rev-parse", "--show-toplevel"], stderr_to_stdout: true) do
+      {path, 0} -> String.trim(path)
+      _ -> File.cwd!()
     end
   end
 
@@ -326,8 +313,8 @@ defmodule GitlockMCP.Cache do
     couplings
     |> Enum.flat_map(fn c ->
       [
-        {c.entity, %{file: c.coupled, coupling_pct: c.degree, co_changes: c.average}},
-        {c.coupled, %{file: c.entity, coupling_pct: c.degree, co_changes: c.average}}
+        {c.entity, %{file: c.coupled, coupling_pct: c.degree, co_changes: c.windows}},
+        {c.coupled, %{file: c.entity, coupling_pct: c.degree, co_changes: c.windows}}
       ]
     end)
     |> Enum.group_by(fn {file, _} -> file end, fn {_, data} -> data end)
@@ -345,7 +332,7 @@ defmodule GitlockMCP.Cache do
   defp format_hotspot(h) do
     %{
       file: h.entity,
-      risk_score: round(h.normalized_score),
+      risk_score: round(h.risk_score),
       risk_level: to_string(h.risk_factor),
       revisions: h.revisions,
       complexity: h.complexity,
@@ -389,7 +376,7 @@ defmodule GitlockMCP.Cache do
     parts = []
 
     parts =
-      if hotspot && hotspot.normalized_score > 70 do
+      if hotspot && hotspot.risk_score > 70 do
         [
           "High-risk file — #{hotspot.revisions} revisions, complexity #{hotspot.complexity}."
           | parts
